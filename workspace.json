@@ -1,0 +1,8 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "workouterr-ui": "apps/workouterr-ui",
+    "workouterr-ui-e2e": "apps/workouterr-ui-e2e"
+  }
+}
