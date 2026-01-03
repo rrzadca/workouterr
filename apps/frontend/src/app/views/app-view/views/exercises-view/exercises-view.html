@@ -1,0 +1,32 @@
+<p-card header="Ćwiczenia" class="shadow-lg h-full">
+    <p-table
+        [value]="exercises()"
+        size="small"
+        [loading]="isLoading()"
+        strippedRows
+    >
+        <ng-template #header>
+            <tr>
+                <th>Nazwa</th>
+                <th>Partie</th>
+                <th>Typ</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-exercise>
+            <tr>
+                <td>
+                    <span
+                        [pTooltip]="exercise.description"
+                        tooltipPosition="top"
+                    >
+                        {{ exercise.name }}
+                    </span>
+                </td>
+                <td>
+                    {{ exercise.targets | dictionaryList }}
+                </td>
+                <td>{{ exercise.measurementUnit.name }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-card>

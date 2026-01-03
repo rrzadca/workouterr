@@ -1,0 +1,28 @@
+<p-card header="Ćwiczenia" class="shadow-lg h-full">
+    <p-table
+        [value]="workouts()"
+        size="small"
+        [loading]="isLoading()"
+        strippedRows
+    >
+        <ng-template #header>
+            <tr>
+                <th>Trening</th>
+                <th>Typ</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-exercise>
+            <tr>
+                <td>
+                    <span
+                        [pTooltip]="exercise.description"
+                        tooltipPosition="top"
+                    >
+                        {{ exercise.name }}
+                    </span>
+                </td>
+                <td>{{ exercise.type.name }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-card>

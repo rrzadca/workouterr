@@ -1,0 +1,59 @@
+@import 'tailwindcss';
+@import 'tailwindcss-primeui';
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-primary: #3f858c;
+    --color-primary-50: #f1f8f9;
+    --color-primary-100: #d5eaec;
+    --color-primary-200: #b8dcdf;
+    --color-primary-300: #9cced3;
+    --color-primary-400: #80c0c6;
+    --color-primary-500: #64b2b9;
+    --color-primary-600: #4ca1a9;
+    --color-primary-700: #3f858c;
+    --color-primary-800: #39797f;
+    --color-primary-900: #336b71;
+
+    --color-surface-50: #deeef8;
+    --color-surface-100: #deeef8;
+    --color-surface-200: #47a0d7;
+    --color-surface-300: #2881b8;
+    --color-surface-400: #2575a7;
+    --color-surface-500: #1d5e86;
+    --color-surface-600: #164664;
+    --color-surface-700: #0e2d40;
+    --color-surface-800: #0b2332;
+    --color-surface-900: #071721;
+    --color-surface-950: #0b2332;
+
+    --color-secondary: #f2ae2e;
+    --color-secondary-50: #fef7ec;
+    --color-secondary-100: #fdf0d9;
+    --color-secondary-200: #fbe8c5;
+    --color-secondary-300: #f9dd9f;
+    --color-secondary-400: #f8d28c;
+    --color-secondary-500: #f6ca79;
+    --color-secondary-600: #f4bb52;
+    --color-secondary-700: #f2ae2e;
+    --color-secondary-800: #e69b0f;
+    --color-secondary-900: #c0810c;
+
+    --color-stone-50: #fafaf9;
+    --color-stone-100: #f5f5f4;
+    --color-stone-200: #e7e5e4;
+    --color-stone-300: #d6d3d1;
+    --color-stone-400: #a8a29e;
+    --color-stone-500: #78716c;
+    --color-stone-600: #57534e;
+    --color-stone-700: #44403c;
+    --color-stone-800: #292524;
+    --color-stone-900: #1c1917;
+    --color-stone-950: #0c0a09;
+
+    --color-text-primary: var(--p-stone-200);
+    --color-text-secondary: var(--p-stone-400);
+    --color-text-tertiary: var(--p-stone-600);
+
+    --p-menu-background: var(--color-surface-700);
+}

@@ -1,0 +1,20 @@
+<rr-app-layout
+    [sidebarTemplate]="sidebarTemplate"
+    [topbarTemplate]="topbarTemplate"
+    [footerTemplate]="footerTemplate"
+    [isDesktopSidebarClosable]="true"
+>
+    <router-outlet></router-outlet>
+</rr-app-layout>
+
+<ng-template #sidebarTemplate>
+    <rr-app-sidebar></rr-app-sidebar>
+</ng-template>
+
+<ng-template #topbarTemplate>
+    <rr-app-topbar></rr-app-topbar>
+</ng-template>
+
+<ng-template #footerTemplate>
+    <rr-app-footer></rr-app-footer>
+</ng-template>

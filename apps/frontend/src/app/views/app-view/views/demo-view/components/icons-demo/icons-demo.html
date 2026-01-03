@@ -1,0 +1,37 @@
+<p-accordion [value]="['0', '1']" multiple="true">
+    <p-accordion-panel value="0">
+        <p-accordion-header>PrimeNG</p-accordion-header>
+        <p-accordion-content>
+            <div class="flex gap-4 w-full flex-wrap">
+                @for (iconName of primeNgIconNames; track iconName) {
+                    <rr-icon
+                        [name]="iconName"
+                        size="xl"
+                        [clickable]="true"
+                        pTooltip="{{ iconName }}"
+                        tooltipPosition="top"
+                        (click)="handleIconClick(iconName)"
+                    ></rr-icon>
+                }
+            </div>
+        </p-accordion-content>
+    </p-accordion-panel>
+
+    <p-accordion-panel value="1">
+        <p-accordion-header>Font Awesome</p-accordion-header>
+        <p-accordion-content>
+            <div class="flex gap-4 flex-wrap">
+                @for (iconName of appIconNames; track iconName) {
+                    <rr-icon
+                        [name]="iconName"
+                        size="xl"
+                        [clickable]="true"
+                        pTooltip="{{ iconName }}"
+                        tooltipPosition="top"
+                        (click)="handleIconClick(iconName)"
+                    ></rr-icon>
+                }
+            </div>
+        </p-accordion-content>
+    </p-accordion-panel>
+</p-accordion>
