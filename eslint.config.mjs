@@ -14,6 +14,7 @@ export default typescriptEslint.config(
       '**/storybook-static/',
       '**/coverage/',
       'api/src/generated/',
+      '.scratch/',
     ],
   },
   eslintJs.configs.recommended,
