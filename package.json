@@ -1,8 +1,14 @@
 {
   "name": "workouterr",
   "private": true,
-  "workspaces": [],
+  "workspaces": [
+    "shared"
+  ],
   "engines": {
     "node": ">=24 <25"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "~6.0.3"
   }
 }
