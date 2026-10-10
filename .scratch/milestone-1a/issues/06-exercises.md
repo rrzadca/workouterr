@@ -13,6 +13,7 @@ The user's exercise library, end to end.
 - API: list (active / archived), create, update, archive, restore. Every query is scoped to the logged-in user
 - Angular: exercise list filtered by muscle group, exercise editor with steppers for steps, archive and restore
 - `ui` components as needed: input, number input with step buttons, checkbox group / chips, select
+- Design: `ExercisesScreen.jsx`; see [design/README.md](../design/README.md)
 
 ## Acceptance criteria
 

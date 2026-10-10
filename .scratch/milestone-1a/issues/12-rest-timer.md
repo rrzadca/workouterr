@@ -12,6 +12,7 @@ Blocked by: 11
 - Sound on / off setting (a minimal settings page and a user setting in the API)
 - Screen Wake Lock while a session is in progress: acquire on start, re-acquire on `visibilitychange`, release on
   finish or discard; no error if the browser doesn't support it
+- Design: the `RestTimer` component, and the sound switch in `SettingsScreen.jsx` for the settings page; see [design/README.md](../design/README.md)
 
 ## Acceptance criteria
 

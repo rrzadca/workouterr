@@ -22,6 +22,8 @@ scope disagree, the scope wins and the ticket gets fixed.
 - Whole-session `PUT` with client UUIDs and a version number (the same sync model 1b builds offline support on)
 - Deployment to MyDevil (migrations from the Mac, see ADR-0001), nightly backups, cleanup cron
 - Tests per the scope's Tests section; the deploy script runs them all
+- Look and feel from the Claude Design reference: see [design/README.md](design/README.md) (it also lists the
+  parts of the design that are not in 1a)
 
 ## Not in 1a
 

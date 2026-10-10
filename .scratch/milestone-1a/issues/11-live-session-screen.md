@@ -18,6 +18,7 @@ The screen I use in the gym. Fast logging is a success criterion: a prefilled se
 - Saving: whole-session PUT, debounced; a visible "saved / saving / error" state; a 409 shows the choice
   "keep this device's version / load the other one"
 - Finish (sets not logged are ignored) and discard
+- Design: `StartScreen.jsx` (without plan chips), `SessionScreen.jsx`, `SessionExercise.jsx`; see [design/README.md](../design/README.md)
 
 ## Acceptance criteria
 

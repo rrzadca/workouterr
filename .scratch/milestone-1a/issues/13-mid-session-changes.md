@@ -13,6 +13,7 @@ Blocked by: 11
   adjusted by its mark if it had one); no increase / decrease mark on them
 - On finish: offer to save swapped and extra exercises into the routine; if accepted, ask for sets, rest time and
   progression strategy and update the routine (a swap replaces the entry: remove the old one, add a new one)
+- Design: `ExercisePicker.jsx`, and the swap / extra / "save to routine" parts of `SessionScreen.jsx`; see [design/README.md](../design/README.md)
 
 ## Acceptance criteria
 
