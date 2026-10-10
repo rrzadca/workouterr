@@ -6,7 +6,15 @@ import { builtinModules } from 'node:module';
 
 export default typescriptEslint.config(
   {
-    ignores: ['**/node_modules/', '**/dist/', '**/out-tsc/', '**/.angular/', '**/storybook-static/', '**/coverage/'],
+    ignores: [
+      '**/node_modules/',
+      '**/dist/',
+      '**/out-tsc/',
+      '**/.angular/',
+      '**/storybook-static/',
+      '**/coverage/',
+      'api/src/generated/',
+    ],
   },
   eslintJs.configs.recommended,
   {
@@ -19,6 +27,8 @@ export default typescriptEslint.config(
       },
     },
     rules: {
+      // Express tells error middleware apart by its 4 parameters, so an unused `_next` must stay
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       // node:test's test() returns a promise that the test runner itself awaits
       '@typescript-eslint/no-floating-promises': [
         'error',

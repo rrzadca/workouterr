@@ -3,6 +3,7 @@ node_modules/
 
 # Build output
 dist/
+api/src/generated/
 out-tsc/
 .angular/
 storybook-static/
