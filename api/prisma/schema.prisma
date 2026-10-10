@@ -1,0 +1,23 @@
+generator client {
+  provider               = "prisma-client"
+  output                 = "../src/generated/prisma"
+  runtime                = "nodejs"
+  moduleFormat           = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
+}
+
+// The connection URL lives in prisma.config.ts (Prisma 7 no longer reads it from here)
+datasource db {
+  provider = "postgresql"
+}
+
+// Minimal for now: issue 06 adds the metric type, muscle groups and the other steps
+model Exercise {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  name       String
+  // kg, exact: PostgreSQL numeric, Prisma Decimal, never a float
+  weightStep Decimal? @map("weight_step") @db.Decimal(5, 2)
+
+  @@map("exercise")
+}

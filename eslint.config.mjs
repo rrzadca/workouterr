@@ -6,7 +6,15 @@ import { builtinModules } from 'node:module';
 
 export default typescriptEslint.config(
   {
-    ignores: ['**/node_modules/', '**/dist/', '**/out-tsc/', '**/.angular/', '**/storybook-static/', '**/coverage/'],
+    ignores: [
+      '**/node_modules/',
+      '**/dist/',
+      '**/out-tsc/',
+      '**/.angular/',
+      '**/storybook-static/',
+      '**/coverage/',
+      'api/src/generated/',
+    ],
   },
   eslintJs.configs.recommended,
   {
