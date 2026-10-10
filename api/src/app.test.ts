@@ -1,31 +1,25 @@
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { once } from 'node:events';
-import type { Server } from 'node:http';
-import type { AddressInfo } from 'node:net';
 import { createApp } from './app.ts';
+import { listen, type ListeningApp } from './test-support/listen.ts';
 
-let server: Server;
-let baseUrl: string;
+let app: ListeningApp;
 
 before(async () => {
-  server = createApp().listen(0);
-  await once(server, 'listening');
-  const address = server.address() as AddressInfo;
-  baseUrl = `http://localhost:${address.port}`;
+  app = await listen(createApp());
 });
 
-after(() => {
-  server.close();
+after(async () => {
+  await app.close();
 });
 
 test('GET /api/health answers ok', async () => {
-  const response = await fetch(`${baseUrl}/api/health`);
+  const response = await fetch(`${app.baseUrl}/api/health`);
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { status: 'ok' });
 });
 
 test('GET /api/muscle-groups lists the groups from shared', async () => {
-  const response = await fetch(`${baseUrl}/api/muscle-groups`);
+  const response = await fetch(`${app.baseUrl}/api/muscle-groups`);
   assert.deepEqual(await response.json(), ['CHEST', 'BACK', 'SHOULDERS', 'ARMS', 'CORE', 'LEGS']);
 });
