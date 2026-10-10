@@ -1,9 +1,9 @@
 import type { ErrorRequestHandler } from 'express';
-import { HttpError } from './http-error.ts';
+import { HttpError, type ErrorCode } from './http-error.ts';
 
 export interface ErrorResponseBody {
   error: {
-    code: string;
+    code: ErrorCode;
     message: string;
     details?: unknown;
   };
