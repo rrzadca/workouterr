@@ -2,7 +2,8 @@
   "name": "workouterr",
   "private": true,
   "workspaces": [
-    "shared"
+    "shared",
+    "api"
   ],
   "engines": {
     "node": ">=24 <25"
