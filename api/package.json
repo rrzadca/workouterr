@@ -6,7 +6,8 @@
     "start": "node --env-file-if-exists=.env src/server.ts",
     "dev": "node --env-file-if-exists=.env --watch src/server.ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --test \"src/**/*.test.ts\"",
+    "pretest": "node --env-file-if-exists=.env src/test-support/migrate-test-database.ts",
+    "test": "node --env-file-if-exists=.env --test --test-concurrency=1 \"src/**/*.test.ts\"",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev"
