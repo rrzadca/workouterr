@@ -15,9 +15,13 @@ The app frame every screen lives in.
 - An HTTP layer that turns the API error shape into typed errors
 - Home page shows the result of `GET /api/health`
 - First `ui` components as needed: button, page layout
+- Design: the tokens from `design/source/tokens.css` as a Tailwind v4 `@theme` with light and dark values
+  (`data-theme`), the Geist / Geist Mono / Black Ops One fonts, and the logo from `web/src/assets/images` in the
+  shell header. Look follows `AppShell.jsx`, `SidebarNav` and `Button`; see [design/README.md](../design/README.md)
 
 ## Acceptance criteria
 
 - [ ] `ng serve` shows the health status from the API through the proxy
 - [ ] No hard-coded UI text in templates (a lint rule or a review check)
 - [ ] Layout is usable at iPad portrait and landscape sizes
+- [ ] The shell matches the design's `AppShell` look in both light and dark theme, with the right logo for each

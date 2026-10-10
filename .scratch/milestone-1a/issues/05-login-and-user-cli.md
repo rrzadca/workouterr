@@ -15,6 +15,7 @@ Auth for a single account created by hand. No registration, no email flows (that
 - `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`
 - Login error says only "invalid email or password"
 - Angular: login page, auth guard, logout button, redirect to login on 401
+- Design: `LoginScreen.jsx`, the login form only (no registration, "remember me", forgot password or Apple login); see [design/README.md](../design/README.md)
 
 ## Acceptance criteria
 

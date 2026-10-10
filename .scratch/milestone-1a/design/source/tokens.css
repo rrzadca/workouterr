@@ -1,0 +1,119 @@
+/* Fonts (Google Fonts): Geist 300-800, Geist Mono 400-700, Black Ops One 400.
+   The export embeds them as @font-face blocks; extract.py leaves those out. */
+
+/* Workouterr webfonts.
+   Served from Google Fonts CDN — no binaries are self-hosted in this system yet.
+   Geist / Geist Mono = UI + numerals. Black Ops One = brand display (stencil,
+   nearest Google Fonts match to the WorkouteRR wordmark). */
+:root{--font-ui:"Geist","SF Pro Text",-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;--font-mono:"Geist Mono","SF Mono",ui-monospace,monospace;--font-display:"Black Ops One","Geist",sans-serif}
+
+/* Brand palette sampled directly from the WorkouteRR logo files. */
+:root{
+--navy-900:#08202f;--navy-800:#0e2d40;--navy-700:#14405a;--navy-600:#1c5375;--navy-500:#2a6a92;
+--teal-700:#28595f;--teal-600:#2f6e75;--teal-500:#3f858c;--teal-400:#5aa1a8;--teal-300:#8cc3c8;--teal-200:#bfdedf;--teal-100:#e6f1f2;
+--amber-700:#a8720f;--amber-600:#c4881b;--amber-500:#f2ae2e;--amber-400:#f7c561;--amber-300:#fadfa2;--amber-100:#fdf3dc;
+--gray-0:#ffffff;--gray-25:#fafbfc;--gray-50:#f3f5f7;--gray-100:#eaeef1;--gray-200:#dde3e8;--gray-300:#c6ced5;--gray-400:#9aa5ad;--gray-500:#77838b;--gray-600:#576269;--gray-700:#3b444a;--gray-800:#242c31;--gray-900:#141a1e;
+--green-500:#2e9e6b;--green-100:#e0f3ea;--red-500:#d64545;--red-100:#fbe6e6;--orange-500:#e08a17;--blue-500:#2f7fd1;
+
+--brand-navy:var(--navy-800);--brand-teal:var(--teal-500);--brand-amber:var(--amber-500);
+
+/* ---- Light theme (default) ---- */
+--surface-app:#eceff2;--surface-card:var(--gray-0);--surface-raised:var(--gray-0);--surface-sunken:var(--gray-50);
+--surface-chrome:rgba(240,243,246,.72);--surface-sidebar:rgba(232,236,240,.68);--surface-overlay:rgba(255,255,255,.86);
+--surface-hover:rgba(14,45,64,.05);--surface-active:rgba(14,45,64,.09);--surface-selected:var(--teal-100);
+--text-strong:var(--navy-800);--text-body:var(--gray-800);--text-muted:var(--gray-500);--text-faint:var(--gray-400);--text-invert:#ffffff;--text-on-accent:#ffffff;--text-on-amber:var(--navy-900);
+--border-hairline:rgba(14,45,64,.12);--border-subtle:var(--gray-200);--border-strong:var(--gray-300);--border-field:rgba(14,45,64,.18);
+--accent:var(--teal-500);--accent-hover:var(--teal-600);--accent-press:var(--teal-700);--accent-soft:var(--teal-100);--accent-ring:rgba(63,133,140,.35);
+--highlight:var(--amber-500);--highlight-soft:var(--amber-100);
+--status-success:var(--green-500);--status-success-soft:var(--green-100);--status-danger:var(--red-500);--status-danger-soft:var(--red-100);--status-warn:var(--orange-500);--status-warn-soft:var(--amber-100);--status-info:var(--blue-500);
+--scrim:rgba(8,32,47,.32);
+}
+
+/* ---- Dark theme ---- */
+[data-theme="dark"]{
+--surface-app:#08161e;--surface-card:#102530;--surface-raised:#16303d;--surface-sunken:#0b1d26;
+--surface-chrome:rgba(13,36,48,.72);--surface-sidebar:rgba(10,28,38,.7);--surface-overlay:rgba(18,42,54,.9);
+--surface-hover:rgba(255,255,255,.06);--surface-active:rgba(255,255,255,.11);--surface-selected:rgba(63,133,140,.24);
+--text-strong:#f2f7f8;--text-body:#dde8ea;--text-muted:#93a6ae;--text-faint:#6b7d86;--text-invert:var(--navy-900);--text-on-accent:#ffffff;--text-on-amber:var(--navy-900);
+--border-hairline:rgba(255,255,255,.1);--border-subtle:rgba(255,255,255,.09);--border-strong:rgba(255,255,255,.18);--border-field:rgba(255,255,255,.16);
+--accent:var(--teal-400);--accent-hover:var(--teal-300);--accent-press:var(--teal-500);--accent-soft:rgba(63,133,140,.2);--accent-ring:rgba(90,161,168,.45);
+--highlight:var(--amber-500);--highlight-soft:rgba(242,174,46,.16);
+--status-success:#4cbd87;--status-success-soft:rgba(46,158,107,.18);--status-danger:#f06a6a;--status-danger-soft:rgba(214,69,69,.18);--status-warn:var(--amber-400);--status-warn-soft:rgba(242,174,46,.16);--status-info:#5aa0e6;
+--scrim:rgba(2,10,15,.55);
+}
+
+:root{
+--text-display-1:44px;--text-display-2:34px;--text-title-1:26px;--text-title-2:20px;--text-title-3:17px;
+--text-body-lg:15px;--text-body:13px;--text-label:12px;--text-caption:11px;--text-metric-xl:56px;--text-metric:32px;
+--leading-tight:1.08;--leading-snug:1.25;--leading-normal:1.45;--leading-loose:1.6;
+--weight-regular:400;--weight-medium:500;--weight-semibold:600;--weight-bold:700;
+--tracking-display:-0.02em;--tracking-title:-0.01em;--tracking-normal:0;--tracking-caps:0.09em;
+/* semantic type roles */
+--type-brand:var(--weight-regular) var(--text-display-2)/var(--leading-tight) var(--font-display);
+--type-title:var(--weight-semibold) var(--text-title-2)/var(--leading-snug) var(--font-ui);
+--type-body:var(--weight-regular) var(--text-body)/var(--leading-normal) var(--font-ui);
+--type-label:var(--weight-medium) var(--text-label)/1.3 var(--font-ui);
+--type-metric:var(--weight-semibold) var(--text-metric)/1 var(--font-mono);
+}
+
+:root{
+--space-0:0px;--space-1:2px;--space-2:4px;--space-3:6px;--space-4:8px;--space-5:12px;--space-6:16px;--space-7:20px;--space-8:24px;--space-9:32px;--space-10:40px;--space-11:56px;--space-12:72px;
+--gutter-card:16px;--gutter-screen:24px;--gutter-section:32px;
+--control-h-sm:22px;--control-h-md:28px;--control-h-lg:34px;--control-h-xl:44px;
+--sidebar-w:228px;--inspector-w:280px;--titlebar-h:44px;--toolbar-h:52px;--tabbar-h:56px;
+}
+
+:root{
+--radius-xs:4px;--radius-sm:6px;--radius-md:8px;--radius-lg:10px;--radius-xl:14px;--radius-2xl:18px;--radius-window:12px;--radius-pill:999px;
+--hairline:1px;
+--shadow-control:0 1px 1px rgba(8,32,47,.09), inset 0 1px 0 rgba(255,255,255,.55);
+--shadow-card:0 1px 2px rgba(8,32,47,.07), 0 6px 18px -8px rgba(8,32,47,.14);
+--shadow-raised:0 2px 6px rgba(8,32,47,.09), 0 18px 40px -14px rgba(8,32,47,.22);
+--shadow-window:0 24px 70px -20px rgba(8,32,47,.4), 0 0 0 1px rgba(8,32,47,.1);
+--shadow-popover:0 8px 30px -8px rgba(8,32,47,.3), 0 0 0 1px rgba(8,32,47,.08);
+--focus-ring:0 0 0 3px var(--accent-ring);
+--blur-vibrancy:saturate(180%) blur(30px);/* @kind other */
+--blur-scrim:blur(6px);/* @kind other */
+}
+[data-theme="dark"]{
+--shadow-control:0 1px 1px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+--shadow-card:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -10px rgba(0,0,0,.55);
+--shadow-raised:0 2px 8px rgba(0,0,0,.45), 0 20px 44px -16px rgba(0,0,0,.6);
+--shadow-window:0 24px 70px -20px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.08);
+--shadow-popover:0 10px 34px -10px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.1);
+}
+
+:root{
+--dur-instant:80ms;/* @kind other */
+--dur-fast:140ms;/* @kind other */
+--dur-base:200ms;/* @kind other */
+--dur-slow:320ms;/* @kind other */
+--dur-sheet:420ms;/* @kind other */
+--ease-standard:cubic-bezier(.4,0,.2,1);/* @kind other */
+--ease-out:cubic-bezier(.16,1,.3,1);/* @kind other */
+--ease-in:cubic-bezier(.5,0,1,1);/* @kind other */
+--ease-spring:cubic-bezier(.34,1.4,.64,1);/* @kind other */
+--press-scale:.97;/* @kind other */
+--transition-control:background-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard), transform var(--dur-instant) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard);/* @kind other */
+}
+@media (prefers-reduced-motion:reduce){:root{
+--dur-fast:0ms;/* @kind other */
+--dur-base:0ms;/* @kind other */
+--dur-slow:0ms;/* @kind other */
+--dur-sheet:0ms;/* @kind other */
+}}
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--surface-app);color:var(--text-body);font:var(--type-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--accent-hover);text-decoration:underline}
+::selection{background:var(--accent-soft);color:var(--text-strong)}
+:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.wo-num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.wo-caps{text-transform:uppercase;letter-spacing:var(--tracking-caps);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--text-muted)}
+.wo-scroll::-webkit-scrollbar{width:9px;height:9px}
+.wo-scroll::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:var(--radius-pill);border:2px solid transparent;background-clip:content-box}
+.wo-scroll::-webkit-scrollbar-track{background:transparent}
+@keyframes wo-spin{to{transform:rotate(360deg)}}
+@keyframes wo-fade-up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes wo-pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}

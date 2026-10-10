@@ -18,6 +18,7 @@ Routines with routine entries, end to end.
   - routines vs training plans comes in 1b
 - Angular: routine list, routine editor (pick exercises filtered by muscle group, reorder, ladder editor that
   sorts rungs, rest time in `m:ss`)
+- Design: `RoutinesScreen.jsx` (with `ExercisePicker.jsx` for adding exercises); see [design/README.md](../design/README.md)
 
 ## Acceptance criteria
 
