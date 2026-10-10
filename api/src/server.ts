@@ -1,5 +1,7 @@
 import { createApp } from './app.ts';
 import { loadConfig, type Config } from './config.ts';
+import { createPrismaClient } from './database.ts';
+import { appVersion } from './version.ts';
 
 let config: Config;
 try {
@@ -9,9 +11,11 @@ try {
   process.exit(1);
 }
 
-createApp().listen(config.port, (error) => {
+const prisma = createPrismaClient(config.databaseUrl);
+
+createApp({ prisma, version: appVersion }).listen(config.port, (error) => {
   if (error) {
     throw error;
   }
-  console.log(`API listening on http://localhost:${config.port}`);
+  console.log(`API ${appVersion} listening on http://localhost:${config.port}`);
 });

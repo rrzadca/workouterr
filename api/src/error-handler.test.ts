@@ -1,16 +1,16 @@
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
 import express from 'express';
-import { createApp } from './app.ts';
 import { errorHandler } from './error-handler.ts';
 import { HttpError } from './http-error.ts';
 import { listen, type ListeningApp } from './test-support/listen.ts';
+import { startTestApp, type TestApp } from './test-support/test-app.ts';
 
-let realApp: ListeningApp;
+let realApp: TestApp;
 let throwingApp: ListeningApp;
 
 before(async () => {
-  realApp = await listen(createApp());
+  realApp = await startTestApp();
 
   // A small app with routes that fail on purpose, using the same error handler
   const app = express();
