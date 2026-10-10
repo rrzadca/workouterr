@@ -1,5 +1,5 @@
 import express from 'express';
-import type { Express } from 'express';
+import type { Express, Router } from 'express';
 import { muscleGroupSchema, type MuscleGroup } from '@workouterr/shared';
 import { errorHandler } from './error-handler.ts';
 import type { PrismaClient } from './generated/prisma/client.ts';
@@ -8,10 +8,12 @@ import { notFound } from './not-found.ts';
 export interface AppDependencies {
   prisma: PrismaClient;
   version: string;
+  /** Extra /api routes, mounted before the 404 */
+  routes?: Router;
 }
 
 /** Builds the app without listening, so tests can start it on any port with their own database. */
-export function createApp({ prisma, version }: AppDependencies): Express {
+export function createApp({ prisma, version, routes }: AppDependencies): Express {
   const app = express();
 
   app.use(express.json());
@@ -31,6 +33,9 @@ export function createApp({ prisma, version }: AppDependencies): Express {
     response.json(muscleGroups);
   });
 
+  if (routes) {
+    app.use('/api', routes);
+  }
   app.use('/api', notFound);
   app.use(errorHandler);
 

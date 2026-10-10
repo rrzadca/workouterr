@@ -1,3 +1,4 @@
+import type { Router } from 'express';
 import { createApp } from '../app.ts';
 import type { PrismaClient } from '../generated/prisma/client.ts';
 import { appVersion } from '../version.ts';
@@ -10,10 +11,10 @@ export interface TestApp {
   close: () => Promise<void>;
 }
 
-/** Starts the real app on a free port against the test database (or the Prisma client given). */
-export async function startTestApp(options: { prisma?: PrismaClient } = {}): Promise<TestApp> {
+/** Starts the real app on a free port against the test database (or the Prisma client given), plus any extra routes. */
+export async function startTestApp(options: { prisma?: PrismaClient; routes?: Router } = {}): Promise<TestApp> {
   const prisma = options.prisma ?? createTestPrismaClient();
-  const app = await listen(createApp({ prisma, version: appVersion }));
+  const app = await listen(createApp({ prisma, version: appVersion, routes: options.routes }));
   return {
     baseUrl: app.baseUrl,
     prisma,
