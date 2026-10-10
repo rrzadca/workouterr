@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out-tsc/
+.angular/
+storybook-static/
+
+# Test output
+coverage/
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Editors and tools
+.idea/
+.vscode/
+.claude/settings.local.json
+
+# OS and logs
+.DS_Store
+*.log

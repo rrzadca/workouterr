@@ -1,0 +1,8 @@
+{
+  "name": "workouterr",
+  "private": true,
+  "workspaces": [],
+  "engines": {
+    "node": ">=24 <25"
+  }
+}
