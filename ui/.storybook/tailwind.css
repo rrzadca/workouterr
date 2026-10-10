@@ -1,0 +1,3 @@
+/* Storybook only: apps that use this library run Tailwind themselves and add `@source` for the library's files. */
+@import 'tailwindcss';
+@source '../src';

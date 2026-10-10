@@ -47,5 +47,21 @@ export default typescriptEslint.config(
       ],
     },
   },
+  {
+    files: ['ui/src/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@workouterr/*', '@jsverse/transloco'],
+              message: 'ui is reusable in other projects: no app packages or translations; take text through inputs.',
+            },
+          ],
+        },
+      ],
+    },
+  },
   eslintConfigPrettier,
 );
