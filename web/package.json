@@ -16,6 +16,7 @@
     "@angular/forms": "^22.2.0",
     "@angular/platform-browser": "^22.2.0",
     "@angular/router": "^22.2.0",
+    "@jsverse/transloco": "^8.4.0",
     "@lucide/angular": "^1.55.0",
     "@radinf/ui": "*",
     "@workouterr/shared": "*",
