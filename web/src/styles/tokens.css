@@ -1,0 +1,288 @@
+/*
+ * Workouterr design tokens as a Tailwind v4 theme, from .scratch/milestone-1a/design/source/tokens.css.
+ *
+ * Every token lives in a Tailwind namespace, so it becomes a utility: --color-surface-card → bg-surface-card,
+ * --color-text-strong → text-text-strong, --spacing-control-xl → h-control-xl, --text-title-2 → text-title-2.
+ * The design names its colours --text-body and its font size --text-body too; here the colour is --color-text-body
+ * and the size is --text-body, so the two no longer overwrite each other.
+ *
+ * Dark theme: [data-theme="dark"] redefines the colour and shadow variables. Utilities read them through var(),
+ * so the same class (bg-surface-card) changes with the theme. Screens use the semantic names only; the palette is
+ * here to define them.
+ *
+ * `static` writes every variable to :root even when no utility uses it, so plain CSS can use var(--color-…) too.
+ */
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme static {
+  /* Only the design's colours exist; Tailwind's default palette (bg-red-500, …) is switched off. */
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Brand palette, sampled from the logo */
+  --color-navy-900: #08202f;
+  --color-navy-800: #0e2d40;
+  --color-navy-700: #14405a;
+  --color-navy-600: #1c5375;
+  --color-navy-500: #2a6a92;
+  --color-teal-700: #28595f;
+  --color-teal-600: #2f6e75;
+  --color-teal-500: #3f858c;
+  --color-teal-400: #5aa1a8;
+  --color-teal-300: #8cc3c8;
+  --color-teal-200: #bfdedf;
+  --color-teal-100: #e6f1f2;
+  --color-amber-700: #a8720f;
+  --color-amber-600: #c4881b;
+  --color-amber-500: #f2ae2e;
+  --color-amber-400: #f7c561;
+  --color-amber-300: #fadfa2;
+  --color-amber-100: #fdf3dc;
+  --color-gray-0: #ffffff;
+  --color-gray-25: #fafbfc;
+  --color-gray-50: #f3f5f7;
+  --color-gray-100: #eaeef1;
+  --color-gray-200: #dde3e8;
+  --color-gray-300: #c6ced5;
+  --color-gray-400: #9aa5ad;
+  --color-gray-500: #77838b;
+  --color-gray-600: #576269;
+  --color-gray-700: #3b444a;
+  --color-gray-800: #242c31;
+  --color-gray-900: #141a1e;
+  --color-green-500: #2e9e6b;
+  --color-green-100: #e0f3ea;
+  --color-red-500: #d64545;
+  --color-red-100: #fbe6e6;
+  --color-orange-500: #e08a17;
+  --color-blue-500: #2f7fd1;
+
+  /* Semantic colours, light theme (dark values below) */
+  --color-surface-app: #eceff2;
+  --color-surface-card: var(--color-gray-0);
+  --color-surface-raised: var(--color-gray-0);
+  --color-surface-sunken: var(--color-gray-50);
+  --color-surface-chrome: rgba(240, 243, 246, 0.72);
+  --color-surface-sidebar: rgba(232, 236, 240, 0.68);
+  --color-surface-overlay: rgba(255, 255, 255, 0.86);
+  --color-surface-hover: rgba(14, 45, 64, 0.05);
+  --color-surface-active: rgba(14, 45, 64, 0.09);
+  --color-surface-selected: var(--color-teal-100);
+  --color-text-strong: var(--color-navy-800);
+  --color-text-body: var(--color-gray-800);
+  --color-text-muted: var(--color-gray-500);
+  --color-text-faint: var(--color-gray-400);
+  --color-text-invert: #ffffff;
+  --color-text-on-accent: #ffffff;
+  --color-text-on-amber: var(--color-navy-900);
+  --color-border-hairline: rgba(14, 45, 64, 0.12);
+  --color-border-subtle: var(--color-gray-200);
+  --color-border-strong: var(--color-gray-300);
+  --color-border-field: rgba(14, 45, 64, 0.18);
+  --color-accent: var(--color-teal-500);
+  --color-accent-hover: var(--color-teal-600);
+  --color-accent-press: var(--color-teal-700);
+  --color-accent-soft: var(--color-teal-100);
+  --color-accent-ring: rgba(63, 133, 140, 0.35);
+  --color-highlight: var(--color-amber-500);
+  --color-highlight-soft: var(--color-amber-100);
+  --color-status-success: var(--color-green-500);
+  --color-status-success-soft: var(--color-green-100);
+  --color-status-danger: var(--color-red-500);
+  --color-status-danger-soft: var(--color-red-100);
+  --color-status-warn: var(--color-orange-500);
+  --color-status-warn-soft: var(--color-amber-100);
+  --color-status-info: var(--color-blue-500);
+  --color-scrim: rgba(8, 32, 47, 0.32);
+
+  /* Fonts (loaded from Google Fonts in index.html) */
+  --font-ui: 'Geist', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --font-mono: 'Geist Mono', 'SF Mono', ui-monospace, monospace;
+  --font-display: 'Black Ops One', 'Geist', sans-serif;
+  --default-font-family: var(--font-ui);
+  --default-mono-font-family: var(--font-mono);
+
+  /* Font sizes */
+  --text-display-1: 44px;
+  --text-display-2: 34px;
+  --text-title-1: 26px;
+  --text-title-2: 20px;
+  --text-title-3: 17px;
+  --text-body-lg: 15px;
+  --text-body: 13px;
+  --text-label: 12px;
+  --text-caption: 11px;
+  --text-metric-xl: 56px;
+  --text-metric: 32px;
+
+  --leading-tight: 1.08;
+  --leading-snug: 1.25;
+  --leading-normal: 1.45;
+  --leading-loose: 1.6;
+
+  --tracking-display: -0.02em;
+  --tracking-title: -0.01em;
+  --tracking-caps: 0.09em;
+
+  /* Named sizes on top of Tailwind's 4px spacing scale: h-control-xl, w-sidebar, p-gutter-screen */
+  --spacing-control-sm: 22px;
+  --spacing-control-md: 28px;
+  --spacing-control-lg: 34px;
+  --spacing-control-xl: 44px;
+  --spacing-sidebar: 228px;
+  --spacing-inspector: 280px;
+  --spacing-toolbar: 52px;
+  --spacing-tabbar: 56px;
+  --spacing-gutter-card: 16px;
+  --spacing-gutter-screen: 24px;
+  --spacing-gutter-section: 32px;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-window: 12px;
+  --radius-pill: 999px;
+
+  /* backdrop-blur-vibrancy backdrop-saturate-180 together make the design's --blur-vibrancy */
+  --blur-vibrancy: 30px;
+  --blur-scrim: 6px;
+
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.5, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  --animate-fade-up: fade-up var(--duration-base) var(--ease-out);
+  --animate-pop: pop var(--duration-base) var(--ease-spring);
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/*
+ * Shadows change with the theme. Tailwind copies a shadow's value into the utility, so a dark override of
+ * --shadow-card would be ignored. `inline` makes the utility read var(--elevation-card) instead, which the
+ * dark theme redefines.
+ */
+@theme inline {
+  --shadow-control: var(--elevation-control);
+  --shadow-card: var(--elevation-card);
+  --shadow-raised: var(--elevation-raised);
+  --shadow-popover: var(--elevation-popover);
+}
+
+:root {
+  --elevation-control: 0 1px 1px rgba(8, 32, 47, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --elevation-card: 0 1px 2px rgba(8, 32, 47, 0.07), 0 6px 18px -8px rgba(8, 32, 47, 0.14);
+  --elevation-raised: 0 2px 6px rgba(8, 32, 47, 0.09), 0 18px 40px -14px rgba(8, 32, 47, 0.22);
+  --elevation-popover: 0 8px 30px -8px rgba(8, 32, 47, 0.3), 0 0 0 1px rgba(8, 32, 47, 0.08);
+
+  /* Durations for duration-(--duration-fast); no Tailwind namespace takes named durations */
+  --duration-instant: 80ms;
+  --duration-fast: 140ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --duration-sheet: 420ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+    --duration-sheet: 0ms;
+  }
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-surface-app: #08161e;
+  --color-surface-card: #102530;
+  --color-surface-raised: #16303d;
+  --color-surface-sunken: #0b1d26;
+  --color-surface-chrome: rgba(13, 36, 48, 0.72);
+  --color-surface-sidebar: rgba(10, 28, 38, 0.7);
+  --color-surface-overlay: rgba(18, 42, 54, 0.9);
+  --color-surface-hover: rgba(255, 255, 255, 0.06);
+  --color-surface-active: rgba(255, 255, 255, 0.11);
+  --color-surface-selected: rgba(63, 133, 140, 0.24);
+  --color-text-strong: #f2f7f8;
+  --color-text-body: #dde8ea;
+  --color-text-muted: #93a6ae;
+  --color-text-faint: #6b7d86;
+  --color-text-invert: var(--color-navy-900);
+  --color-text-on-accent: #ffffff;
+  --color-text-on-amber: var(--color-navy-900);
+  --color-border-hairline: rgba(255, 255, 255, 0.1);
+  --color-border-subtle: rgba(255, 255, 255, 0.09);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
+  --color-border-field: rgba(255, 255, 255, 0.16);
+  --color-accent: var(--color-teal-400);
+  --color-accent-hover: var(--color-teal-300);
+  --color-accent-press: var(--color-teal-500);
+  --color-accent-soft: rgba(63, 133, 140, 0.2);
+  --color-accent-ring: rgba(90, 161, 168, 0.45);
+  --color-highlight: var(--color-amber-500);
+  --color-highlight-soft: rgba(242, 174, 46, 0.16);
+  --color-status-success: #4cbd87;
+  --color-status-success-soft: rgba(46, 158, 107, 0.18);
+  --color-status-danger: #f06a6a;
+  --color-status-danger-soft: rgba(214, 69, 69, 0.18);
+  --color-status-warn: var(--color-amber-400);
+  --color-status-warn-soft: rgba(242, 174, 46, 0.16);
+  --color-status-info: #5aa0e6;
+  --color-scrim: rgba(2, 10, 15, 0.55);
+
+  --elevation-control: 0 1px 1px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --elevation-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 22px -10px rgba(0, 0, 0, 0.55);
+  --elevation-raised: 0 2px 8px rgba(0, 0, 0, 0.45), 0 20px 44px -16px rgba(0, 0, 0, 0.6);
+  --elevation-popover: 0 10px 34px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-surface-app);
+    color: var(--color-text-body);
+    font-family: var(--font-ui);
+    font-size: var(--text-body);
+    line-height: var(--leading-normal);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-soft);
+    color: var(--color-text-strong);
+  }
+
+  /* The design draws focus as a 3px box-shadow ring; an outline looks the same and leaves shadow-* free */
+  :focus-visible {
+    outline: 3px solid var(--color-accent-ring);
+    outline-offset: 0;
+  }
+}
