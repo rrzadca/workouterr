@@ -40,15 +40,7 @@ const sizeClasses: Record<ButtonSize, string> = {
     '[disabled]': 'disabled() || loading()',
     '[attr.aria-busy]': 'loading() || null',
   },
-  template: `
-    @if (loading()) {
-      <span
-        class="size-[1em] animate-spin rounded-full border-2 border-current border-r-transparent"
-        aria-hidden="true"
-      ></span>
-    }
-    <ng-content />
-  `,
+  templateUrl: './button.html',
 })
 export class Button {
   readonly variant = input<ButtonVariant>('secondary');
