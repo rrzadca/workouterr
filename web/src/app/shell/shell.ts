@@ -4,7 +4,13 @@ import { translateSignal, TranslocoPipe } from '@jsverse/transloco';
 import { LucideDynamicIcon, LucideHouse, LucideMoon, LucideSun } from '@lucide/angular';
 import { Button, SidebarNav, type SidebarNavSection } from '@radinf/ui';
 import { FormatDatePipe } from '../formatting/format-date.pipe';
-import { ThemeService } from '../theme/theme.service';
+import { ThemeService, type Theme } from '../theme/theme.service';
+
+// The -dark logo files are navy for light backgrounds, the -light files teal for dark ones
+const shellAppearanceByTheme = {
+  light: { logoVariant: 'dark', themeToggleIcon: LucideMoon, themeToggleLabelKey: 'shell.switchToDarkTheme' },
+  dark: { logoVariant: 'light', themeToggleIcon: LucideSun, themeToggleLabelKey: 'shell.switchToLightTheme' },
+} as const satisfies Record<Theme, object>;
 
 /** The frame around every signed-in screen: header, sidebar navigation and the routed page. */
 @Component({
@@ -18,12 +24,7 @@ export class Shell {
   protected readonly themeService = inject(ThemeService);
   protected readonly today = new Date();
 
-  // The -dark logo files are navy for light backgrounds, the -light files teal for dark ones
-  protected readonly logoVariant = computed(() => (this.themeService.theme() === 'dark' ? 'light' : 'dark'));
-  protected readonly themeToggleIcon = computed(() => (this.themeService.theme() === 'dark' ? LucideSun : LucideMoon));
-  protected readonly themeToggleLabelKey = computed(() =>
-    this.themeService.theme() === 'dark' ? 'shell.switchToLightTheme' : 'shell.switchToDarkTheme',
-  );
+  protected readonly appearance = computed(() => shellAppearanceByTheme[this.themeService.theme()]);
 
   private readonly trainingLabel = translateSignal('shell.sections.training');
   private readonly startLabel = translateSignal('shell.navigation.start');

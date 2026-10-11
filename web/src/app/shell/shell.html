@@ -11,11 +11,11 @@
     rad-button
     variant="ghost"
     iconOnly
-    [attr.aria-label]="themeToggleLabelKey() | transloco"
-    [attr.title]="themeToggleLabelKey() | transloco"
+    [attr.aria-label]="appearance().themeToggleLabelKey | transloco"
+    [attr.title]="appearance().themeToggleLabelKey | transloco"
     (click)="themeService.toggle()"
   >
-    <svg [lucideIcon]="themeToggleIcon()" [size]="20" />
+    <svg [lucideIcon]="appearance().themeToggleIcon" [size]="20" />
   </button>
 </header>
 
@@ -27,9 +27,9 @@
     [attr.aria-label]="'shell.mainNavigation' | transloco"
   >
     <div sidebarHeader class="flex items-center gap-2 px-2 pt-1 pb-1.5">
-      <img [src]="'assets/images/logo-simple-' + logoVariant() + '.png'" alt="" class="h-[26px] w-auto" />
+      <img [src]="'assets/images/logo-simple-' + appearance().logoVariant + '.png'" alt="" class="h-[26px] w-auto" />
       <img
-        [src]="'assets/images/logo-name-' + logoVariant() + '.png'"
+        [src]="'assets/images/logo-name-' + appearance().logoVariant + '.png'"
         [alt]="'app.name' | transloco"
         class="h-[13px] w-auto"
       />

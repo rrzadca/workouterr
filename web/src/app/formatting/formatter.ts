@@ -16,25 +16,37 @@ export class Formatter {
   private readonly dateFormatters = new Map<string, Intl.DateTimeFormat>();
 
   formatNumber(value: number, format: NumberFormat = 'decimal'): string {
-    const locale = this.locale();
-    const cacheKey = `${locale}|${format}`;
-    let numberFormatter = this.numberFormatters.get(cacheKey);
-    if (!numberFormatter) {
-      numberFormatter = new Intl.NumberFormat(locale, numberFormats[format]);
-      this.numberFormatters.set(cacheKey, numberFormatter);
-    }
+    const numberFormatter = this.cachedFormatter(
+      this.numberFormatters,
+      format,
+      (locale) => new Intl.NumberFormat(locale, numberFormats[format]),
+    );
     return numberFormatter.format(value);
   }
 
   formatDate(value: Date | string | number, format: DateFormat = 'medium'): string {
+    const dateFormatter = this.cachedFormatter(
+      this.dateFormatters,
+      format,
+      (locale) => new Intl.DateTimeFormat(locale, dateFormats[format]),
+    );
+    return dateFormatter.format(new Date(value));
+  }
+
+  /** Returns the formatter for the active locale and this format, building it on first use. */
+  private cachedFormatter<IntlFormatter>(
+    cache: Map<string, IntlFormatter>,
+    format: string,
+    createFormatter: (locale: string) => IntlFormatter,
+  ): IntlFormatter {
     const locale = this.locale();
     const cacheKey = `${locale}|${format}`;
-    let dateFormatter = this.dateFormatters.get(cacheKey);
-    if (!dateFormatter) {
-      dateFormatter = new Intl.DateTimeFormat(locale, dateFormats[format]);
-      this.dateFormatters.set(cacheKey, dateFormatter);
+    let formatter = cache.get(cacheKey);
+    if (!formatter) {
+      formatter = createFormatter(locale);
+      cache.set(cacheKey, formatter);
     }
-    return dateFormatter.format(new Date(value));
+    return formatter;
   }
 
   private locale(): string {
