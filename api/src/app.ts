@@ -1,6 +1,6 @@
 import express from 'express';
 import type { Express, Router } from 'express';
-import { muscleGroupSchema, type MuscleGroup } from '@workouterr/shared';
+import { muscleGroupSchema, type HealthResponse, type MuscleGroup } from '@workouterr/shared';
 import { errorHandler } from './error-handler.ts';
 import type { PrismaClient } from './generated/prisma/client.ts';
 import { notFound } from './not-found.ts';
@@ -21,10 +21,12 @@ export function createApp({ prisma, version, routes }: AppDependencies): Express
   app.get('/api/health', async (_request, response) => {
     try {
       await prisma.$queryRaw`SELECT 1`;
-      response.json({ status: 'ok', version, database: 'up' });
+      const healthy: HealthResponse = { status: 'ok', version, database: 'up' };
+      response.json(healthy);
     } catch (error) {
       console.error('Health check: database unreachable', error);
-      response.status(503).json({ status: 'unavailable', version, database: 'down' });
+      const unavailable: HealthResponse = { status: 'unavailable', version, database: 'down' };
+      response.status(503).json(unavailable);
     }
   });
 
