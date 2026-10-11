@@ -23,9 +23,22 @@ const variantClasses: Record<ButtonVariant, string> = {
 
 // The design is a Mac app with 28px controls; on the iPad the 44px xl size is the default touch target
 const sizeClasses: Record<ButtonSize, string> = {
-  md: 'h-control-md px-3 text-body rounded-sm',
-  lg: 'h-control-lg px-4 text-body-lg rounded-md',
-  xl: 'h-control-xl px-5.5 text-body-lg rounded-lg',
+  md: 'h-control-md text-body rounded-sm',
+  lg: 'h-control-lg text-body-lg rounded-md',
+  xl: 'h-control-xl text-body-lg rounded-lg',
+};
+
+const paddingClasses: Record<ButtonSize, string> = {
+  md: 'px-3',
+  lg: 'px-4',
+  xl: 'px-5.5',
+};
+
+// An icon-only button is a square as wide as it is high
+const iconOnlyClasses: Record<ButtonSize, string> = {
+  md: 'w-control-md',
+  lg: 'w-control-lg',
+  xl: 'w-control-xl',
 };
 
 /**
@@ -49,8 +62,16 @@ export class Button {
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Shows a spinner and blocks clicks while an action runs */
   readonly loading = input(false, { transform: booleanAttribute });
+  /** A square button that holds only an icon; give it an aria-label, since it has no text */
+  readonly iconOnly = input(false, { transform: booleanAttribute });
 
   protected readonly classes = computed(() =>
-    [baseClasses, variantClasses[this.variant()], sizeClasses[this.size()], this.fullWidth() ? 'w-full' : ''].join(' '),
+    [
+      baseClasses,
+      variantClasses[this.variant()],
+      sizeClasses[this.size()],
+      this.iconOnly() ? iconOnlyClasses[this.size()] : paddingClasses[this.size()],
+      this.fullWidth() ? 'w-full' : '',
+    ].join(' '),
   );
 }

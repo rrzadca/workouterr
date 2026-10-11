@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/angular-vite';
+import { LucideMoon } from '@lucide/angular';
+import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
 import { Button } from './button';
 
 const meta: Meta<Button & { label: string }> = {
@@ -45,6 +46,19 @@ export const Loading: Story = { args: { loading: true, label: 'Saving' } };
 export const Disabled: Story = { args: { disabled: true } };
 
 export const FullWidth: Story = { args: { fullWidth: true } };
+
+export const IconOnly: Story = {
+  decorators: [moduleMetadata({ imports: [LucideMoon] })],
+  render: (args) => ({
+    props: args,
+    template: `
+      <button rad-button iconOnly [variant]="variant" [size]="size" aria-label="Dark theme">
+        <svg lucideMoon [size]="18"></svg>
+      </button>
+    `,
+  }),
+  args: { variant: 'ghost' },
+};
 
 export const AllVariantsAndSizes: Story = {
   render: () => ({

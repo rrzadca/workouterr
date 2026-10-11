@@ -1,5 +1,16 @@
 {
   "app": {
     "name": "Workouterr"
+  },
+  "shell": {
+    "mainNavigation": "Main",
+    "switchToDarkTheme": "Switch to dark theme",
+    "switchToLightTheme": "Switch to light theme",
+    "sections": {
+      "training": "Training"
+    },
+    "navigation": {
+      "start": "Start"
+    }
   }
 }

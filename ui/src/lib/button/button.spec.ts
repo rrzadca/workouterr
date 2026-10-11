@@ -12,6 +12,7 @@ import { Button, type ButtonSize, type ButtonVariant } from './button';
       [size]="size()"
       [loading]="loading()"
       [disabled]="disabled()"
+      [iconOnly]="iconOnly()"
       (click)="clicks = clicks + 1"
     >
       Save
@@ -23,6 +24,7 @@ class ButtonHost {
   readonly size = signal<ButtonSize>('xl');
   readonly loading = signal(false);
   readonly disabled = signal(false);
+  readonly iconOnly = signal(false);
   clicks = 0;
 }
 
@@ -74,6 +76,14 @@ describe('Button', () => {
     await fixture.whenStable();
     expect(button.disabled).toBe(true);
     expect(button.hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('is a square without side padding when it holds only an icon', async () => {
+    const { fixture, host, button } = await renderButton();
+    host.iconOnly.set(true);
+    await fixture.whenStable();
+    expect(button.classList).toContain('w-control-xl');
+    expect(button.classList).not.toContain('px-5.5');
   });
 
   it('passes clicks through when enabled', async () => {
