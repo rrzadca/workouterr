@@ -1,13 +1,6 @@
 import type { ErrorRequestHandler } from 'express';
-import { HttpError, type ErrorCode } from './http-error.ts';
-
-export interface ErrorResponseBody {
-  error: {
-    code: ErrorCode;
-    message: string;
-    details?: unknown;
-  };
-}
+import type { ErrorResponseBody } from '@workouterr/shared';
+import { HttpError } from './http-error.ts';
 
 /** The one place that turns errors into responses, so every error has the same JSON shape. */
 export const errorHandler: ErrorRequestHandler = (error: unknown, _request, response, _next) => {

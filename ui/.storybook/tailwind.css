@@ -1,3 +1,10 @@
 /* Storybook only: apps that use this library run Tailwind themselves and add `@source` for the library's files. */
 @import 'tailwindcss';
+
+/*
+ * The components use semantic utilities (bg-accent, text-text-strong, …) and leave their values to the app.
+ * Stories borrow Workouterr's values so they look like the app; nothing under src/ depends on them.
+ */
+@import '../../web/src/styles/tokens.css';
+
 @source '../src';

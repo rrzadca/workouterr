@@ -1,0 +1,42 @@
+<ng-content select="[sidebarHeader]" />
+
+@for (section of sections(); track $index) {
+  <div class="flex flex-col gap-px">
+    @if (section.label) {
+      <span class="px-2 py-1 text-caption leading-none font-semibold uppercase tracking-caps text-text-faint">
+        {{ section.label }}
+      </span>
+    }
+    @for (item of section.items; track item.link) {
+      <a
+        [routerLink]="item.link"
+        [routerLinkActive]="[]"
+        [routerLinkActiveOptions]="{ exact: item.link === '/' }"
+        ariaCurrentWhenActive="page"
+        #linkState="routerLinkActive"
+        class="flex min-h-control-xl items-center gap-2.5 rounded-md px-2.5 text-body-lg leading-none transition-[background-color] duration-(--duration-fast) ease-standard"
+        [class]="linkState.isActive ? activeLinkClasses : inactiveLinkClasses"
+      >
+        @if (item.icon) {
+          <svg
+            [lucideIcon]="item.icon"
+            [size]="18"
+            [class]="linkState.isActive ? 'shrink-0 text-text-on-accent' : 'shrink-0 text-text-muted'"
+          />
+        }
+        <span class="min-w-0 flex-1 truncate">{{ item.label }}</span>
+        @if (item.badge !== undefined) {
+          <span
+            class="font-mono text-caption font-semibold"
+            [class]="linkState.isActive ? 'text-text-on-accent/80' : 'text-text-faint'"
+          >
+            {{ item.badge }}
+          </span>
+        }
+      </a>
+    }
+  </div>
+}
+
+<span class="flex-1"></span>
+<ng-content select="[sidebarFooter]" />

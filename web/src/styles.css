@@ -1,3 +1,5 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+@import './styles/tokens.css';
+
+/* @radinf/ui components carry Tailwind classes; scan their source so those classes are generated */
+@source '../../ui/src';

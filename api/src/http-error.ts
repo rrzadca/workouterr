@@ -1,5 +1,4 @@
-/** Every error code the API answers with; clients can switch on these. CONFLICT is for the 409s in issues 08 and 10. */
-export type ErrorCode = 'NOT_FOUND' | 'INVALID_JSON' | 'VALIDATION_FAILED' | 'CONFLICT' | 'INTERNAL_ERROR';
+import type { ErrorCode } from '@workouterr/shared';
 
 /** An error that becomes a response with its own status and code instead of a 500. */
 export class HttpError extends Error {

@@ -11,7 +11,9 @@
   },
   "peerDependencies": {
     "@angular/common": "^22.2.0",
-    "@angular/core": "^22.2.0"
+    "@angular/core": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "@lucide/angular": "^1.55.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
@@ -28,6 +30,8 @@
     "@angular/compiler-cli": "^22.2.0",
     "@angular/core": "^22.2.0",
     "@angular/platform-browser": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "@lucide/angular": "^1.55.0",
     "@storybook/addon-a11y": "^10.6.1",
     "@storybook/addon-docs": "^10.6.1",
     "@storybook/angular-vite": "^10.6.1",
