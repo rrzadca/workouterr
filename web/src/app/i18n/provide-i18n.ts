@@ -8,6 +8,10 @@ export const availableLanguages = ['en'] as const;
 export type Language = (typeof availableLanguages)[number];
 export const defaultLanguage: Language = 'en';
 
+export function isLanguage(value: string): value is Language {
+  return (availableLanguages as readonly string[]).includes(value);
+}
+
 export function provideI18n(): EnvironmentProviders[] {
   return [
     ...provideTransloco({
