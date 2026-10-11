@@ -16,8 +16,8 @@ export class ApiError extends Error {
 }
 
 /**
- * A response that is not the API's error shape: the dev proxy's 502/504 when the API is down, or an endpoint
- * such as GET /api/health that sends its own body with an error status. `body` is whatever came back.
+ * A response that is not the API's error shape, such as GET /api/health's 503 with its own body.
+ * `body` is whatever came back.
  */
 export class UnexpectedResponseError extends Error {
   readonly status: number;
@@ -31,7 +31,7 @@ export class UnexpectedResponseError extends Error {
   }
 }
 
-/** No response at all: offline, or the server could not be reached. */
+/** No answer from the API: offline, the server could not be reached, or a proxy in front of it said so (502/504). */
 export class NetworkError extends Error {
   constructor() {
     super('The server could not be reached');

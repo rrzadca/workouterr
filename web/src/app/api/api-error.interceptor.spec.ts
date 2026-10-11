@@ -69,6 +69,13 @@ describe('apiErrorInterceptor', () => {
     expect(error).toBeInstanceOf(NetworkError);
   });
 
+  it('reports a proxy that could not reach the API as a NetworkError', async () => {
+    const error = await failureOf('/api/health', (request) =>
+      request.flush('', { status: 502, statusText: 'Bad Gateway' }),
+    );
+    expect(error).toBeInstanceOf(NetworkError);
+  });
+
   it('leaves requests outside /api alone', async () => {
     const error = await failureOf('/i18n/en.json', (request) =>
       request.flush('missing', { status: 404, statusText: 'Not Found' }),

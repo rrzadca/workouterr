@@ -12,5 +12,18 @@
     "navigation": {
       "start": "Start"
     }
+  },
+  "home": {
+    "title": "Start",
+    "health": {
+      "heading": "Server status",
+      "checking": "Checking the server…",
+      "ok": "The server and its database are running",
+      "databaseDown": "The server is running, but its database is not",
+      "serverUnreachable": "The server cannot be reached",
+      "unexpectedError": "The server answered with an unexpected error",
+      "version": "Version {{ version }}",
+      "checkAgain": "Check again"
+    }
   }
 }

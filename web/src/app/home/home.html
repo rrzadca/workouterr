@@ -1,0 +1,34 @@
+<rad-page-layout [title]="'home.title' | transloco">
+  <button pageActions rad-button [loading]="health.isLoading()" (click)="health.reload()">
+    {{ 'home.health.checkAgain' | transloco }}
+  </button>
+
+  <section
+    class="max-w-xl rounded-xl border border-border-hairline bg-surface-card p-gutter-card shadow-card"
+    aria-live="polite"
+  >
+    <h2 class="mb-3 text-title-3 font-semibold text-text-strong">{{ 'home.health.heading' | transloco }}</h2>
+
+    @if (health.error()) {
+      <p class="flex items-center gap-2 text-body-lg text-status-danger">
+        <span class="size-2.5 shrink-0 rounded-full bg-status-danger"></span>
+        {{ errorKey() | transloco }}
+      </p>
+    } @else if (health.value(); as value) {
+      <p class="flex items-center gap-2 text-body-lg text-text-strong">
+        @if (value.status === 'ok') {
+          <span class="size-2.5 shrink-0 rounded-full bg-status-success"></span>
+          {{ 'home.health.ok' | transloco }}
+        } @else {
+          <span class="size-2.5 shrink-0 rounded-full bg-status-warn"></span>
+          {{ 'home.health.databaseDown' | transloco }}
+        }
+      </p>
+      <p class="mt-2 text-text-muted">
+        {{ 'home.health.version' | transloco: { version: value.version } }}
+      </p>
+    } @else {
+      <p class="text-text-muted">{{ 'home.health.checking' | transloco }}</p>
+    }
+  </section>
+</rad-page-layout>

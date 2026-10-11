@@ -1,11 +1,12 @@
 import type { Routes } from '@angular/router';
+import { Home } from './home/home';
 import { Shell } from './shell/shell';
 
 export const routes: Routes = [
   {
     path: '',
     component: Shell,
-    // The home page arrives in step 13; login (ticket 05) will be a route outside the shell
-    children: [],
+    // Login (ticket 05) will be a route next to this one, outside the shell
+    children: [{ path: '', component: Home }],
   },
 ];
