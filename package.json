@@ -1,6 +1,7 @@
 {
   "name": "workouterr",
   "private": true,
+  "type": "module",
   "workspaces": [
     "shared",
     "api",
@@ -11,12 +12,13 @@
     "node": ">=24 <25"
   },
   "scripts": {
-    "lint": "eslint . && prettier --check .",
+    "lint": "eslint . && prettier --check . && node scripts/check-template-text.ts",
     "format": "prettier --write .",
-    "typecheck": "npm run typecheck --workspaces",
-    "test": "npm test --workspaces"
+    "typecheck": "npm run typecheck --workspaces && tsc -p scripts",
+    "test": "npm test --workspaces && node --test \"scripts/**/*.test.ts\""
   },
   "devDependencies": {
+    "@angular/compiler": "^22.2.0",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.19.2",
     "eslint": "^10.12.0",
