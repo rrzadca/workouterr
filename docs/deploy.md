@@ -170,7 +170,49 @@ Cron jobs (ticket 14) don't read `~/.bash_profile`; their scripts must load it t
 
 ## Deploying
 
-<!-- Filled in by ticket 04 task 5 (scripts/deploy.sh). -->
+<!-- How to run scripts/deploy.sh: filled in by ticket 04 task 5. -->
+
+### What the server gets
+
+The server holds the npm workspace, minus the parts it doesn't run, in `~/domains/DOMAIN/app/`:
+
+```
+~/domains/DOMAIN/
+├── app/                      root package.json + package-lock.json, api/, shared/
+│   └── api/
+│       ├── public_nodejs/
+│       │   ├── app.js        Passenger's entry point
+│       │   ├── index.html    Angular's page, served by the app with no-cache
+│       │   └── public/       the rest of the Angular build, served by nginx
+│       └── src/generated/    Prisma client, generated on the Mac
+├── public_nodejs -> app/api/public_nodejs
+└── logs/
+```
+
+`api/` imports `shared/` as TypeScript through the workspace link `node_modules/@workouterr/shared`, so `shared/`
+must sit next to `api/` with the root `package.json`; copying `api/` alone breaks the import.
+
+### Dependencies on the server
+
+```sh
+npm ci --omit=dev --omit=optional --workspace=api --ignore-scripts
+```
+
+- `--workspace=api`: only the API's dependencies (and the `shared` link), not Angular's. `web/` and `ui/` aren't on
+  the server, and `npm ci` doesn't need them.
+- `--omit=dev`: no TypeScript, ESLint or test tools.
+- `--omit=optional`: `@prisma/client` lists the Prisma CLI as an optional peer, which `--omit=dev` alone still
+  installs (with its engines: 336 MB instead of 87 MB). The server never runs the CLI (ADR-0001).
+- `--ignore-scripts`: skips `api`'s `postinstall`, whose `prisma generate` needs the CLI. It is the only install
+  script among the production packages today.
+
+The Prisma client in `api/src/generated/` is therefore generated on the Mac (`npm run db:generate -w api`) and
+uploaded with the code. It is plain TypeScript plus Prisma's WebAssembly query compiler, with nothing built for the
+Mac's platform, so the same files run on FreeBSD. Generating it in every deploy keeps it in step with the migrations
+that deploy applies.
+
+A native dependency (argon2, ticket 05) needs its install script, so it is rebuilt by name after `npm ci`
+(`npm rebuild argon2`), which runs only that package's script.
 
 ## Operations
 
