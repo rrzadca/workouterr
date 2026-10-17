@@ -115,4 +115,4 @@ Mac's DNS still cached OVH's parking IP):
 - `~/.bash_profile` variables: reach the app (`spikeVariable: from-bash-profile`)
 - HTTPS: Let's Encrypt certificate for `workouterr.app` issued, valid until 2027-01-15
 - Cold start after restart: works. After `devil www restart`, the first request answers with a new `startedAt`
-- Error log notes:
+- Error log notes: `~/domains/workouterr.app/logs/error.log` empty after all checks and the restart
