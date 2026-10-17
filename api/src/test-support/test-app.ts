@@ -11,10 +11,17 @@ export interface TestApp {
   close: () => Promise<void>;
 }
 
-/** Starts the real app on a free port against the test database (or the Prisma client given), plus any extra routes. */
-export async function startTestApp(options: { prisma?: PrismaClient; routes?: Router } = {}): Promise<TestApp> {
+/**
+ * Starts the real app on a free port against the test database (or the Prisma client given), plus any extra routes
+ * and the Angular index.html.
+ */
+export async function startTestApp(
+  options: { prisma?: PrismaClient; routes?: Router; indexHtmlPath?: string } = {},
+): Promise<TestApp> {
   const prisma = options.prisma ?? createTestPrismaClient();
-  const app = await listen(createApp({ prisma, version: appVersion, routes: options.routes }));
+  const app = await listen(
+    createApp({ prisma, version: appVersion, routes: options.routes, indexHtmlPath: options.indexHtmlPath }),
+  );
   return {
     baseUrl: app.baseUrl,
     prisma,
