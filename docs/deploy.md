@@ -18,6 +18,17 @@ Placeholders used below:
 
 Steps 1–5 run once, in an SSH session (`ssh LOGIN@sX.mydevil.net`) or in the DevilWEB panel.
 
+### 0. SSH key login from the Mac
+
+The deploy script opens several SSH connections, so log in with a key instead of the password. From the Mac:
+
+```sh
+ssh-copy-id -i ~/.ssh/id_ed25519.pub LOGIN@sX.mydevil.net    # asks for the password one last time
+ssh -o BatchMode=yes LOGIN@sX.mydevil.net 'echo key login works'
+```
+
+If the key has a passphrase, store it in the macOS keychain once with `ssh-add --apple-use-keychain ~/.ssh/id_ed25519`.
+
 ### 1. Node 24 on the command line
 
 The system default is an older Node. Links in `~/bin` make `node` and `npm` mean 24:
