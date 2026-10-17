@@ -170,7 +170,37 @@ Cron jobs (ticket 14) don't read `~/.bash_profile`; their scripts must load it t
 
 ## Deploying
 
-<!-- How to run scripts/deploy.sh: filled in by ticket 04 task 5. -->
+### Running a deploy
+
+Once, on the Mac: `cp .env.deploy.example .env.deploy` and fill in the SSH target and domain. The file holds no
+password; the script reads `DATABASE_URL` from `~/.bash_profile` on the server.
+
+Then, with Docker PostgreSQL running (the tests need it) and everything committed:
+
+```sh
+nvm use
+scripts/deploy.sh
+```
+
+The steps run in this order, and the first failure stops the deploy:
+
+| Step                | What happens                                                                  |
+| ------------------- | ----------------------------------------------------------------------------- |
+| Settings            | reads `.env.deploy`; refuses Node other than 24 and uncommitted changes       |
+| Checks              | `npm run lint`, `npm run typecheck`, `npm test`                               |
+| Tunnel              | SSH tunnel `localhost:15432` → the production database                        |
+| Migrate             | `prisma migrate deploy` through the tunnel (ADR-0001), then the tunnel closes |
+| Build               | generates the Prisma client, builds the Angular app from a clean `web/dist`   |
+| Upload              | assembles the server tree (below) and mirrors it with `rsync --delete`        |
+| Install and restart | `npm ci` (see below) and `devil www restart` over SSH                         |
+| Smoke check         | `GET /api/health` is ok with this version; `/` is the Angular app             |
+
+The first deploy also replaces MyDevil's default `public_nodejs/` with the link into `app/`, keeping the original as
+`public_nodejs.original`.
+
+Migrations run before the new code is uploaded, so if a later step fails, the old code runs on the new schema until
+the next deploy. That is why migrations must stay backward compatible (ADR-0001). During the upload and `npm ci`,
+the running app can briefly fail requests.
 
 ### What the server gets
 
