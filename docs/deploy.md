@@ -149,7 +149,9 @@ this). They are never in git, and the deploy never touches the file.
 | `DATABASE_URL` | `postgresql://DATABASE:PASSWORD@pgsqlX.mydevil.net:5432/DATABASE`    |
 | `PORT`         | not set: Passenger gives the app its own socket and ignores the port |
 
-`NODE_ENV` is not set by hand either: Passenger sets it from the site's environment (`production` in step 2).
+`NODE_ENV` is not set by hand either. Passenger runs the site in its `production` environment (step 2; the process
+title shows `(production)`) and should pass that on as `NODE_ENV`, but this is not confirmed on MyDevil. The app does
+not read `NODE_ENV` today; check it before relying on it.
 
 ### Setting it up
 
