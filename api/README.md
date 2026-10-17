@@ -34,6 +34,8 @@ Environment variables, validated with zod at startup (`src/config.ts`); the serv
 | `PORT`              | server      | `3000` (default; ignored under Passenger)                      |
 | `TEST_DATABASE_URL` | tests       | must name a database ending in `_test`                         |
 
+In production they are exports in `~/.bash_profile` on the server; see `docs/deploy.md`.
+
 ## Tests
 
 `node:test` against a real PostgreSQL (no mocks), so Docker must be running. `pretest` runs `prisma migrate deploy`

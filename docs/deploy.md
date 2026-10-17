@@ -129,9 +129,44 @@ If compiling fails, set `export CC=clang CXX=clang++` (or `gcc` / `g++`) before 
 
 ## Production configuration
 
-The app reads environment variables (`api/src/config.ts`). Never commit them.
+The app reads environment variables (`api/src/config.ts`) and refuses to start when one is missing or invalid. On
+the server they live in `~/.bash_profile`, which Passenger reads when it starts the app (the deploy spike confirmed
+this). They are never in git, and the deploy never touches the file.
 
-<!-- Filled in by ticket 04 task 3, after the spike shows how Passenger gets environment variables. -->
+| Variable       | Production value                                                     |
+| -------------- | -------------------------------------------------------------------- |
+| `DATABASE_URL` | `postgresql://DATABASE:PASSWORD@pgsqlX.mydevil.net:5432/DATABASE`    |
+| `PORT`         | not set: Passenger gives the app its own socket and ignores the port |
+
+`NODE_ENV` is not set by hand either: Passenger sets it from the site's environment (`production` in step 2).
+
+### Setting it up
+
+The password goes into a URL, so characters like `@`, `:`, `/` or `#` would break it. Give the database a
+password made of letters and digits only (this replaces the one chosen in step 3):
+
+```sh
+openssl rand -hex 24                   # copy the output
+devil pgsql passwd DATABASE            # paste it as the new password
+```
+
+Add the variable, with single quotes so the shell takes the value literally, and keep the file private, since it
+now holds a password:
+
+```sh
+cat >> ~/.bash_profile <<'EOF'
+export DATABASE_URL='postgresql://DATABASE:PASSWORD@pgsqlX.mydevil.net:5432/DATABASE'
+EOF
+chmod 600 ~/.bash_profile
+source ~/.bash_profile
+psql "$DATABASE_URL" -c 'select 1'     # the connection works from the server
+```
+
+### Changing a value
+
+Edit `~/.bash_profile`, then `devil www restart DOMAIN`. A running app keeps the values it started with.
+
+Cron jobs (ticket 14) don't read `~/.bash_profile`; their scripts must load it themselves.
 
 ## Deploying
 
