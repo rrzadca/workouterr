@@ -43,7 +43,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   Scope: Tech stack and hosting.
   Done when: the first commit exists and `dotnet --version` / `node --version` match the pinned versions, and
   `docker version` works.
-- [ ] **2. API skeleton.** Solution with `Workouterr.Api` and `Workouterr.Domain`; `Directory.Build.props` with
+- [x] **2. API skeleton.** Solution with `Workouterr.Api` and `Workouterr.Domain`; `Directory.Build.props` with
   nullable and warnings as errors; Problem Details; `GET /api/health`; `api/CLAUDE.md` with the build and run commands.
   Scope: Tech stack and hosting → Backend.
   Done when: `dotnet build` is clean and `curl /api/health` returns 200.

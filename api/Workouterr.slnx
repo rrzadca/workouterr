@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Workouterr.Api/Workouterr.Api.csproj" />
+    <Project Path="src/Workouterr.Domain/Workouterr.Domain.csproj" />
+  </Folder>
+</Solution>

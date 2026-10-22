@@ -42,4 +42,4 @@ screen's file before building any UI.
 Run from the side's own folder. Each plan task that adds a command adds it here (or in `api/CLAUDE.md` /
 `web/CLAUDE.md` for side-specific ones).
 
-- None yet (repository not created).
+- API: see `api/CLAUDE.md`.
