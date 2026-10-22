@@ -9,6 +9,8 @@ ASP.NET Core Minimal API on .NET 10. Run every command from `api/`.
 - Shared build settings (target framework, nullable, warnings as errors) live in `Directory.Build.props`; project
   files only add what is specific to them.
 - Errors are Problem Details (`application/problem+json`), never ad-hoc error bodies.
+- Endpoints are Minimal API handlers with typed results (`Results<Ok<T>, ProblemHttpResult>`), a name
+  (`WithName`, the client's function name) and a tag, so the OpenAPI document describes them fully.
 - Every route sits under `/api`, so the dev proxy and Caddy forward it to the API.
 - Database names are snake_case (`EFCore.NamingConventions`); tables EF or Identity name explicitly get a snake_case
   name in `AppDbContext`. Migrations live in `Persistence/Migrations`, are generated and never edited by hand.
@@ -20,8 +22,14 @@ ASP.NET Core Minimal API on .NET 10. Run every command from `api/`.
   stays in the `postgres-data` volume).
 - `dotnet build`: build the solution (warnings fail it).
 - `dotnet run --project src/Workouterr.Api`: run the API on `http://localhost:5080`.
-- `curl http://localhost:5080/api/health`: `Healthy` (200), or `Unhealthy` (503) when the database is down.
+- `curl http://localhost:5080/api/health`: `{"status":"Healthy"}` (200), or Problem Details (503) when the database is
+  down.
+- `http://localhost:5080/api/doc`: Swagger UI over the live OpenAPI document (`/api/openapi/v1.json`), Development
+  only.
 - `dotnet ef migrations add <Name> --project src/Workouterr.Api --output-dir Persistence/Migrations`: add a migration.
 - `dotnet ef database update --project src/Workouterr.Api`: apply migrations to the dev database.
+- `scripts/check-openapi.sh`: rebuild the API (`--no-incremental`) and fail if `contracts/openapi/workouterr.json`
+  differs from the committed or staged one (run by the deploy script). A `dotnet build` that recompiles the API regenerates
+  the document; commit it with the change.
 - `dotnet test`: run the domain and API tests (Docker must be running: API tests start their own PostgreSQL container).
 - `dotnet format --verify-no-changes`: check formatting (run by the deploy script); `dotnet format` fixes it.

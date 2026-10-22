@@ -18,3 +18,7 @@ trim_trailing_whitespace = false
 # EF Core migrations are generated: formatters and analyzers leave them as EF writes them.
 [**/Migrations/*.cs]
 generated_code = true
+
+# The OpenAPI document is written by the API build without a final newline; the check script compares it byte for byte.
+[contracts/openapi/*.json]
+insert_final_newline = false
