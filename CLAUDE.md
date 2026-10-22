@@ -21,8 +21,8 @@ screen's file before building any UI.
 
 ## Conventions
 
-- **Descriptive names**: full words for every identifier and import alias (`zod`, `request`, `response`, `error`,
-  `index`), including where the ecosystem habitually shortens them.
+- **Descriptive names**: identifiers and import aliases say what they hold or do. Common short forms are fine
+  (`err`, `app`, `tseslint`); avoid cryptic or invented abbreviations.
 - Angular components keep their template in a sibling `.html` file (`templateUrl`). Test host components in specs
   and Storybook `render` templates may stay inline.
 - UI text goes through Transloco keys. Colours come from the semantic tokens (`--surface-*`, `--text-*`, `--accent`,
@@ -43,3 +43,4 @@ Run from the side's own folder. Each plan task that adds a command adds it here 
 `web/CLAUDE.md` for side-specific ones).
 
 - API: see `api/CLAUDE.md`.
+- Web: see `web/CLAUDE.md`.

@@ -59,7 +59,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   `contracts/openapi/workouterr.json`; a check script fails if the committed file is out of date.
   Scope: Tech stack and hosting → API contract.
   Done when: changing an endpoint without regenerating makes the check fail.
-- [ ] **6. Angular workspace.** Workspace in `web/` with the `workouterr` app: Tailwind, ESLint, Prettier
+- [x] **6. Angular workspace.** Workspace in `web/` with the `workouterr` app: Tailwind, ESLint, Prettier
   (Angular parser for `.html`), Vitest through Angular's default runner, dev proxy for `/api` (same origin as
   production); `web/CLAUDE.md` with the serve, lint, build and test commands.
   Scope: Tech stack and hosting → Frontend.
