@@ -47,7 +47,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   nullable and warnings as errors; Problem Details; `GET /api/health`; `api/CLAUDE.md` with the build and run commands.
   Scope: Tech stack and hosting → Backend.
   Done when: `dotnet build` is clean and `curl /api/health` returns 200.
-- [ ] **3. Database.** `deploy/compose.dev.yaml` with PostgreSQL; EF Core 10 + Npgsql; `AppDbContext :
+- [x] **3. Database.** `deploy/compose.dev.yaml` with PostgreSQL; EF Core 10 + Npgsql; `AppDbContext :
   IdentityDbContext` with `Guid` user IDs; first migration; `/api/health` checks the database.
   Scope: Tech stack and hosting → Database, Auth.
   Done when: the migration applies to the dev database and `/api/health` reports the database as healthy.
