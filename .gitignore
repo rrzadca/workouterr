@@ -1,0 +1,28 @@
+# .NET
+bin/
+obj/
+TestResults/
+*.user
+
+# Node and Angular
+node_modules/
+dist/
+.angular/
+coverage/
+storybook-static/
+playwright-report/
+test-results/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Editors and OS
+.idea/
+.vscode/
+.vs/
+.DS_Store
+
+# Claude Code: personal settings stay local; .claude/settings.json is shared
+.claude/settings.local.json
