@@ -3,4 +3,8 @@
     <Project Path="src/Workouterr.Api/Workouterr.Api.csproj" />
     <Project Path="src/Workouterr.Domain/Workouterr.Domain.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Workouterr.Api.Tests/Workouterr.Api.Tests.csproj" />
+    <Project Path="tests/Workouterr.Domain.Tests/Workouterr.Domain.Tests.csproj" />
+  </Folder>
 </Solution>

@@ -51,7 +51,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   IdentityDbContext` with `Guid` user IDs; first migration; `/api/health` checks the database.
   Scope: Tech stack and hosting → Database, Auth.
   Done when: the migration applies to the dev database and `/api/health` reports the database as healthy.
-- [ ] **4. Backend tests.** `Workouterr.Domain.Tests` and `Workouterr.Api.Tests` (xUnit, `WebApplicationFactory`,
+- [x] **4. Backend tests.** `Workouterr.Domain.Tests` and `Workouterr.Api.Tests` (xUnit, `WebApplicationFactory`,
   Testcontainers PostgreSQL).
   Scope: Tech stack and hosting → Tests.
   Done when: `dotnet test` runs a passing `/api/health` API test against a container database.
