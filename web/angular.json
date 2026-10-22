@@ -1,0 +1,82 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm",
+    "schematicCollections": ["angular-eslint"]
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "workouterr": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "projects/workouterr",
+      "sourceRoot": "projects/workouterr/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/workouterr/src/main.ts",
+            "tsConfig": "projects/workouterr/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/workouterr/public"
+              }
+            ],
+            "styles": ["projects/workouterr/src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "projects/workouterr/proxy.conf.json"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "workouterr:build:production"
+            },
+            "development": {
+              "buildTarget": "workouterr:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/workouterr/**/*.ts", "projects/workouterr/**/*.html"],
+            "eslintConfig": "projects/workouterr/eslint.config.js"
+          }
+        }
+      }
+    }
+  }
+}

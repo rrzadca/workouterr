@@ -43,3 +43,4 @@ Run from the side's own folder. Each plan task that adds a command adds it here 
 `web/CLAUDE.md` for side-specific ones).
 
 - API: see `api/CLAUDE.md`.
+- Web: see `web/CLAUDE.md`.

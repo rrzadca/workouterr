@@ -1,0 +1,11 @@
+<main class="p-6">
+  <h1 class="text-2xl font-semibold">Workouterr</h1>
+  @if (health.isLoading()) {
+    <p>Checking the API…</p>
+  } @else if (health.error()) {
+    <p>API unreachable</p>
+  } @else {
+    <p>API: {{ health.value()?.status }}</p>
+  }
+</main>
+<router-outlet />
