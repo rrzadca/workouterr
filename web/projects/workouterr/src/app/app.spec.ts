@@ -26,13 +26,23 @@ describe('App', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('API: Healthy');
   });
 
-  it('shows the API as unreachable when the health check fails', async () => {
+  it('shows the API as unhealthy when the health check answers 503', async () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
 
     httpTesting
       .expectOne('/api/health')
       .flush({ title: 'Unhealthy' }, { status: 503, statusText: 'Service Unavailable' });
+    await fixture.whenStable();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API unhealthy');
+  });
+
+  it('shows the API as unreachable when the request fails', async () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    httpTesting.expectOne('/api/health').error(new ProgressEvent('error'));
     await fixture.whenStable();
 
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('API unreachable');

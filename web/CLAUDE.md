@@ -18,6 +18,6 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
 - `npm start`: serve the app on `http://localhost:4200`, proxying `/api` to the API on `http://localhost:5080` (start
   the API first, see `api/CLAUDE.md`).
 - `npm run lint`: ESLint over every project.
-- `npm run format:check`: fail on unformatted files (run by the deploy script); `npm run format` fixes them.
+- `npm run format:check`: fail on unformatted files; `npm run format` fixes them.
 - `npm run build`: production build into `dist/workouterr` (also the type check).
 - `npm test -- --watch=false`: run the unit tests once; `npm test` watches.

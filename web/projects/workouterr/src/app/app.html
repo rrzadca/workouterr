@@ -2,6 +2,8 @@
   <h1 class="text-2xl font-semibold">Workouterr</h1>
   @if (health.isLoading()) {
     <p>Checking the API…</p>
+  } @else if (isUnhealthy()) {
+    <p>API unhealthy</p>
   } @else if (health.error()) {
     <p>API unreachable</p>
   } @else {
