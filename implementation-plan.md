@@ -55,7 +55,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   Testcontainers PostgreSQL).
   Scope: Tech stack and hosting → Tests.
   Done when: `dotnet test` runs a passing `/api/health` API test against a container database.
-- [ ] **5. OpenAPI document.** `Microsoft.AspNetCore.OpenApi`, generated at build into
+- [x] **5. OpenAPI document.** `Microsoft.AspNetCore.OpenApi`, generated at build into
   `contracts/openapi/workouterr.json`; a check script fails if the committed file is out of date.
   Scope: Tech stack and hosting → API contract.
   Done when: changing an endpoint without regenerating makes the check fail.
