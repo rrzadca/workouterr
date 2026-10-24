@@ -2,26 +2,26 @@ import { computed, effect, Injectable, signal } from '@angular/core';
 
 export type Theme = 'light' | 'dark';
 
-const storageKey = 'workouterr.theme';
+const themeStorageKey = 'workouterr.theme';
 
 // The theme is `data-theme` on <html>: the choice saved by the theme button, else the system theme, followed live.
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private readonly systemDark = matchMedia('(prefers-color-scheme: dark)');
+  private readonly darkThemeQuery = matchMedia('(prefers-color-scheme: dark)');
   private readonly savedTheme = this.readSavedTheme();
 
-  private readonly systemTheme = signal<Theme>(this.systemDark.matches ? 'dark' : 'light');
+  private readonly systemTheme = signal<Theme>(this.darkThemeQuery.matches ? 'dark' : 'light');
   readonly theme = computed(() => this.savedTheme ?? this.systemTheme());
 
   constructor() {
     // A signal, so the zoneless app re-renders whatever reads `theme`.
-    this.systemDark.addEventListener('change', (event) => this.systemTheme.set(event.matches ? 'dark' : 'light'));
+    this.darkThemeQuery.addEventListener('change', (event) => this.systemTheme.set(event.matches ? 'dark' : 'light'));
     effect(() => (document.documentElement.dataset['theme'] = this.theme()));
   }
 
   private readSavedTheme(): Theme | null {
     try {
-      const savedTheme = localStorage.getItem(storageKey);
+      const savedTheme = localStorage.getItem(themeStorageKey);
       return savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : null;
     } catch {
       // Storage can be blocked (private mode, settings); fall back to the system theme.

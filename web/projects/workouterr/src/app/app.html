@@ -1,17 +1,5 @@
 <main class="p-gutter-screen" *transloco="let t">
   <h1 class="font-display text-display-2 text-text-strong">{{ t('app.name') }}</h1>
-  <p class="text-body text-text-muted">
-    @if (health.isLoading()) {
-      {{ t('health.checking') }}
-    } @else if (isUnhealthy()) {
-      {{ t('health.unhealthy') }}
-    } @else if (health.error()) {
-      {{ t('health.unreachable') }}
-    } @else if (health.value()?.status === 'Degraded') {
-      {{ t('health.degraded') }}
-    } @else {
-      {{ t('health.healthy') }}
-    }
-  </p>
+  <p class="text-body text-text-muted">{{ t(healthStatusKey()) }}</p>
 </main>
 <router-outlet />

@@ -4,7 +4,7 @@
  * Differences from the mockup tokens:
  * - The body text colour is `--text-default`: in the mockup `--text-body` is both a colour and a font size, and the
  *   font size wins.
- * - Scales Tailwind also uses (fonts, font sizes, line heights, letter spacing, radii, shadows, easings, sizes) are
+ * - Scales Tailwind also uses (fonts, font sizes, line heights, letter spacing, radii, easings, sizes) are
  *   defined in `@theme`, so they exist once, as both CSS variables and utilities. Control heights and layout sizes
  *   are `--spacing-*` (`h-control-md`, `w-sidebar`).
  * - `--space-*` is dropped: Tailwind's 4 px spacing scale covers it (`--space-5` 12px is `p-3`).
@@ -93,6 +93,12 @@
   --status-warn-soft: var(--amber-100);
   --status-info: var(--blue-500);
   --scrim: rgba(8, 32, 47, 0.32);
+
+  --shadow-control: 0 1px 1px rgba(8, 32, 47, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --shadow-card: 0 1px 2px rgba(8, 32, 47, 0.07), 0 6px 18px -8px rgba(8, 32, 47, 0.14);
+  --shadow-raised: 0 2px 6px rgba(8, 32, 47, 0.09), 0 18px 40px -14px rgba(8, 32, 47, 0.22);
+  --shadow-window: 0 24px 70px -20px rgba(8, 32, 47, 0.4), 0 0 0 1px rgba(8, 32, 47, 0.1);
+  --shadow-popover: 0 8px 30px -8px rgba(8, 32, 47, 0.3), 0 0 0 1px rgba(8, 32, 47, 0.08);
 }
 
 [data-theme='light'] {
@@ -210,14 +216,6 @@
   --radius-window: 12px;
   --radius-pill: 999px;
 
-  /* Light values; the dark theme overrides them above. */
-  --shadow-*: initial;
-  --shadow-control: 0 1px 1px rgba(8, 32, 47, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  --shadow-card: 0 1px 2px rgba(8, 32, 47, 0.07), 0 6px 18px -8px rgba(8, 32, 47, 0.14);
-  --shadow-raised: 0 2px 6px rgba(8, 32, 47, 0.09), 0 18px 40px -14px rgba(8, 32, 47, 0.22);
-  --shadow-window: 0 24px 70px -20px rgba(8, 32, 47, 0.4), 0 0 0 1px rgba(8, 32, 47, 0.1);
-  --shadow-popover: 0 8px 30px -8px rgba(8, 32, 47, 0.3), 0 0 0 1px rgba(8, 32, 47, 0.08);
-
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.5, 0, 1, 1);
@@ -268,6 +266,18 @@
   --color-brand-navy: var(--brand-navy);
   --color-brand-teal: var(--brand-teal);
   --color-brand-amber: var(--brand-amber);
+}
+
+/* ---- Shadows as Tailwind shadows (`shadow-card`). Plain `@theme` would copy the light values into each utility at
+   build time, so the dark overrides would never reach it; `inline` makes the utility read the themed token, and
+   `reference` stops Tailwind writing the mapping out as a self-referencing `--shadow-card: var(--shadow-card)`. ---- */
+@theme inline reference {
+  --shadow-*: initial;
+  --shadow-control: var(--shadow-control);
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-window: var(--shadow-window);
+  --shadow-popover: var(--shadow-popover);
 }
 
 /* ---- Type roles, focus, blur and motion ---- */
