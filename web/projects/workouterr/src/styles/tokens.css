@@ -1,0 +1,318 @@
+/*
+ * Design tokens ported from docs/design/tokens.css, scaled for touch (docs/design/README.md).
+ *
+ * Differences from the mockup tokens:
+ * - The body text colour is `--text-default`: in the mockup `--text-body` is both a colour and a font size, and the
+ *   font size wins.
+ * - Scales Tailwind also uses (fonts, font sizes, line heights, letter spacing, radii, easings, sizes) are
+ *   defined in `@theme`, so they exist once, as both CSS variables and utilities. Control heights and layout sizes
+ *   are `--spacing-*` (`h-control-md`, `w-sidebar`).
+ * - `--space-*` is dropped: Tailwind's 4 px spacing scale covers it (`--space-5` 12px is `p-3`).
+ * - Font sizes and control heights are larger: body text 15 px, controls at least 44 px, set values 36 px.
+ */
+
+/* ---- Brand palette ---- */
+:root {
+  --navy-900: #08202f;
+  --navy-800: #0e2d40;
+  --navy-700: #14405a;
+  --navy-600: #1c5375;
+  --navy-500: #2a6a92;
+  --teal-700: #28595f;
+  --teal-600: #2f6e75;
+  --teal-500: #3f858c;
+  --teal-400: #5aa1a8;
+  --teal-300: #8cc3c8;
+  --teal-200: #bfdedf;
+  --teal-100: #e6f1f2;
+  --amber-700: #a8720f;
+  --amber-600: #c4881b;
+  --amber-500: #f2ae2e;
+  --amber-400: #f7c561;
+  --amber-300: #fadfa2;
+  --amber-100: #fdf3dc;
+  --gray-0: #ffffff;
+  --gray-25: #fafbfc;
+  --gray-50: #f3f5f7;
+  --gray-100: #eaeef1;
+  --gray-200: #dde3e8;
+  --gray-300: #c6ced5;
+  --gray-400: #9aa5ad;
+  --gray-500: #77838b;
+  --gray-600: #576269;
+  --gray-700: #3b444a;
+  --gray-800: #242c31;
+  --gray-900: #141a1e;
+  --green-500: #2e9e6b;
+  --green-100: #e0f3ea;
+  --red-500: #d64545;
+  --red-100: #fbe6e6;
+  --orange-500: #e08a17;
+  --blue-500: #2f7fd1;
+
+  --brand-navy: var(--navy-800);
+  --brand-teal: var(--teal-500);
+  --brand-amber: var(--amber-500);
+}
+
+/* ---- Light theme (default) ---- */
+:root {
+  --surface-app: #eceff2;
+  --surface-card: var(--gray-0);
+  --surface-raised: var(--gray-0);
+  --surface-sunken: var(--gray-50);
+  --surface-chrome: rgba(240, 243, 246, 0.72);
+  --surface-sidebar: rgba(232, 236, 240, 0.68);
+  --surface-overlay: rgba(255, 255, 255, 0.86);
+  --surface-hover: rgba(14, 45, 64, 0.05);
+  --surface-active: rgba(14, 45, 64, 0.09);
+  --surface-selected: var(--teal-100);
+  --text-strong: var(--navy-800);
+  --text-default: var(--gray-800);
+  --text-muted: var(--gray-500);
+  --text-faint: var(--gray-400);
+  --text-invert: #ffffff;
+  --text-on-accent: #ffffff;
+  --text-on-amber: var(--navy-900);
+  --border-hairline: rgba(14, 45, 64, 0.12);
+  --border-subtle: var(--gray-200);
+  --border-strong: var(--gray-300);
+  --border-field: rgba(14, 45, 64, 0.18);
+  --accent: var(--teal-500);
+  --accent-hover: var(--teal-600);
+  --accent-press: var(--teal-700);
+  --accent-soft: var(--teal-100);
+  --accent-ring: rgba(63, 133, 140, 0.35);
+  --highlight: var(--amber-500);
+  --highlight-soft: var(--amber-100);
+  --status-success: var(--green-500);
+  --status-success-soft: var(--green-100);
+  --status-danger: var(--red-500);
+  --status-danger-soft: var(--red-100);
+  --status-warn: var(--orange-500);
+  --status-warn-soft: var(--amber-100);
+  --status-info: var(--blue-500);
+  --scrim: rgba(8, 32, 47, 0.32);
+
+  --shadow-control: 0 1px 1px rgba(8, 32, 47, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --shadow-card: 0 1px 2px rgba(8, 32, 47, 0.07), 0 6px 18px -8px rgba(8, 32, 47, 0.14);
+  --shadow-raised: 0 2px 6px rgba(8, 32, 47, 0.09), 0 18px 40px -14px rgba(8, 32, 47, 0.22);
+  --shadow-window: 0 24px 70px -20px rgba(8, 32, 47, 0.4), 0 0 0 1px rgba(8, 32, 47, 0.1);
+  --shadow-popover: 0 8px 30px -8px rgba(8, 32, 47, 0.3), 0 0 0 1px rgba(8, 32, 47, 0.08);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+}
+
+/* ---- Dark theme ---- */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --surface-app: #08161e;
+  --surface-card: #102530;
+  --surface-raised: #16303d;
+  --surface-sunken: #0b1d26;
+  --surface-chrome: rgba(13, 36, 48, 0.72);
+  --surface-sidebar: rgba(10, 28, 38, 0.7);
+  --surface-overlay: rgba(18, 42, 54, 0.9);
+  --surface-hover: rgba(255, 255, 255, 0.06);
+  --surface-active: rgba(255, 255, 255, 0.11);
+  --surface-selected: rgba(63, 133, 140, 0.24);
+  --text-strong: #f2f7f8;
+  --text-default: #dde8ea;
+  --text-muted: #93a6ae;
+  --text-faint: #6b7d86;
+  --text-invert: var(--navy-900);
+  --text-on-accent: #ffffff;
+  --text-on-amber: var(--navy-900);
+  --border-hairline: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --border-field: rgba(255, 255, 255, 0.16);
+  --accent: var(--teal-400);
+  --accent-hover: var(--teal-300);
+  --accent-press: var(--teal-500);
+  --accent-soft: rgba(63, 133, 140, 0.2);
+  --accent-ring: rgba(90, 161, 168, 0.45);
+  --highlight: var(--amber-500);
+  --highlight-soft: rgba(242, 174, 46, 0.16);
+  --status-success: #4cbd87;
+  --status-success-soft: rgba(46, 158, 107, 0.18);
+  --status-danger: #f06a6a;
+  --status-danger-soft: rgba(214, 69, 69, 0.18);
+  --status-warn: var(--amber-400);
+  --status-warn-soft: rgba(242, 174, 46, 0.16);
+  --status-info: #5aa0e6;
+  --scrim: rgba(2, 10, 15, 0.55);
+
+  --shadow-control: 0 1px 1px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 22px -10px rgba(0, 0, 0, 0.55);
+  --shadow-raised: 0 2px 8px rgba(0, 0, 0, 0.45), 0 20px 44px -16px rgba(0, 0, 0, 0.6);
+  --shadow-window: 0 24px 70px -20px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --shadow-popover: 0 10px 34px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* ---- Scales shared with Tailwind ---- */
+@theme {
+  --font-ui: 'Geist Variable', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --font-mono: 'Geist Mono Variable', 'SF Mono', ui-monospace, monospace;
+  --font-display: 'Black Ops One', 'Geist Variable', sans-serif;
+  --default-font-family: var(--font-ui);
+  --default-mono-font-family: var(--font-mono);
+
+  --text-*: initial;
+  --text-display-1: 44px;
+  --text-display-1--line-height: 1.08;
+  --text-display-2: 34px;
+  --text-display-2--line-height: 1.08;
+  --text-title-1: 28px;
+  --text-title-1--line-height: 1.25;
+  --text-title-2: 22px;
+  --text-title-2--line-height: 1.25;
+  --text-title-3: 19px;
+  --text-title-3--line-height: 1.25;
+  --text-body-lg: 17px;
+  --text-body-lg--line-height: 1.45;
+  --text-body: 15px;
+  --text-body--line-height: 1.45;
+  --text-label: 14px;
+  --text-label--line-height: 1.3;
+  --text-caption: 13px;
+  --text-caption--line-height: 1.35;
+  --text-metric: 36px;
+  --text-metric--line-height: 1;
+  --text-metric-xl: 64px;
+  --text-metric-xl--line-height: 1;
+
+  --leading-tight: 1.08;
+  --leading-snug: 1.25;
+  --leading-normal: 1.45;
+  --leading-loose: 1.6;
+  --tracking-display: -0.02em;
+  --tracking-title: -0.01em;
+  --tracking-normal: 0;
+  --tracking-caps: 0.09em;
+
+  --spacing-control-sm: 44px;
+  --spacing-control-md: 48px;
+  --spacing-control-lg: 56px;
+  --spacing-control-xl: 64px;
+  --spacing-gutter-card: 16px;
+  --spacing-gutter-screen: 24px;
+  --spacing-gutter-section: 32px;
+  --spacing-sidebar: 248px;
+  --spacing-inspector: 300px;
+  --spacing-toolbar: 60px;
+  --spacing-tabbar: 64px;
+
+  --radius-*: initial;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-window: 12px;
+  --radius-pill: 999px;
+
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.5, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* ---- Semantic colours as Tailwind colours: the class suffix is the token name (`bg-surface-card`,
+   `text-text-muted`, `border-border-subtle`). `inline` makes the utilities read the token itself, so a
+   `[data-theme]` on any element re-themes its subtree. Tailwind's own palette is removed: no raw colours. ---- */
+@theme inline {
+  --color-*: initial;
+  --color-surface-app: var(--surface-app);
+  --color-surface-card: var(--surface-card);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-chrome: var(--surface-chrome);
+  --color-surface-sidebar: var(--surface-sidebar);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-active: var(--surface-active);
+  --color-surface-selected: var(--surface-selected);
+  --color-text-strong: var(--text-strong);
+  --color-text-default: var(--text-default);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-text-invert: var(--text-invert);
+  --color-text-on-accent: var(--text-on-accent);
+  --color-text-on-amber: var(--text-on-amber);
+  --color-border-hairline: var(--border-hairline);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-border-field: var(--border-field);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-press: var(--accent-press);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ring: var(--accent-ring);
+  --color-highlight: var(--highlight);
+  --color-highlight-soft: var(--highlight-soft);
+  --color-status-success: var(--status-success);
+  --color-status-success-soft: var(--status-success-soft);
+  --color-status-danger: var(--status-danger);
+  --color-status-danger-soft: var(--status-danger-soft);
+  --color-status-warn: var(--status-warn);
+  --color-status-warn-soft: var(--status-warn-soft);
+  --color-status-info: var(--status-info);
+  --color-scrim: var(--scrim);
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-amber: var(--brand-amber);
+}
+
+/* ---- Shadows as Tailwind shadows (`shadow-card`). Plain `@theme` would copy the light values into each utility at
+   build time, so the dark overrides would never reach it; `inline` makes the utility read the themed token, and
+   `reference` stops Tailwind writing the mapping out as a self-referencing `--shadow-card: var(--shadow-card)`. ---- */
+@theme inline reference {
+  --shadow-*: initial;
+  --shadow-control: var(--shadow-control);
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-window: var(--shadow-window);
+  --shadow-popover: var(--shadow-popover);
+}
+
+/* ---- Type roles, focus, blur and motion ---- */
+:root {
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --type-brand: var(--weight-regular) var(--text-display-2) / var(--leading-tight) var(--font-display);
+  --type-title: var(--weight-semibold) var(--text-title-2) / var(--leading-snug) var(--font-ui);
+  --type-body: var(--weight-regular) var(--text-body) / var(--leading-normal) var(--font-ui);
+  --type-label: var(--weight-medium) var(--text-label) / 1.3 var(--font-ui);
+  --type-metric: var(--weight-semibold) var(--text-metric) / 1 var(--font-mono);
+
+  --hairline: 1px;
+  --focus-ring: 0 0 0 3px var(--accent-ring);
+  --blur-vibrancy: saturate(180%) blur(30px);
+  --blur-scrim: blur(6px);
+
+  --dur-instant: 80ms;
+  --dur-fast: 140ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --dur-sheet: 420ms;
+  --press-scale: 0.97;
+  --transition-control:
+    background-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard),
+    transform var(--dur-instant) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+    --dur-sheet: 0ms;
+  }
+}

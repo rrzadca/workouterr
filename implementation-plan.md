@@ -64,14 +64,16 @@ docs/                         design reference (`docs/design/`), server setup, i
   production); `web/CLAUDE.md` with the serve, lint, build and test commands.
   Scope: Tech stack and hosting → Frontend.
   Done when: `ng serve` shows a page that calls `/api/health` through the proxy, and lint, build and test pass.
-- [ ] **7. Translations and theme base.** Transloco with `en` keys; tokens ported from `docs/design/tokens.css`
+- [x] **7. Translations and theme base.** Transloco with `en` keys; tokens ported from `docs/design/tokens.css`
   and mapped in Tailwind (see `docs/design/guidelines/tailwind.config.js`), scaled for touch (controls at least
   44 px, body text 15–16 px); dark theme through `[data-theme="dark"]`; self-hosted Geist, Geist Mono and Black Ops
-  One; a pre-boot script applies the saved theme from `localStorage`, else the system theme.
+  One; a `ThemeService` applies the saved theme from `localStorage`, else the system theme (followed live); until
+  Angular starts, `color-scheme` paints the browser background in the system theme.
   Scope: Accounts → Theme; Non-functional requirements (iPad, multilanguage); Tech stack and hosting →
   Translations, UI component library.
   Design: `docs/design/README.md`, `tokens.css`.
-  Done when: switching the OS theme switches the page with no flash on reload, and all text comes from keys.
+  Done when: switching the OS theme switches the page, a reload in the system theme shows no flash of the other
+  theme, and all text comes from keys.
 - [ ] **8. UI library.** `ui` library project with Storybook showing every story in both themes; self-hosted
   Lucide icons; first components Button and Icon, matching `docs/design/components/core/`. Later components are
   built as screens need them, each from its file in `docs/design/components/`.

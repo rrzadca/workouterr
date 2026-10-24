@@ -1,13 +1,5 @@
-<main class="p-6">
-  <h1 class="text-2xl font-semibold">Workouterr</h1>
-  @if (health.isLoading()) {
-    <p>Checking the API…</p>
-  } @else if (isUnhealthy()) {
-    <p>API unhealthy</p>
-  } @else if (health.error()) {
-    <p>API unreachable</p>
-  } @else {
-    <p>API: {{ health.value()?.status }}</p>
-  }
+<main class="p-gutter-screen" *transloco="let t">
+  <h1 class="font-display text-display-2 text-text-strong">{{ t('app.name') }}</h1>
+  <p class="text-body text-text-muted">{{ t(healthStatusKey()) }}</p>
 </main>
 <router-outlet />

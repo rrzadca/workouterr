@@ -1,0 +1,12 @@
+{
+  "app": {
+    "name": "Workouterr"
+  },
+  "health": {
+    "checking": "Checking the API…",
+    "healthy": "API: healthy",
+    "degraded": "API: degraded",
+    "unhealthy": "API unhealthy",
+    "unreachable": "API unreachable"
+  }
+}

@@ -9,6 +9,18 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
 - Formatting is Prettier's alone (`.prettierrc`, Angular parser for `.html`); ESLint checks code, with
   `eslint-config-prettier` switching off its formatting rules. Each project's `eslint.config.js` extends the shared
   root one and sets its selector prefix.
+- Class members in this order: injected services (`inject(...)`), plain fields, signals (`signal`, `computed`,
+  resources), constructor, methods. A field initializer can only read fields declared above it, so injections go
+  first.
+- UI text lives in `projects/workouterr/public/i18n/<lang>.json` (Transloco, loaded over HTTP before the first
+  render); templates use `*transloco="let t"`, specs provide the same JSON through `TranslocoTestingModule`.
+- Design tokens are in `projects/workouterr/src/styles/tokens.css`. Semantic colours are Tailwind colours named after
+  the token (`bg-surface-card`, `text-text-muted`); Tailwind's default palette, font sizes, radii and shadows are
+  removed, so only the design scales exist.
+- Theme: `data-theme="light" | "dark"` on `<html>`, set by `ThemeService` (`src/app/theme.ts`) when the app starts,
+  from `localStorage['workouterr.theme']`, else the system theme. `dark:` utilities follow the attribute; nothing
+  outside Angular touches the theme. Critical-CSS inlining is off in production: it leaves the
+  `[data-theme='dark']` rules out of the inlined CSS.
 - Unit tests run on Vitest through Angular's runner (`ng test`), with `jsdom`; HTTP is faked with
   `provideHttpClientTesting`.
 

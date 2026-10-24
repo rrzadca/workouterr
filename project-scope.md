@@ -46,8 +46,9 @@ Public product, free to use. Anyone can register.
 - Theme: a sun / moon button in the sidebar footer switches between Light and Dark (no theme setting on the
   settings page). A new account follows the system theme until the button is first tapped; from then on the choice
   is saved on the account (same on every device, like the language and the rest-timer sound), with a copy in
-  `localStorage` applied before Angular starts, so the page doesn't flash the wrong theme on load or on the login
-  screen
+  `localStorage` so the theme is known on load and on the login screen. The theme is managed only inside the Angular
+  app (no script in `index.html`); until Angular starts, the browser background follows the system theme, so a saved
+  theme that differs from the system's shows briefly in the system's colours on load (accepted)
 - Weight unit only kg with 2 decimal places.
 
 ### Exercises
