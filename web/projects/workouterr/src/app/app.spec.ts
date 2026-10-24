@@ -1,6 +1,8 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { TranslocoTestingModule } from '@jsverse/transloco';
+import english from '../../public/i18n/en.json';
 import { App } from './app';
 
 describe('App', () => {
@@ -8,7 +10,14 @@ describe('App', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [App],
+      imports: [
+        App,
+        TranslocoTestingModule.forRoot({
+          langs: { en: english },
+          translocoConfig: { availableLangs: ['en'], defaultLang: 'en' },
+          preloadLangs: true,
+        }),
+      ],
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
     httpTesting = TestBed.inject(HttpTestingController);
@@ -23,7 +32,17 @@ describe('App', () => {
     httpTesting.expectOne('/api/health').flush({ status: 'Healthy' });
     await fixture.whenStable();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API: Healthy');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API: healthy');
+  });
+
+  it('shows the API as degraded when the health check says so', async () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    httpTesting.expectOne('/api/health').flush({ status: 'Degraded' });
+    await fixture.whenStable();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API: degraded');
   });
 
   it('shows the API as unhealthy when the health check answers 503', async () => {

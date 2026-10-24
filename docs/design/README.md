@@ -21,6 +21,8 @@ Transloco keys, the app's own state). `project-scope.md` wins wherever the two d
 
 - **Touch sizes.** The mockups are Mac density (28 px controls, 13 px body text). The app uses controls at least
   44 px tall (about 56 px on the live session screen), 15–16 px body text and larger set values.
+- **Body text colour.** `tokens.css` defines `--text-body` as both a colour and a font size (the font size wins);
+  the app names the colour `--text-default`.
 - **No window chrome.** The macOS title bar goes; the sidebar stays for iPad landscape.
 - **Theme toggle** moves from the title bar to the sidebar footer (sun / moon).
 - **Dropped:** "Continue with Apple", "Remember me", pause on the rest timer.

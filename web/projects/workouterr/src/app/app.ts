@@ -1,6 +1,7 @@
 import { HttpErrorResponse, HttpStatusCode, httpResource } from '@angular/common/http';
 import { Component, computed } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 // Written by hand until task 9 generates it from the OpenAPI document.
 interface HealthResponse {
@@ -8,7 +9,7 @@ interface HealthResponse {
 }
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, TranslocoDirective],
   selector: 'app-root',
   templateUrl: './app.html',
 })
