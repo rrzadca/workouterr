@@ -10,7 +10,7 @@ export type ButtonType = 'button' | 'submit' | 'reset';
 const baseClasses =
   'inline-flex w-full cursor-pointer items-center justify-center gap-1.5 border font-medium leading-none whitespace-nowrap ' +
   '[transition:var(--transition-control),filter_var(--dur-fast)_var(--ease-standard)] ' +
-  'enabled:hover:brightness-105 enabled:active:brightness-92 disabled:cursor-default disabled:opacity-40 ' +
+  'enabled:hover:brightness-105 enabled:active:brightness-92 disabled:cursor-default disabled:opacity-40 [&_*]:pointer-events-none ' +
   'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent-ring';
 
 const variantClasses: Record<ButtonVariant, string> = {
