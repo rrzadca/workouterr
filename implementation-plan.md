@@ -79,7 +79,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   built as screens need them, each from its file in `docs/design/components/`.
   Scope: Tech stack and hosting → UI component library.
   Done when: the Button story renders in light and dark and is used in the app.
-- [ ] **9. Generated client.** orval generates `api-client` (types + zod) from `contracts/openapi/workouterr.json`;
+- [x] **9. Generated client.** orval generates `api-client` (types + zod) from `contracts/openapi/workouterr.json`;
   a check fails if the generated code is out of date.
   Scope: Tech stack and hosting → API contract.
   Done when: the app calls `/api/health` with the generated types, and the check catches a stale client.
