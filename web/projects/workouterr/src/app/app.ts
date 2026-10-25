@@ -2,12 +2,8 @@ import { HttpErrorResponse, HttpStatusCode, httpResource } from '@angular/common
 import { Component, computed } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
+import { GetHealthResponse } from '@workouterr/api-client';
 import { Button } from '@workouterr/ui';
-
-// Written by hand until task 9 generates it from the OpenAPI document.
-interface HealthResponse {
-  status: 'Unhealthy' | 'Degraded' | 'Healthy';
-}
 
 @Component({
   imports: [Button, RouterOutlet, TranslocoDirective],
@@ -16,7 +12,8 @@ interface HealthResponse {
 })
 export class App {
   // A relative URL: the dev proxy (and Caddy in production) forwards /api to the API on the same origin.
-  protected readonly health = httpResource<HealthResponse>(() => '/api/health');
+  // The generated schema checks the body at runtime: a response the contract does not allow becomes an error.
+  protected readonly health = httpResource(() => '/api/health', { parse: GetHealthResponse.parse });
 
   // The translation key for the current health state.
   protected readonly healthStatusKey = computed(() => {
