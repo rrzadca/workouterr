@@ -3,8 +3,13 @@
 Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command from `web/`, on the Node version in
 `.nvmrc`.
 
-- `projects/workouterr`: the app. `projects/ui`: the UI component library. Later projects (`domain`, `api-client`) sit
-  beside them.
+- `projects/workouterr`: the app. `projects/ui`: the UI component library. `projects/api-client`: generated from the
+  API's OpenAPI document. Later projects (`domain`) sit beside them.
+- API client: orval (`orval.config.ts`) turns `../contracts/openapi/workouterr.json` into zod schemas with their
+  TypeScript types in `projects/api-client/src/index.ts`, never edited by hand. The app imports it as
+  `@workouterr/api-client` (a `tsconfig.json` path, like the UI library). A schema per component (`HealthResponse`)
+  and per operation response (`GetHealthResponse`); calls pass the response schema to `httpResource` as
+  `parse: GetHealthResponse.parse`, so a body the contract does not allow becomes the resource's error.
 - The app imports the library as `@workouterr/ui`, mapped in `tsconfig.json` to its source (`src/public-api.ts`), so it
   builds with the app and never needs building first.
 - Calls to the API use relative `/api/...` URLs: `ng serve` proxies them to the API (`proxy.conf.json`), Caddy does the
@@ -44,6 +49,10 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
 - `npm run lint`: ESLint over every project.
 - `npm run format:check`: fail on unformatted files; `npm run format` fixes them.
 - `npm run build`: production build into `dist/workouterr` (also the type check).
+- `npm run generate:api-client`: regenerate `projects/api-client` from the OpenAPI document (after every API change;
+  commit the result with it).
+- `scripts/check-api-client.sh`: regenerate the client and fail if `projects/api-client` differs from the committed or
+  staged one (run by the deploy script).
 - `npm run storybook`: Storybook for the UI library on `http://localhost:6006`.
 - `npm run build-storybook`: static Storybook into `dist/storybook`.
 - `npm test -- --watch=false`: run the unit tests of every project once; `npm test` watches; `npx ng test ui` runs one

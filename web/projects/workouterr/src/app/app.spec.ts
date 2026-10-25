@@ -67,6 +67,16 @@ describe('App', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('API unreachable');
   });
 
+  it('shows the API as unreachable when the body breaks the contract', async () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    httpTesting.expectOne('/api/health').flush({ status: 'Fine' });
+    await fixture.whenStable();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API unreachable');
+  });
+
   it('checks the API again when the button is pressed', async () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
