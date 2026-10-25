@@ -1,0 +1,17 @@
+<!-- A loading button can't be pressed again. -->
+<button
+  [type]="type()"
+  [class]="cssClasses()"
+  [disabled]="disabled() || loading()"
+  [attr.aria-busy]="loading() || null"
+>
+  @if (loading()) {
+    <rad-icon name="loader-circle" [size]="iconSize()" class="animate-[spin_900ms_linear_infinite]" />
+  } @else if (icon(); as icon) {
+    <rad-icon [name]="icon" [size]="iconSize()" />
+  }
+  <ng-content />
+  @if (iconEnd(); as iconEnd) {
+    <rad-icon [name]="iconEnd" [size]="iconSize()" />
+  }
+</button>

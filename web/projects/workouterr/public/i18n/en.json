@@ -7,6 +7,7 @@
     "healthy": "API: healthy",
     "degraded": "API: degraded",
     "unhealthy": "API unhealthy",
-    "unreachable": "API unreachable"
+    "unreachable": "API unreachable",
+    "checkAgain": "Check again"
   }
 }

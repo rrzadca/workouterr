@@ -1,5 +1,8 @@
-<main class="p-gutter-screen" *transloco="let t">
+<main class="flex flex-col items-start gap-4 p-gutter-screen" *transloco="let t">
   <h1 class="font-display text-display-2 text-text-strong">{{ t('app.name') }}</h1>
   <p class="text-body text-text-muted">{{ t(healthStatusKey()) }}</p>
+  <rad-button variant="primary" icon="refresh-cw" [loading]="health.isLoading()" (click)="health.reload()">
+    {{ t('health.checkAgain') }}
+  </rad-button>
 </main>
 <router-outlet />

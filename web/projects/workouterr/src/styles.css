@@ -1,22 +1,2 @@
-@import 'tailwindcss';
-
-/* Self-hosted fonts: the build copies the woff2 files from node_modules into the app, nothing comes from a CDN.
-   Each @font-face carries a unicode-range, so the browser downloads only the subsets a page uses. */
-@import '@fontsource-variable/geist';
-@import '@fontsource-variable/geist-mono';
-@import '@fontsource/black-ops-one';
-
-@import './styles/tokens.css';
-
-/* `dark:` utilities follow the theme attribute set by ThemeService, not the OS setting. */
-@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
-
-@layer base {
-  /* Only once the theme is set: before that the browser's own background follows the system theme. */
-  [data-theme] body {
-    background-color: var(--surface-app);
-    color: var(--text-default);
-    font: var(--type-body);
-    -webkit-font-smoothing: antialiased;
-  }
-}
+/* Tailwind, fonts, design tokens and theme come from the UI library; app-wide styles go below. */
+@import '../../ui/src/styles/global.css';
