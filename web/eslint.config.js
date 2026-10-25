@@ -4,6 +4,7 @@ const { defineConfig } = require('eslint/config');
 const tseslint = require('typescript-eslint');
 const angular = require('angular-eslint');
 const prettier = require('eslint-config-prettier/flat');
+const storybook = require('eslint-plugin-storybook');
 
 // Shared by every project; each project's own eslint.config.js adds its selector prefix.
 module.exports = defineConfig([
@@ -21,6 +22,8 @@ module.exports = defineConfig([
     files: ['**/*.html'],
     extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
   },
+  // Rules for *.stories.ts files.
+  storybook.configs['flat/recommended'],
   // Last, so formatting is Prettier's job alone.
   prettier,
 ]);

@@ -66,4 +66,21 @@ describe('App', () => {
 
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('API unreachable');
   });
+
+  it('checks the API again when the button is pressed', async () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/health').error(new ProgressEvent('error'));
+    await fixture.whenStable();
+
+    const checkAgainButton = (fixture.nativeElement as HTMLElement).querySelector('button') as HTMLButtonElement;
+    expect(checkAgainButton.textContent).toContain('Check again');
+    checkAgainButton.click();
+    fixture.detectChanges();
+
+    httpTesting.expectOne('/api/health').flush({ status: 'Healthy' });
+    await fixture.whenStable();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API: healthy');
+  });
 });

@@ -74,7 +74,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   Design: `docs/design/README.md`, `tokens.css`.
   Done when: switching the OS theme switches the page, a reload in the system theme shows no flash of the other
   theme, and all text comes from keys.
-- [ ] **8. UI library.** `ui` library project with Storybook showing every story in both themes; self-hosted
+- [x] **8. UI library.** `ui` library project with Storybook showing every story in both themes; self-hosted
   Lucide icons; first components Button and Icon, matching `docs/design/components/core/`. Later components are
   built as screens need them, each from its file in `docs/design/components/`.
   Scope: Tech stack and hosting → UI component library.

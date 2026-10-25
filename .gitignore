@@ -26,3 +26,5 @@ test-results/
 
 # Claude Code: personal settings stay local; .claude/settings.json is shared
 .claude/settings.local.json
+
+*storybook.log
