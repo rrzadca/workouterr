@@ -28,7 +28,17 @@ builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>("database");
 
 // Identity's user store and UserManager (password hashing, validation); sign-in is added with the auth endpoints.
-builder.Services.AddIdentityCore<User>(options => options.User.RequireUniqueEmail = true)
+builder.Services.AddIdentityCore<User>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+
+        // Length over composition: at least 12 characters, letters and digits enough, no character classes required.
+        options.Password.RequiredLength = 12;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireDigit = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+    })
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddScoped<UserCreationService>();
 

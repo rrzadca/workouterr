@@ -44,13 +44,24 @@ public class UserCreationTests(ApiFactory factory)
     }
 
     [Fact]
-    public async Task Create_Fails_WhenThePasswordIsTooWeak()
+    public async Task Create_Fails_WhenThePasswordIsShorterThan12Characters()
     {
         using var scope = factory.Services.CreateScope();
         var userCreation = scope.ServiceProvider.GetRequiredService<UserCreationService>();
 
-        var (result, _) = await userCreation.CreateAsync("weak@example.com", "short");
+        var (result, _) = await userCreation.CreateAsync("short@example.com", "abcdefghij1");
 
         Assert.False(result.Succeeded);
+    }
+
+    [Fact]
+    public async Task Create_AcceptsA12CharacterPasswordOfLowercaseLettersOnly()
+    {
+        using var scope = factory.Services.CreateScope();
+        var userCreation = scope.ServiceProvider.GetRequiredService<UserCreationService>();
+
+        var (result, _) = await userCreation.CreateAsync("letters@example.com", "abcdefghijkl");
+
+        Assert.True(result.Succeeded);
     }
 }

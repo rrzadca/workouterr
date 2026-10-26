@@ -41,6 +41,8 @@ Public product, free to use. Anyone can register.
   - Demo users have no email or password: change email, change password, delete account and invites are
     unavailable to them (hidden in the UI, rejected by the API). Theme, language and everything else work normally
   - Demo creation is rate limited per IP and sends no email
+- Passwords: at least 12 characters; letters and digits are enough (no required uppercase, digit or symbol). The
+  same rule applies everywhere a password is set (CLI, registration, reset, change password)
 - Login, logout, password reset (a reset logs out all devices)
 - Change password: requires the current password and logs out all other devices
 - Change email: the new address must be verified before it replaces the old one; the old address is notified
