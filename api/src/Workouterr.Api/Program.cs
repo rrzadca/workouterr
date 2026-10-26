@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Workouterr.Api;
+using Workouterr.Api.Auth;
 using Workouterr.Api.Health;
 using Workouterr.Api.Persistence;
 using Workouterr.Api.Users;
@@ -24,22 +25,12 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
+// Checks the data annotations on request types (LoginRequest, …) and answers 400 with a validation problem.
+builder.Services.AddValidation();
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>("database");
 
-// Identity's user store and UserManager (password hashing, validation); sign-in is added with the auth endpoints.
-builder.Services.AddIdentityCore<User>(options =>
-    {
-        options.User.RequireUniqueEmail = true;
-
-        // Length over composition: at least 12 characters, letters and digits enough, no character classes required.
-        options.Password.RequiredLength = 12;
-        options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequireDigit = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequireLowercase = false;
-    })
-    .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddAuth();
 builder.Services.AddScoped<UserCreationService>();
 
 var application = builder.Build();
@@ -51,6 +42,8 @@ if (CommandLineInterface.IsCommand(args))
 
 application.UseExceptionHandler();
 application.UseStatusCodePages();
+application.UseAuthentication();
+application.UseAuthorization();
 
 // Swagger UI on /api/doc, reading the same document the build writes to contracts/. Development only.
 if (application.Environment.IsDevelopment())
@@ -64,6 +57,7 @@ if (application.Environment.IsDevelopment())
 }
 
 application.MapHealthEndpoints();
+application.MapAuthEndpoints();
 
 application.Run();
 return 0;

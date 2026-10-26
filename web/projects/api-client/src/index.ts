@@ -6,6 +6,14 @@
  */
 import * as zod from 'zod';
 
+export const CurrentUserResponse = zod.object({
+  id: zod.uuid(),
+  email: zod.string(),
+});
+
+export type CurrentUserResponse = zod.input<typeof CurrentUserResponse>;
+export type CurrentUserResponseOutput = zod.output<typeof CurrentUserResponse>;
+
 export const HealthStatus = zod.enum(['Unhealthy', 'Degraded', 'Healthy']);
 
 export type HealthStatus = zod.input<typeof HealthStatus>;
@@ -17,6 +25,30 @@ export const HealthResponse = zod.object({
 
 export type HealthResponse = zod.input<typeof HealthResponse>;
 export type HealthResponseOutput = zod.output<typeof HealthResponse>;
+
+export const httpValidationProblemDetailsStatusRegExpTwo = new RegExp('^-?(?:0|[1-9]\\d*)$');
+
+export const HttpValidationProblemDetails = zod.object({
+  type: zod.string().nullish(),
+  title: zod.string().nullish(),
+  status: zod.union([zod.int(), zod.stringFormat('int32', httpValidationProblemDetailsStatusRegExpTwo)]).nullish(),
+  detail: zod.string().nullish(),
+  instance: zod.string().nullish(),
+  errors: zod.record(zod.string(), zod.array(zod.string())).optional(),
+});
+
+export type HttpValidationProblemDetails = zod.input<typeof HttpValidationProblemDetails>;
+export type HttpValidationProblemDetailsOutput = zod.output<typeof HttpValidationProblemDetails>;
+
+export const loginRequestEmailMax = 256;
+
+export const LoginRequest = zod.object({
+  email: zod.string().min(1).max(loginRequestEmailMax),
+  password: zod.string().min(1),
+});
+
+export type LoginRequest = zod.input<typeof LoginRequest>;
+export type LoginRequestOutput = zod.output<typeof LoginRequest>;
 
 export const problemDetailsStatusRegExpTwo = new RegExp('^-?(?:0|[1-9]\\d*)$');
 
@@ -31,3 +63,11 @@ export const ProblemDetails = zod.object({
 export type ProblemDetails = zod.input<typeof ProblemDetails>;
 export type ProblemDetailsOutput = zod.output<typeof ProblemDetails>;
 export const GetHealthResponse = HealthResponse;
+
+export const LoginBody = LoginRequest;
+
+export const LoginResponse = CurrentUserResponse;
+
+export const LogoutResponse = zod.void();
+
+export const GetCurrentUserResponse = CurrentUserResponse;
