@@ -88,7 +88,7 @@ docs/                         design reference (`docs/design/`), server setup, i
 
 ### Auth
 
-- [ ] **10. CLI commands and users.** Command mode in `Workouterr.Api` (`dotnet run -- user create <email>`), running
+- [x] **10. CLI commands and users.** Command mode in `Workouterr.Api` (`dotnet run -- user create <email>`), running
   with the same configuration and database as the API; the user is created through Identity's `UserManager`.
   Scope: Accounts → Invites (CLI script); Tech stack and hosting → Auth.
   Done when: a user created from the CLI is in the database with a hashed password.
@@ -347,6 +347,15 @@ docs/                         design reference (`docs/design/`), server setup, i
   alerts.
   Scope: Tech stack and hosting (Auth, Operations).
   Done when: every item on the hardening checklist is done.
-- [ ] **58. Open registration.** Turn off the invite check.
+- [ ] **58. Demo accounts.** `POST /api/auth/demo` creates a demo user (flagged, expires in 24 hours) from a demo
+  template JSON file (validated by a test, like the starter set) through the user-creation path, generates the
+  session history relative to today and logs the visitor in; rate limited per IP. Account changes rejected for demo
+  users; expired-demo-users job (deletion as in task 54). "Demo" button on the login screen; email, password and
+  delete cards hidden in settings for demo users.
+  Scope: Accounts → Demo accounts; Tech stack and hosting → Scheduled jobs.
+  Design: `docs/design/screens/LoginScreen.jsx` (button added in the login card's style).
+  Done when: two visitors get separate demo accounts with recent history, and the job deletes an expired one with
+  all its data.
+- [ ] **59. Open registration.** Turn off the invite check.
   Scope: Accounts → Invites; Timeline → Public launch.
   Done when: a stranger can register, verify and log in.
