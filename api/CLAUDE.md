@@ -22,6 +22,9 @@ ASP.NET Core Minimal API on .NET 10. Run every command from `api/`.
   stays in the `postgres-data` volume).
 - `dotnet build`: build the solution (warnings fail it).
 - `dotnet run --project src/Workouterr.Api`: run the API on `http://localhost:5080`.
+- `dotnet run --project src/Workouterr.Api -- user create <email>`: create a user (verified) in the database the
+  API's configuration points at; asks for the password twice with hidden input, or reads one line from a pipe. Exit
+  code 1 with Identity's messages when the email is taken or the password breaks the rules.
 - `curl http://localhost:5080/api/health`: `{"status":"Healthy"}` (200), or Problem Details (503) when the database is
   down.
 - `http://localhost:5080/api/doc`: Swagger UI over the live OpenAPI document (`/api/openapi/v1.json`), Development

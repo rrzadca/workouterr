@@ -32,6 +32,15 @@ Public product, free to use. Anyone can register.
   - Redeeming it opens registration with the email filled in and locked; the account counts as verified straight
     away, since the invite proved the address
   - At public launch the invite check is turned off by configuration (the invite table stays)
+- **Demo accounts**: a "Demo" button on the login screen lets anyone try the app without registering
+  - Each click creates a separate, temporary demo user and logs the visitor straight in; visitors never share data
+  - The new user gets a copy of a demo template (exercises, routines, a training plan and a few weeks of session
+    history) in the browser's language. History dates are generated relative to the creation day, so it looks
+    recent and prefill and progression work from the first session
+  - A demo user expires 24 hours after creation; a daily cleanup job deletes expired demo users and all their data
+  - Demo users have no email or password: change email, change password, delete account and invites are
+    unavailable to them (hidden in the UI, rejected by the API). Theme, language and everything else work normally
+  - Demo creation is rate limited per IP and sends no email
 - Login, logout, password reset (a reset logs out all devices)
 - Change password: requires the current password and logs out all other devices
 - Change email: the new address must be verified before it replaces the old one; the old address is notified
@@ -344,7 +353,8 @@ The project is also a learning path for building REST APIs with .NET and ASP.NET
 - Scheduled jobs: a `BackgroundService` in the API with a `PeriodicTimer`, once a day (one API instance, so no
   locks). Jobs are idempotent (`DELETE ... WHERE expires_at < now()`), so a missed or doubled run does no harm.
   Each job is a plain class with its own test and is also available as a CLI command. Jobs: unverified accounts
-  older than 7 days, expired logins in the ticket store, old rate-limit records, expired invites
+  older than 7 days, expired logins in the ticket store, old rate-limit records, expired invites, expired demo
+  users
 - Hosting: one Hetzner VPS in the EU (Germany or Finland) with Docker Compose
   - The domain stays registered at OVH; its DNS zone there points at the server and holds the email records
   - Compose runs `caddy` (HTTPS, serves the Angular app, proxies `/api`, so app and API share one domain),
@@ -408,5 +418,5 @@ No deadline; side project at its own pace. Suggested milestones:
      rotation, Polish, invite-only registration, email verification, password reset, change password and change
      email (needs the email service), rate limiting, scheduled cleanup jobs
 2. **History and progress**: session history (with edits), per-exercise charts, personal records, data export
-3. **Public launch**: open registration (invite check turned off), privacy policy and terms, production hardening
-   including nightly backups with a tested restore
+3. **Public launch**: open registration (invite check turned off), demo accounts, privacy policy and terms,
+   production hardening including nightly backups with a tested restore

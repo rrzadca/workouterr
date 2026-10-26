@@ -1,9 +1,17 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Workouterr.Api;
 using Workouterr.Api.Health;
 using Workouterr.Api.Persistence;
+using Workouterr.Api.Users;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// A command's output is for the person at the terminal; the SQL EF Core logs for each query would bury it.
+if (CommandLineInterface.IsCommand(args))
+{
+    builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+}
 
 // Read when the first DbContext is created, not at startup: build-time OpenAPI generation starts the app without one.
 builder.Services.AddDbContext<AppDbContext>((services, options) => options
@@ -19,7 +27,17 @@ builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>("database");
 
+// Identity's user store and UserManager (password hashing, validation); sign-in is added with the auth endpoints.
+builder.Services.AddIdentityCore<User>(options => options.User.RequireUniqueEmail = true)
+    .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddScoped<UserCreationService>();
+
 var application = builder.Build();
+
+if (CommandLineInterface.IsCommand(args))
+{
+    return await CommandLineInterface.InvokeAsync(application.Services, args);
+}
 
 application.UseExceptionHandler();
 application.UseStatusCodePages();
@@ -38,3 +56,4 @@ if (application.Environment.IsDevelopment())
 application.MapHealthEndpoints();
 
 application.Run();
+return 0;
