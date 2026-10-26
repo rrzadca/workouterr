@@ -92,7 +92,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   with the same configuration and database as the API; the user is created through Identity's `UserManager`.
   Scope: Accounts → Invites (CLI script); Tech stack and hosting → Auth.
   Done when: a user created from the CLI is in the database with a hashed password.
-- [ ] **11. Auth endpoints.** `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me` on
+- [x] **11. Auth endpoints.** `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me` on
   `SignInManager` with the Identity cookie; generic errors that never reveal whether an email exists.
   Scope: Accounts; Tech stack and hosting → Auth.
   Done when: API tests cover a good login (of a user created like the CLI does), a wrong password, an unknown
