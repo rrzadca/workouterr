@@ -16,16 +16,63 @@ namespace Workouterr.Api.Auth;
 /// </remarks>
 public class LoginStore(IServiceScopeFactory scopeFactory, TimeProvider timeProvider) : ITicketStore
 {
-    // HttpContext.Items key: the session ID a login request came with, ended once its sign-in succeeds.
+    // HttpContext.Items keys: the session ID a login request came with, ended once its sign-in succeeds; the login
+    // the request's cookie points to; and a marker that TryRenewAsync has stored this request's renewal.
     private static readonly object ReplacedLoginIdKey = new();
+    private static readonly object CurrentLoginIdKey = new();
+    private static readonly object RenewedKey = new();
 
-    // AuthenticationProperties item: the login's latest possible expiry, kept in the ticket so the cookie events can
-    // cap the renewed cookie without reading the store.
+    // AuthenticationProperties item: the login's latest possible expiry, kept in the ticket so a renewal can cap it
+    // without reading the store.
     private const string MaximumExpiryItem = "MaximumExpiry";
 
-    /// <summary>The latest the login can expire (its start + <see cref="LoginLifetime.Maximum"/>); null for a ticket
-    /// that wasn't stored by this store.</summary>
-    public static DateTimeOffset? GetMaximumExpiry(AuthenticationProperties properties) =>
+    /// <summary>
+    /// Extends the request's login to 30 days from now (capped at its maximum), unless it was extended within the last
+    /// day. The check and the write are one UPDATE, so of overlapping requests on a day-old login exactly one renews
+    /// it, and a late renewal never overwrites a newer one.
+    /// </summary>
+    /// <returns>Whether this request renewed the login; only then are the ticket's issued and expiry times moved on,
+    /// for the cookie handler to refresh the cookie with.</returns>
+    public async Task<bool> TryRenewAsync(
+        AuthenticationTicket ticket, HttpContext httpContext, CancellationToken cancellationToken)
+    {
+        // A ticket without a maximum isn't renewed: it lapses after 30 days rather than outliving its 90.
+        if (httpContext.Items[CurrentLoginIdKey] is not Guid id
+            || GetMaximumExpiry(ticket.Properties) is not { } maximumExpiry)
+        {
+            return false;
+        }
+
+        var now = timeProvider.GetUtcNow();
+        var slidingExpiry = now + LoginLifetime.Sliding;
+        var expiresAt = slidingExpiry < maximumExpiry ? slidingExpiry : maximumExpiry;
+        var renewedProperties = ticket.Properties.Clone();
+        renewedProperties.IssuedUtc = now;
+        renewedProperties.ExpiresUtc = expiresAt;
+        var renewedTicket = TicketSerializer.Default.Serialize(
+            new AuthenticationTicket(ticket.Principal, renewedProperties, ticket.AuthenticationScheme));
+
+        var lastRenewalBefore = now - LoginLifetime.RenewAfter;
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var database = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var renewedCount = await database.Logins
+            .Where(login => login.Id == id && login.RenewedAt <= lastRenewalBefore)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(login => login.Ticket, renewedTicket)
+                .SetProperty(login => login.RenewedAt, now)
+                .SetProperty(login => login.ExpiresAt, expiresAt), cancellationToken);
+        if (renewedCount == 0)
+        {
+            return false;
+        }
+
+        ticket.Properties.IssuedUtc = now;
+        ticket.Properties.ExpiresUtc = expiresAt;
+        httpContext.Items[RenewedKey] = true;
+        return true;
+    }
+
+    private static DateTimeOffset? GetMaximumExpiry(AuthenticationProperties properties) =>
         properties.Items.TryGetValue(MaximumExpiryItem, out var value) && value is not null
             ? DateTimeOffset.Parse(value, CultureInfo.InvariantCulture)
             : null;
@@ -71,6 +118,12 @@ public class LoginStore(IServiceScopeFactory scopeFactory, TimeProvider timeProv
 
     public Task RenewAsync(string key, AuthenticationTicket ticket) =>
         RenewAsync(key, ticket, CancellationToken.None);
+
+    // The handler calls this overload when it refreshes the cookie, after TryRenewAsync has already stored the
+    // renewal. Other renewals (a sign-in on a logged-in request) write the new ticket as given.
+    public Task RenewAsync(
+        string key, AuthenticationTicket ticket, HttpContext httpContext, CancellationToken cancellationToken) =>
+        httpContext.Items.ContainsKey(RenewedKey) ? Task.CompletedTask : RenewAsync(key, ticket, cancellationToken);
 
     public async Task RenewAsync(string key, AuthenticationTicket ticket, CancellationToken cancellationToken)
     {
@@ -118,7 +171,14 @@ public class LoginStore(IServiceScopeFactory scopeFactory, TimeProvider timeProv
             return null;
         }
 
-        return await RetrieveAsync(key, cancellationToken);
+        var ticket = await RetrieveAsync(key, cancellationToken);
+        if (ticket is not null)
+        {
+            // For TryRenewAsync: the cookie events see the ticket but not the session ID.
+            httpContext.Items[CurrentLoginIdKey] = Guid.Parse(key);
+        }
+
+        return ticket;
     }
 
     public async Task<AuthenticationTicket?> RetrieveAsync(string key, CancellationToken cancellationToken)
@@ -159,6 +219,7 @@ public class LoginStore(IServiceScopeFactory scopeFactory, TimeProvider timeProv
         var maximumExpiry = login.CreatedAt + LoginLifetime.Maximum;
         ticket.Properties.ExpiresUtc = slidingExpiry < maximumExpiry ? slidingExpiry : maximumExpiry;
 
+        login.RenewedAt = ticket.Properties.IssuedUtc ?? timeProvider.GetUtcNow();
         login.ExpiresAt = ticket.Properties.ExpiresUtc.Value;
         login.Ticket = TicketSerializer.Default.Serialize(ticket);
     }

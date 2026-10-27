@@ -127,6 +127,32 @@ public class LoginStorageTests(ApiFactory factory)
     }
 
     [Fact]
+    public async Task OverlappingRequests_RenewTheLoginOnce()
+    {
+        var time = new FakeTimeProvider(DateTimeOffset.UtcNow);
+        await using var application = WithTime(time);
+        await CreateUserAsync("overlap@example.com");
+        var cookie = await LoginAsync(application, "overlap@example.com");
+
+        // A day later, a burst of requests (the app loading its screen) all carry the day-old ticket.
+        time.Advance(TimeSpan.FromHours(25));
+        var responses = await Task.WhenAll(Enumerable.Range(0, 10)
+            .Select(_ => SendAsync(application, HttpMethod.Get, "/api/auth/me", cookie)));
+        try
+        {
+            Assert.All(responses, response => Assert.Equal(HttpStatusCode.OK, response.StatusCode));
+            Assert.Single(responses, response => response.Headers.Contains(HeaderNames.SetCookie));
+        }
+        finally
+        {
+            foreach (var response in responses)
+            {
+                response.Dispose();
+            }
+        }
+    }
+
+    [Fact]
     public async Task Login_IsExtendedByUse_AndExpiresAfter30DaysUnused()
     {
         var time = new FakeTimeProvider(DateTimeOffset.UtcNow);

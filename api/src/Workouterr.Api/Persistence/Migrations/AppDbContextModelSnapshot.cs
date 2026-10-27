@@ -199,6 +199,10 @@ namespace Workouterr.Api.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_at");
 
+                    b.Property<DateTimeOffset>("RenewedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("renewed_at");
+
                     b.Property<byte[]>("Ticket")
                         .IsRequired()
                         .HasColumnType("bytea")

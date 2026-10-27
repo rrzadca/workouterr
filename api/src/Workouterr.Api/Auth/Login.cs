@@ -13,6 +13,10 @@ public class Login
 
     public DateTimeOffset CreatedAt { get; set; }
 
+    /// <summary>When the login was last extended (or created): the ticket's issued time. A renewal checks it in the
+    /// same UPDATE that writes it, so a login is extended at most once a day however many requests overlap.</summary>
+    public DateTimeOffset RenewedAt { get; set; }
+
     /// <summary>The sliding expiry, capped at <see cref="CreatedAt"/> + <see cref="LoginLifetime.Maximum"/>.</summary>
     public DateTimeOffset ExpiresAt { get; set; }
 }
