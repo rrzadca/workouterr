@@ -12,8 +12,10 @@ public static class AuthEndpoints
     {
         var auth = endpoints.MapGroup("/api/auth").WithTags("Auth");
 
+        // Every login gets a new session ID, even one sent while already logged in (see LoginStore).
         auth.MapPost("/login", Login)
             .WithName("Login")
+            .WithMetadata(new ReplacesCurrentLogin())
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 

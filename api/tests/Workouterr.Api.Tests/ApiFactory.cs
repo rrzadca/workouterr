@@ -17,6 +17,9 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     // Same major version as deploy/compose.dev.yaml.
     private readonly PostgreSqlContainer database = new PostgreSqlBuilder("postgres:18").Build();
 
+    // The login cookie is Secure, and the test client's cookie container sends a Secure cookie over HTTPS only.
+    public ApiFactory() => ClientOptions.BaseAddress = new Uri("https://localhost");
+
     public async ValueTask InitializeAsync()
     {
         await database.StartAsync();

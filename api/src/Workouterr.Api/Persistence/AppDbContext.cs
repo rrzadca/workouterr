@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Workouterr.Api.Auth;
 using Workouterr.Api.Users;
 
 namespace Workouterr.Api.Persistence;
@@ -8,6 +9,8 @@ namespace Workouterr.Api.Persistence;
 public class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options)
 {
+    public DbSet<Login> Logins => Set<Login>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -20,5 +23,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         builder.Entity<IdentityRole<Guid>>().ToTable("roles");
         builder.Entity<IdentityRoleClaim<Guid>>().ToTable("role_claims");
         builder.Entity<IdentityUserRole<Guid>>().ToTable("user_roles");
+
+        // Deleting a user deletes their logins.
+        builder.Entity<Login>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(login => login.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

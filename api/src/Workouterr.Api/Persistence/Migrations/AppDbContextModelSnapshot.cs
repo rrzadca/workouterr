@@ -184,6 +184,39 @@ namespace Workouterr.Api.Persistence.Migrations
                     b.ToTable("user_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("Workouterr.Api.Auth.Login", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<byte[]>("Ticket")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("ticket");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_logins");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_logins_user_id");
+
+                    b.ToTable("logins", (string)null);
+                });
+
             modelBuilder.Entity("Workouterr.Api.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -320,6 +353,16 @@ namespace Workouterr.Api.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_tokens_users_user_id");
+                });
+
+            modelBuilder.Entity("Workouterr.Api.Auth.Login", b =>
+                {
+                    b.HasOne("Workouterr.Api.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_logins_users_user_id");
                 });
 #pragma warning restore 612, 618
         }

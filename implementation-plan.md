@@ -97,7 +97,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   Scope: Accounts; Tech stack and hosting → Auth.
   Done when: API tests cover a good login (of a user created like the CLI does), a wrong password, an unknown
   email (same response), and logout.
-- [ ] **12. Login storage.** Server-side ticket store in PostgreSQL; cookie `HttpOnly`, `Secure`, `SameSite=Strict`,
+- [x] **12. Login storage.** Server-side ticket store in PostgreSQL; cookie `HttpOnly`, `Secure`, `SameSite=Strict`,
   30 days sliding (renewed at most once a day), 90 days max; session ID rotated on login; security stamp checked on
   every request.
   Scope: Tech stack and hosting → Auth.
