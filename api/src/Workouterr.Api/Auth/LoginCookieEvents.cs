@@ -25,10 +25,16 @@ public class LoginCookieEvents(SignInManager<User> signInManager, TimeProvider t
             return;
         }
 
+        var now = timeProvider.GetUtcNow();
         var issuedAt = context.Properties.IssuedUtc;
-        if (issuedAt is null || timeProvider.GetUtcNow() - issuedAt >= LoginLifetime.RenewAfter)
+        if (issuedAt is null || now - issuedAt >= LoginLifetime.RenewAfter)
         {
-            // A new IssuedUtc, an expiry 30 days from now (capped by LoginStore) and a fresh cookie.
+            // The handler gives the renewed ticket and cookie this lifetime (ExpiresUtc - IssuedUtc) from now: 30 days,
+            // cut short so the cookie never outlives the login's 90-day maximum.
+            var slidingExpiry = now + LoginLifetime.Sliding;
+            var maximumExpiry = LoginStore.GetMaximumExpiry(context.Properties);
+            context.Properties.IssuedUtc = now;
+            context.Properties.ExpiresUtc = maximumExpiry < slidingExpiry ? maximumExpiry : slidingExpiry;
             context.ShouldRenew = true;
         }
     }

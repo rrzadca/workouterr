@@ -17,6 +17,6 @@ public class Login
     public DateTimeOffset ExpiresAt { get; set; }
 }
 
-/// <summary>Endpoint metadata: a request to this endpoint ends the login it was sent with, so the sign-in it makes
-/// stores a new login under a new session ID.</summary>
+/// <summary>Endpoint metadata: a successful sign-in on this endpoint ends the login the request was sent with and
+/// stores a new login under a new session ID; a failed one leaves it in place.</summary>
 public sealed class ReplacesCurrentLogin;

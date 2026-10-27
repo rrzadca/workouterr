@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -15,9 +16,33 @@ namespace Workouterr.Api.Auth;
 /// </remarks>
 public class LoginStore(IServiceScopeFactory scopeFactory, TimeProvider timeProvider) : ITicketStore
 {
+    // HttpContext.Items key: the session ID a login request came with, ended once its sign-in succeeds.
+    private static readonly object ReplacedLoginIdKey = new();
+
+    // AuthenticationProperties item: the login's latest possible expiry, kept in the ticket so the cookie events can
+    // cap the renewed cookie without reading the store.
+    private const string MaximumExpiryItem = "MaximumExpiry";
+
+    /// <summary>The latest the login can expire (its start + <see cref="LoginLifetime.Maximum"/>); null for a ticket
+    /// that wasn't stored by this store.</summary>
+    public static DateTimeOffset? GetMaximumExpiry(AuthenticationProperties properties) =>
+        properties.Items.TryGetValue(MaximumExpiryItem, out var value) && value is not null
+            ? DateTimeOffset.Parse(value, CultureInfo.InvariantCulture)
+            : null;
+
     public Task<string> StoreAsync(AuthenticationTicket ticket) => StoreAsync(ticket, CancellationToken.None);
 
-    public async Task<string> StoreAsync(AuthenticationTicket ticket, CancellationToken cancellationToken)
+    public Task<string> StoreAsync(AuthenticationTicket ticket, CancellationToken cancellationToken) =>
+        AddLoginAsync(ticket, replacedLoginId: null, cancellationToken);
+
+    // The handler calls this overload, and only on a successful sign-in, so a wrong password leaves the current
+    // login in place.
+    public Task<string> StoreAsync(
+        AuthenticationTicket ticket, HttpContext httpContext, CancellationToken cancellationToken) =>
+        AddLoginAsync(ticket, httpContext.Items[ReplacedLoginIdKey] as Guid?, cancellationToken);
+
+    private async Task<string> AddLoginAsync(
+        AuthenticationTicket ticket, Guid? replacedLoginId, CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow();
         var login = new Login
@@ -27,10 +52,18 @@ public class LoginStore(IServiceScopeFactory scopeFactory, TimeProvider timeProv
             CreatedAt = now,
             Ticket = [],
         };
+        ticket.Properties.Items[MaximumExpiryItem] =
+            (now + LoginLifetime.Maximum).ToString("O", CultureInfo.InvariantCulture);
         SetTicket(login, ticket);
 
         await using var scope = scopeFactory.CreateAsyncScope();
         var database = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        // Deleted before the new login is added: if adding fails, the old session ID is still gone.
+        if (replacedLoginId is { } replacedId)
+        {
+            await database.Logins.Where(replaced => replaced.Id == replacedId).ExecuteDeleteAsync(cancellationToken);
+        }
+
         database.Logins.Add(login);
         await database.SaveChangesAsync(cancellationToken);
         return login.Id.ToString();
@@ -55,7 +88,15 @@ public class LoginStore(IServiceScopeFactory scopeFactory, TimeProvider timeProv
         }
 
         SetTicket(login, ticket);
-        await database.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await database.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // Deleted since it was read (a logout or a stamp change on another request): the deletion wins, and the
+            // next request with this cookie is anonymous.
+        }
     }
 
     public Task<AuthenticationTicket?> RetrieveAsync(string key) => RetrieveAsync(key, CancellationToken.None);
@@ -65,11 +106,15 @@ public class LoginStore(IServiceScopeFactory scopeFactory, TimeProvider timeProv
     public async Task<AuthenticationTicket?> RetrieveAsync(
         string key, HttpContext httpContext, CancellationToken cancellationToken)
     {
-        // A login request replaces the login it came with, so the session ID changes on every login: a session ID
-        // planted in the browser before the login is worthless after it.
+        // A successful login replaces the login it came with (see StoreAsync), so the session ID changes on every
+        // login: a session ID planted in the browser before the login is worthless after it.
         if (httpContext.GetEndpoint()?.Metadata.GetMetadata<ReplacesCurrentLogin>() is not null)
         {
-            await RemoveAsync(key, cancellationToken);
+            if (Guid.TryParse(key, out var replacedLoginId))
+            {
+                httpContext.Items[ReplacedLoginIdKey] = replacedLoginId;
+            }
+
             return null;
         }
 

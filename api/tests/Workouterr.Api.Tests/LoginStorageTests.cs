@@ -87,6 +87,25 @@ public class LoginStorageTests(ApiFactory factory)
     }
 
     [Fact]
+    public async Task FailedLogin_KeepsTheCurrentLogin()
+    {
+        var user = await CreateUserAsync("failed-rotate@example.com");
+        var cookie = await LoginAsync(factory, "failed-rotate@example.com");
+
+        using var client = CreateClient(factory);
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        {
+            Content = JsonContent.Create(new LoginRequest("failed-rotate@example.com", "Wrong-password-1")),
+        };
+        request.Headers.Add(HeaderNames.Cookie, cookie);
+        using var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, await GetMeStatusAsync(factory, cookie));
+        Assert.Equal(1, await CountLoginsAsync(user));
+    }
+
+    [Fact]
     public async Task Login_IsRenewedAtMostOnceADay()
     {
         var time = new FakeTimeProvider(DateTimeOffset.UtcNow);
@@ -144,6 +163,32 @@ public class LoginStorageTests(ApiFactory factory)
 
         time.Advance(TimeSpan.FromDays(2));
         Assert.Equal(HttpStatusCode.Unauthorized, await GetMeStatusAsync(application, cookie));
+    }
+
+    [Fact]
+    public async Task RenewedCookie_ExpiresNoLaterThanTheLogin()
+    {
+        var time = new FakeTimeProvider(DateTimeOffset.UtcNow);
+        var loginStart = time.GetUtcNow();
+        await using var application = WithTime(time);
+        await CreateUserAsync("cookie-maximum@example.com");
+        var cookie = await LoginAsync(application, "cookie-maximum@example.com");
+
+        for (var day = 20; day <= 80; day += 20)
+        {
+            time.Advance(TimeSpan.FromDays(20));
+            Assert.Equal(HttpStatusCode.OK, await GetMeStatusAsync(application, cookie));
+        }
+
+        // Day 85: a plain 30-day renewal would run to day 115.
+        time.Advance(TimeSpan.FromDays(5));
+        using var response = await SendAsync(application, HttpMethod.Get, "/api/auth/me", cookie);
+
+        var renewedCookie = SetCookieHeaderValue.Parse(response.Headers.GetValues(HeaderNames.SetCookie).Single());
+        Assert.NotNull(renewedCookie.Expires);
+        // The Expires attribute has whole seconds.
+        var maximumExpiry = loginStart + LoginLifetime.Maximum;
+        Assert.InRange(renewedCookie.Expires.Value, maximumExpiry - TimeSpan.FromSeconds(1), maximumExpiry);
     }
 
     // The same API and database, on a clock the test moves.
