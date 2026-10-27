@@ -33,6 +33,14 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("ConnectionStrings:Workouterr", database.GetConnectionString());
     }
 
+    // Every client sends the Origin a browser on the app's own page would, so state-changing requests pass the CSRF
+    // guard. A request that sets its own Origin keeps it.
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        client.DefaultRequestHeaders.Add("Origin", "https://localhost");
+    }
+
     public override async ValueTask DisposeAsync()
     {
         await base.DisposeAsync();

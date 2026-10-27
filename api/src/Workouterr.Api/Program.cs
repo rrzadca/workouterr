@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Workouterr.Api;
 using Workouterr.Api.Auth;
+using Workouterr.Api.Compatibility;
 using Workouterr.Api.Health;
 using Workouterr.Api.Persistence;
 using Workouterr.Api.Users;
@@ -42,6 +43,9 @@ if (CommandLineInterface.IsCommand(args))
 
 application.UseExceptionHandler();
 application.UseStatusCodePages();
+// Both answer before authentication, so a rejected request never touches the login store.
+application.UseClientVersionCheck();
+application.UseCsrfGuard();
 application.UseAuthentication();
 application.UseAuthorization();
 

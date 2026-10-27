@@ -102,7 +102,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   every request.
   Scope: Tech stack and hosting → Auth.
   Done when: API tests show a logout and a stamp change take effect on the next request.
-- [ ] **13. CSRF guard and client version.** Middleware: state-changing requests must be JSON with a matching
+- [x] **13. CSRF guard and client version.** Middleware: state-changing requests must be JSON with a matching
   `Origin`; the client version header is read (the `426` path is in place but unused).
   Scope: Tech stack and hosting → Auth (CSRF); Non-functional requirements → old clients.
   Done when: API tests reject a cross-origin login POST and a form-encoded one.
