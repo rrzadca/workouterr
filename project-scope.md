@@ -328,6 +328,12 @@ The project is also a learning path for building REST APIs with .NET and ASP.NET
     user's stored data is deleted, never synced to the wrong account
   - Cookie is `HttpOnly`, `Secure`, `SameSite=Strict`; the session ID is rotated on login
   - CSRF: state-changing requests must be JSON and carry an `Origin` header matching the app's domain
+    - "Matching" compares the Origin's host and port with the request's `Host` header, so no domain is configured;
+      the dev proxy and Caddy must pass `Host` through unchanged. The scheme is ignored (the API sees plain HTTP
+      behind them)
+    - A state-changing request without an `Origin` is rejected, which also blocks clients that aren't browsers
+      (native apps, curl). Native apps will need another way through (e.g. a token instead of the cookie), decided
+      when one is built
   - Login, registration, password reset and invite redemption are rate limited (failed attempts per email and per
     IP, stored in PostgreSQL so restarts don't reset them; ASP.NET Core's built-in rate limiter keeps counts in
     memory, so it isn't used for this). Responses never reveal whether an email is registered

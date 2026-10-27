@@ -102,17 +102,19 @@ docs/                         design reference (`docs/design/`), server setup, i
   every request.
   Scope: Tech stack and hosting → Auth.
   Done when: API tests show a logout and a stamp change take effect on the next request.
-- [ ] **13. CSRF guard and client version.** Middleware: state-changing requests must be JSON with a matching
+- [x] **13. CSRF guard and client version.** Middleware: state-changing requests must be JSON with a matching
   `Origin`; the client version header is read (the `426` path is in place but unused).
   Scope: Tech stack and hosting → Auth (CSRF); Non-functional requirements → old clients.
   Done when: API tests reject a cross-origin login POST and a form-encoded one.
 - [ ] **14. Login screen and app shell.** Login page, auth guard, 401 handling, logout; tablet-first app layout with
   navigation (sidebar with logo, sections and a footer with the user, active plan, sun / moon theme button and
-  logout). The theme button saves to `localStorage` only; task 18 saves it on the account.
-  Scope: Accounts → Theme; Non-functional requirements (iPad).
+  logout). The theme button saves to `localStorage` only; task 18 saves it on the account. Every request carries
+  the app's build version in the client version header; an OpenAPI transformer adds that header and the guard's
+  `403` / `415` / `426` responses to the document, so the client takes the header name from the contract.
+  Scope: Accounts → Theme; Non-functional requirements (iPad, old clients).
   Design: `docs/design/screens/LoginScreen.jsx` (login half only), `AppShell.jsx`.
   Done when: you can log in on an iPad-sized viewport, reach an empty home page, switch the theme and log out; the
-  layout is checked on the real iPad.
+  layout is checked on the real iPad; the API's requests carry the version header.
 
 ### Deploy
 
