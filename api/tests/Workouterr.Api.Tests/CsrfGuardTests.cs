@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Workouterr.Api.Auth;
@@ -71,6 +73,32 @@ public class CsrfGuardTests(ApiFactory factory)
         Assert.Equal(HttpStatusCode.UnsupportedMediaType, response.StatusCode);
     }
 
+    // Over HTTP/2 and HTTP/3 a body needs neither Content-Length nor Transfer-Encoding, and nothing makes it declare a
+    // Content-Type. The test server speaks HTTP/1.1 and would add Transfer-Encoding, so the request is built directly
+    // with the server's word that it has a body.
+    [Fact]
+    public async Task Logout_IsRejected_WithAnUndeclaredBody()
+    {
+        var context = new DefaultHttpContext { RequestServices = factory.Services };
+        context.Request.Method = HttpMethods.Post;
+        context.Request.Path = "/api/auth/logout";
+        context.Request.Host = new HostString("localhost");
+        context.Request.Headers.Origin = ApiFactory.AppOrigin;
+        context.Request.Body = new MemoryStream("email=csrf@example.com"u8.ToArray());
+        context.Features.Set<IHttpRequestBodyDetectionFeature>(new RequestWithBody());
+        var reachedEndpoint = false;
+        var guard = new CsrfGuard(_ =>
+        {
+            reachedEndpoint = true;
+            return Task.CompletedTask;
+        });
+
+        await guard.InvokeAsync(context);
+
+        Assert.False(reachedEndpoint);
+        Assert.Equal(StatusCodes.Status415UnsupportedMediaType, context.Response.StatusCode);
+    }
+
     [Fact]
     public async Task Get_IsAllowed_FromAnotherOrigin()
     {
@@ -81,5 +109,10 @@ public class CsrfGuardTests(ApiFactory factory)
         using var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    private sealed class RequestWithBody : IHttpRequestBodyDetectionFeature
+    {
+        public bool CanHaveBody => true;
     }
 }

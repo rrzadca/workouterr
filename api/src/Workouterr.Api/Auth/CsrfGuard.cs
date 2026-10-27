@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Net.Http.Headers;
 
 namespace Workouterr.Api.Auth;
@@ -50,9 +51,12 @@ public class CsrfGuard(RequestDelegate next)
         Uri.TryCreate(request.Headers.Origin, UriKind.Absolute, out var origin)
         && string.Equals(origin.Authority, request.Host.Value, StringComparison.OrdinalIgnoreCase);
 
-    // A Content-Type counts too: an empty form submission still says it is a form.
+    // The server knows best: over HTTP/2 and HTTP/3 a body needs neither Content-Length nor Transfer-Encoding. The
+    // headers cover a server that doesn't say, and a Content-Type counts too: an empty form submission still says it is
+    // a form.
     private static bool HasBody(HttpRequest request) =>
-        request.ContentLength > 0 || request.ContentType is not null
+        request.HttpContext.Features.Get<IHttpRequestBodyDetectionFeature>()?.CanHaveBody == true
+        || request.ContentLength > 0 || request.ContentType is not null
         || request.Headers.ContainsKey(HeaderNames.TransferEncoding);
 }
 
