@@ -25,7 +25,7 @@ public class ClientVersionCheckTests(ApiFactory factory)
     public async Task OlderVersions_AreTurnedAway_OnceAMinimumIsSet(string? clientVersion, HttpStatusCode expected)
     {
         await using var application = factory.WithWebHostBuilder(builder =>
-            builder.UseSetting("Clients:MinimumVersion", "2.0.0"));
+            builder.UseSetting(ClientVersionCheck.MinimumVersionSetting, "2.0.0"));
         using var client = application.CreateClient();
         if (clientVersion is not null)
         {

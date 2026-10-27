@@ -9,8 +9,9 @@ namespace Workouterr.Api.Compatibility;
 public class ClientVersionCheck(RequestDelegate next, IConfiguration configuration)
 {
     public const string HeaderName = "X-Client-Version";
+    public const string MinimumVersionSetting = "Clients:MinimumVersion";
 
-    private readonly Version? minimumVersion = configuration.GetValue<Version?>("Clients:MinimumVersion");
+    private readonly Version? minimumVersion = configuration.GetValue<Version?>(MinimumVersionSetting);
 
     public async Task InvokeAsync(HttpContext context)
     {

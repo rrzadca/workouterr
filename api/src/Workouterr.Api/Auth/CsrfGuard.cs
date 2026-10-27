@@ -9,6 +9,9 @@ namespace Workouterr.Api.Auth;
 /// </summary>
 public class CsrfGuard(RequestDelegate next)
 {
+    public const string CrossOriginTitle = "Cross-origin request";
+    public const string JsonRequiredTitle = "JSON required";
+
     public async Task InvokeAsync(HttpContext context)
     {
         var request = context.Request;
@@ -21,7 +24,7 @@ public class CsrfGuard(RequestDelegate next)
         // Browsers send Origin on every POST, PUT, PATCH and DELETE, so a request without one didn't come from our app.
         if (!IsSameOrigin(request))
         {
-            await TypedResults.Problem(statusCode: StatusCodes.Status403Forbidden, title: "Cross-origin request")
+            await TypedResults.Problem(statusCode: StatusCodes.Status403Forbidden, title: CrossOriginTitle)
                 .ExecuteAsync(context);
             return;
         }
@@ -29,7 +32,7 @@ public class CsrfGuard(RequestDelegate next)
         // A request without a body (logout) has nothing a form could have filled in; one with a body must be JSON.
         if (HasBody(request) && !request.HasJsonContentType())
         {
-            await TypedResults.Problem(statusCode: StatusCodes.Status415UnsupportedMediaType, title: "JSON required")
+            await TypedResults.Problem(statusCode: StatusCodes.Status415UnsupportedMediaType, title: JsonRequiredTitle)
                 .ExecuteAsync(context);
             return;
         }

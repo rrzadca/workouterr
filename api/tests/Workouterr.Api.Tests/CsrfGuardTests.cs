@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Workouterr.Api.Auth;
 
@@ -52,8 +53,11 @@ public class CsrfGuardTests(ApiFactory factory)
 
         using var response = await client.PostAsync("/api/auth/login", form, TestContext.Current.CancellationToken);
 
+        // The endpoint's own JSON binding would answer 415 too; the title shows the guard turned it away first.
         Assert.Equal(HttpStatusCode.UnsupportedMediaType, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(TestContext.Current.CancellationToken);
+        Assert.Equal(CsrfGuard.JsonRequiredTitle, problem?.Title);
     }
 
     [Fact]
