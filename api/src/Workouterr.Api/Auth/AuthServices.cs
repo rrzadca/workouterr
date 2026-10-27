@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Workouterr.Api.Persistence;
 using Workouterr.Api.Users;
 
@@ -33,23 +35,27 @@ public static class AuthServices
             .AddSignInManager();
 
         // The Identity application cookie is the only way in (no external or two-factor logins, so not
-        // AddIdentityCookies). Cookie defaults redirect to a login page; an API answers 401 / 403 instead.
+        // AddIdentityCookies).
         services.AddAuthentication(IdentityConstants.ApplicationScheme)
             .AddCookie(IdentityConstants.ApplicationScheme, options =>
             {
-                // What AddIdentityCookies would set: the security stamp is checked, so a stamp change ends the login.
-                options.Events.OnValidatePrincipal = SecurityStampValidator.ValidatePrincipalAsync;
-                options.Events.OnRedirectToLogin = context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Task.CompletedTask;
-                };
-                options.Events.OnRedirectToAccessDenied = context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    return Task.CompletedTask;
-                };
+                // Out of reach of scripts, sent over HTTPS only, and never on requests started by another site.
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+
+                // LoginCookieEvents renews once a day; the built-in sliding renews only past half the lifetime.
+                options.ExpireTimeSpan = LoginLifetime.Sliding;
+                options.SlidingExpiration = false;
+
+                // Resolved from DI on each request, so the events can use scoped services (SignInManager).
+                options.EventsType = typeof(LoginCookieEvents);
             });
+        services.AddScoped<LoginCookieEvents>();
+        services.AddSingleton<LoginStore>();
+        services.AddOptions<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme)
+            .Configure<LoginStore>((options, loginStore) => options.SessionStore = loginStore);
+        services.TryAddSingleton(TimeProvider.System);
         services.AddAuthorization();
 
         return services;
