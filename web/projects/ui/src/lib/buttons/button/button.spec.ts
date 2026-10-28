@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { type IconName } from '../icon/icons';
+import { type IconName } from '../../icon/icons';
 import { Button, type ButtonVariant } from './button';
 
 @Component({

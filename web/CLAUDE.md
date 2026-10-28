@@ -10,6 +10,17 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   `@workouterr/api-client` (a `tsconfig.json` path, like the UI library). A schema per component (`HealthResponse`)
   and per operation response (`GetHealthResponse`); calls pass the response schema to `httpResource` as
   `parse: GetHealthResponse.parse`, so a body the contract does not allow becomes the resource's error.
+- Every `/api` request carries the build version (`package.json` `version`) in the client version header
+  (`src/app/api/client-version.ts`); the header name is checked against the contract's operation header schemas.
+- Auth (`src/app/auth/`): `AuthService` knows the current user from `/api/auth/me` (asked once per load) and logs in
+  and out; `requireLogin` / `requireLoggedOut` guard the routes; a 401 from any call not marked `handlesUnauthorized`
+  ends the login and shows the login page. Pages after login are children of the `Shell` route (sidebar layout);
+  every page is lazy-loaded (`loadComponent`).
+- Forms are Signal Forms (`@angular/forms/signals`): `form(model, (path) => validateStandardSchema(path, SomeBody))`
+  with the generated zod schema, so the API's limits are the form's; `[formRoot]` on the `<form>`, `[formField]` on
+  each control. UI library controls are Signal Forms controls (`FormValueControl`: a `value` model, plus the state
+  inputs `[formField]` fills, such as `touched` and `invalid`), so `<rad-form-input-text [formField]="…" />` binds
+  like a native input; the page passes only the translated `error` message.
 - The app imports the library as `@workouterr/ui`, mapped in `tsconfig.json` to its source (`src/public-api.ts`), so it
   builds with the app and never needs building first.
 - Calls to the API use relative `/api/...` URLs: `ng serve` proxies them to the API (`proxy.conf.json`), Caddy does the

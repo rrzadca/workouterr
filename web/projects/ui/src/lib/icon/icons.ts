@@ -1,9 +1,16 @@
 import {
   LucideArrowRight,
   LucideCheck,
+  LucideCircleAlert,
+  LucideHouse,
   LucideLoaderCircle,
+  LucideLock,
+  LucideLogOut,
+  LucideMail,
+  LucideMoon,
   LucidePlus,
   LucideRefreshCw,
+  LucideSun,
   type LucideIcon,
 } from '@lucide/angular';
 
@@ -12,9 +19,16 @@ import {
 export const icons = {
   'arrow-right': LucideArrowRight,
   check: LucideCheck,
+  'circle-alert': LucideCircleAlert,
+  house: LucideHouse,
   'loader-circle': LucideLoaderCircle,
+  lock: LucideLock,
+  'log-out': LucideLogOut,
+  mail: LucideMail,
+  moon: LucideMoon,
   plus: LucidePlus,
   'refresh-cw': LucideRefreshCw,
+  sun: LucideSun,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof icons;

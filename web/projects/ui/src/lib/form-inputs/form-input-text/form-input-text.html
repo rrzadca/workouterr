@@ -1,0 +1,33 @@
+<!-- The label wraps the input: tapping it focuses the input, and its text is the input's accessible name. -->
+<label class="flex flex-col gap-1.5">
+  <span class="text-label text-text-muted">{{ label() }}</span>
+  <span [class]="boxClasses()">
+    @if (icon(); as icon) {
+      <rad-icon [name]="icon" [size]="18" class="text-text-faint" />
+    }
+    <!-- 17 px text: Safari zooms into a focused input whose text is smaller than 16 px. Browsers paint an autofilled
+         input with their own background, which no style overrides; an inset shadow covers it with the box's colour. -->
+    <input
+      #inputElement
+      class="h-full min-w-0 flex-1 bg-transparent text-body-lg text-text-strong outline-none placeholder:text-text-faint disabled:opacity-55 autofill:shadow-[inset_0_0_0_100px_var(--surface-card)] autofill:[-webkit-text-fill-color:var(--text-strong)]"
+      [type]="type()"
+      [value]="value()"
+      [attr.name]="name() || null"
+      [attr.autocomplete]="autocomplete() ?? null"
+      [attr.placeholder]="placeholder() ?? null"
+      [attr.autocapitalize]="isLiteral() ? 'none' : null"
+      [attr.spellcheck]="isLiteral() ? 'false' : null"
+      [disabled]="disabled()"
+      [readOnly]="readonly()"
+      [attr.aria-invalid]="showsError() || null"
+      [attr.aria-describedby]="showsError() ? errorId : null"
+      (input)="value.set(inputElement.value)"
+      (blur)="touch.emit()"
+    />
+  </span>
+  @if (showsError()) {
+    <span class="text-caption text-status-danger" [id]="errorId">{{ error() }}</span>
+  } @else if (hint(); as hint) {
+    <span class="text-caption text-text-faint">{{ hint }}</span>
+  }
+</label>

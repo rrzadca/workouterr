@@ -24,7 +24,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
 // Enums travel as their names, so the OpenAPI document lists them and the client gets a closed set of strings.
 builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer<MiddlewareResponsesTransformer>());
 builder.Services.AddProblemDetails();
 // Checks the data annotations on request types (LoginRequest, …) and answers 400 with a validation problem.
 builder.Services.AddValidation();

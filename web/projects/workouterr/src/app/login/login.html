@@ -1,0 +1,49 @@
+<div class="flex min-h-dvh" *transloco="let t">
+  <!-- The brand panel is navy in both themes, as in the mockup. -->
+  <div class="hidden flex-[0_0_44%] flex-col items-center justify-center gap-5 bg-(--brand-navy) p-10 md:flex">
+    <img src="brand/logo-full-teal.png" [alt]="t('app.name')" class="w-[58%] max-w-65" />
+    <p class="max-w-70 text-center text-text-on-accent/60">{{ t('login.tagline') }}</p>
+  </div>
+
+  <main class="flex flex-1 items-center justify-center p-10">
+    <div class="flex w-full max-w-sm flex-col gap-6">
+      <div>
+        <h1 class="text-title-1 font-semibold tracking-title text-text-strong">{{ t('login.title') }}</h1>
+        <p class="mt-1.5 text-text-muted">{{ t('login.subtitle') }}</p>
+      </div>
+
+      <form [formRoot]="loginForm" class="flex flex-col gap-4">
+        <rad-form-input-text
+          type="email"
+          autocomplete="username"
+          icon="mail"
+          [label]="t('login.email')"
+          [error]="t(emailErrorKey())"
+          [formField]="loginForm.email"
+        />
+        <rad-form-input-text
+          type="password"
+          autocomplete="current-password"
+          icon="lock"
+          [label]="t('login.password')"
+          [error]="t('login.passwordRequired')"
+          [formField]="loginForm.password"
+        />
+
+        @if (loginErrorKey(); as loginError) {
+          <p
+            role="alert"
+            class="flex items-center gap-2 rounded-md bg-status-danger-soft px-3 py-2.5 text-status-danger"
+          >
+            <rad-icon name="circle-alert" [size]="18" />
+            {{ t(loginError) }}
+          </p>
+        }
+
+        <rad-button type="submit" variant="primary" size="xl" fullWidth [loading]="loginForm().submitting()">
+          {{ t('login.submit') }}
+        </rad-button>
+      </form>
+    </div>
+  </main>
+</div>

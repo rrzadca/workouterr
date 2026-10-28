@@ -8,15 +8,26 @@ const themeStorageKey = 'workouterr.theme';
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly darkThemeQuery = matchMedia('(prefers-color-scheme: dark)');
-  private readonly savedTheme = this.readSavedTheme();
 
+  private readonly savedTheme = signal(this.readSavedTheme());
   private readonly systemTheme = signal<Theme>(this.darkThemeQuery.matches ? 'dark' : 'light');
-  readonly theme = computed(() => this.savedTheme ?? this.systemTheme());
+  readonly theme = computed(() => this.savedTheme() ?? this.systemTheme());
 
   constructor() {
     // A signal, so the zoneless app re-renders whatever reads `theme`.
     this.darkThemeQuery.addEventListener('change', (event) => this.systemTheme.set(event.matches ? 'dark' : 'light'));
     effect(() => (document.documentElement.dataset['theme'] = this.theme()));
+  }
+
+  // The theme button: switches to the other theme and keeps it, so the system theme no longer applies.
+  toggle() {
+    const theme = this.theme() === 'dark' ? 'light' : 'dark';
+    this.savedTheme.set(theme);
+    try {
+      localStorage.setItem(themeStorageKey, theme);
+    } catch {
+      // Blocked storage: the theme still switches, until the next load.
+    }
   }
 
   private readSavedTheme(): Theme | null {

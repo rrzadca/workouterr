@@ -11,6 +11,8 @@ ASP.NET Core Minimal API on .NET 10. Run every command from `api/`.
 - Errors are Problem Details (`application/problem+json`), never ad-hoc error bodies.
 - Endpoints are Minimal API handlers with typed results (`Results<Ok<T>, ProblemHttpResult>`), a name
   (`WithName`, the client's function name) and a tag, so the OpenAPI document describes them fully.
+- What middleware adds to every endpoint is described in the document by `MiddlewareResponsesTransformer`: the client
+  version header parameter and 426 on every operation, the CSRF guard's 403 and 415 on state-changing ones.
 - Every route sits under `/api`, so the dev proxy and Caddy forward it to the API.
 - Database names are snake_case (`EFCore.NamingConventions`); tables EF or Identity name explicitly get a snake_case
   name in `AppDbContext`. Migrations live in `Persistence/Migrations`, are generated and never edited by hand.
