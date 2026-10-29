@@ -43,7 +43,8 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   native events such as `(click)` reach the host by bubbling. Icons are Lucide (`@lucide/angular`, bundled, so
   self-hosted): `<rad-icon name="plus" />`, with the names allowed listed in `projects/ui/src/lib/icon/icons.ts` (add
   one there when a screen needs it). Storybook (`@storybook/angular-vite`) shows every story twice, in a light and a
-  dark panel (`.storybook/preview.ts`).
+  dark panel (`.storybook/preview.ts`); a story covering the whole viewport (a modal) sets
+  `parameters: { singleThemePanel: true }` and renders once, in the theme picked in the toolbar.
 - Global styles live in the library: `projects/ui/src/styles/global.css` (Tailwind, fonts, tokens, theme), loaded by
   the app's `styles.css` and by Storybook. PostCSS (Tailwind) is configured once, in `.postcssrc.json` at the
   workspace root.

@@ -2,11 +2,13 @@ import { argsToTemplate, moduleMetadata, type Meta, type StoryObj } from '@story
 import { Button } from '../../buttons/button/button';
 import { Dialog } from './dialog';
 
-// The dialog covers its whole panel: each story shows one.
+// A modal covers the whole viewport, so each story renders once, in the toolbar's theme, and the docs page shows each
+// story in its own iframe.
 const meta: Meta<Dialog> = {
   title: 'Feedback/Dialog',
   component: Dialog,
   decorators: [moduleMetadata({ imports: [Button] })],
+  parameters: { singleThemePanel: true, docs: { story: { inline: false, iframeHeight: 360 } } },
   args: {
     title: 'New version available',
     description: 'Workouterr has been updated. Reload to keep using it.',
