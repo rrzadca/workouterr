@@ -20,6 +20,9 @@ export class AuthService {
   private readonly router = inject(Router);
 
   private readonly authContext = new HttpContext().set(handlesUnauthorized, true);
+  // The /api/auth/me request in flight, shared by every caller until it settles. Overlapping navigations would
+  // otherwise each ask, and a cancelled navigation's late answer could overwrite a login made since.
+  private currentUserRequest: Promise<CurrentUserResponseOutput | null> | null = null;
 
   // `undefined` until the API has been asked, `null` when nobody is logged in.
   private readonly user = signal<CurrentUserResponseOutput | null | undefined>(undefined);
@@ -34,6 +37,12 @@ export class AuthService {
     if (knownUser !== undefined) {
       return knownUser;
     }
+    // Cleared once settled, so a failure leaves the next call free to ask again.
+    this.currentUserRequest ??= this.fetchCurrentUser().finally(() => (this.currentUserRequest = null));
+    return this.currentUserRequest;
+  }
+
+  private async fetchCurrentUser(): Promise<CurrentUserResponseOutput | null> {
     let user: CurrentUserResponseOutput | null;
     try {
       user = GetCurrentUserResponse.parse(

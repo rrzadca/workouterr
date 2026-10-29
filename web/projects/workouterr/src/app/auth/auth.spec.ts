@@ -72,6 +72,32 @@ describe('Auth', () => {
     expect(await navigateAnsweringMe('/', (me) => me.flush(user))).toBe('/');
   });
 
+  it('shares one /api/auth/me request between overlapping callers', async () => {
+    const auth = TestBed.inject(AuthService);
+
+    const first = auth.loadCurrentUser();
+    const second = auth.loadCurrentUser();
+    httpTesting.expectOne('/api/auth/me').flush(user);
+
+    expect(await first).toEqual(user);
+    expect(await second).toEqual(user);
+  });
+
+  it('asks again after a shared request fails, rejecting every caller of the failed one', async () => {
+    const auth = TestBed.inject(AuthService);
+
+    const first = auth.loadCurrentUser();
+    const second = auth.loadCurrentUser();
+    httpTesting.expectOne('/api/auth/me').error(new ProgressEvent('error'));
+    await expect(first).rejects.toBeDefined();
+    await expect(second).rejects.toBeDefined();
+
+    const retry = auth.loadCurrentUser();
+    httpTesting.expectOne('/api/auth/me').flush(user);
+
+    expect(await retry).toEqual(user);
+  });
+
   it('sends a logged-in user away from the login page', async () => {
     expect(await navigateAnsweringMe('/login', (me) => me.flush(user))).toBe('/');
   });
