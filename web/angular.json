@@ -76,7 +76,10 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "setupFiles": ["projects/ui/testing/html-dialog.ts"]
+          }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
@@ -108,7 +111,8 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/ui/tsconfig.spec.json"
+            "tsConfig": "projects/ui/tsconfig.spec.json",
+            "setupFiles": ["projects/ui/testing/html-dialog.ts"]
           }
         },
         "lint": {

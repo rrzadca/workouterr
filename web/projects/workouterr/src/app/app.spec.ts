@@ -29,7 +29,7 @@ describe('App', () => {
   it('shows no prompt while the API accepts this build', async () => {
     const { page } = await render();
 
-    expect(page.querySelector('[role="dialog"]')).toBeNull();
+    expect(page.querySelector('dialog')).toBeNull();
   });
 
   it('asks for a reload once the API has turned this build away', async () => {
@@ -38,7 +38,8 @@ describe('App', () => {
     TestBed.inject(ClientVersionService).markOutdated();
     await fixture.whenStable();
 
-    const dialog = page.querySelector('[role="dialog"]');
+    const dialog = page.querySelector('dialog');
+    expect(dialog?.hasAttribute('open')).toBe(true);
     expect(dialog?.textContent).toContain('New version available');
     expect(dialog?.querySelector('button')?.textContent).toContain('Reload');
   });

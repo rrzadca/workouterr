@@ -1,18 +1,17 @@
-<!-- The scrim covers the page and takes its taps, so nothing behind the dialog can be pressed. -->
-<div class="fixed inset-0 z-60 flex items-center justify-center bg-scrim px-4 [backdrop-filter:var(--blur-scrim)]">
-  <div
-    role="dialog"
-    aria-modal="true"
-    class="w-105 max-w-full rounded-xl border border-border-hairline bg-surface-overlay p-5 text-center shadow-window [backdrop-filter:var(--blur-vibrancy)]"
-    [attr.aria-labelledby]="titleId"
-    [attr.aria-describedby]="description() ? descriptionId : null"
-  >
-    <h2 class="text-title-3 font-semibold text-text-strong" [id]="titleId">{{ title() }}</h2>
-    @if (description(); as description) {
-      <p class="mt-1.5 text-body text-pretty text-text-muted" [id]="descriptionId">{{ description }}</p>
-    }
-    <div class="mt-5 flex justify-end gap-2">
-      <ng-content />
-    </div>
+<!-- The browser draws the scrim (::backdrop) behind the dialog and keeps the page under it inert. -->
+<dialog
+  #dialogElement
+  class="m-auto w-105 max-w-[calc(100%-2rem)] rounded-xl border border-border-hairline bg-surface-overlay p-5 text-center text-text-default shadow-window [backdrop-filter:var(--blur-vibrancy)] backdrop:bg-scrim backdrop:[backdrop-filter:var(--blur-scrim)]"
+  [attr.aria-labelledby]="titleId"
+  [attr.aria-describedby]="description() ? descriptionId : null"
+  (cancel)="$event.preventDefault()"
+  (close)="reopen()"
+>
+  <h2 class="text-title-3 font-semibold text-text-strong" [id]="titleId">{{ title() }}</h2>
+  @if (description(); as description) {
+    <p class="mt-1.5 text-body text-pretty text-text-muted" [id]="descriptionId">{{ description }}</p>
+  }
+  <div class="mt-5 flex justify-end gap-2">
+    <ng-content />
   </div>
-</div>
+</dialog>

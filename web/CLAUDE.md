@@ -55,7 +55,8 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   outside Angular touches the theme. Critical-CSS inlining is off in production: it leaves the
   `[data-theme='dark']` rules out of the inlined CSS.
 - Unit tests run on Vitest through Angular's runner (`ng test`), with `jsdom`; HTTP is faked with
-  `provideHttpClientTesting`.
+  `provideHttpClientTesting`. jsdom has no modal dialogs: `projects/ui/testing/html-dialog.ts` stubs `showModal()` /
+  `close()`, loaded by both projects' tests (`setupFiles` in `angular.json`).
 
 ## Commands
 
