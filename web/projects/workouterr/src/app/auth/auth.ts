@@ -42,6 +42,12 @@ export class AuthService {
     return this.currentUserRequest;
   }
 
+  // Nobody is logged in on this device any more: forget the user and show the login page.
+  private async showLoggedOut() {
+    this.user.set(null);
+    await this.router.navigateByUrl('/login');
+  }
+
   private async fetchCurrentUser(): Promise<CurrentUserResponseOutput | null> {
     let user: CurrentUserResponseOutput | null;
     try {
@@ -69,14 +75,12 @@ export class AuthService {
   // Leaves `currentUser` in place when the request fails: the cookie is still there, so the device is still logged in.
   async logout() {
     await firstValueFrom(this.http.post('/api/auth/logout', null, { context: this.authContext }));
-    this.user.set(null);
-    await this.router.navigateByUrl('/login');
+    await this.showLoggedOut();
   }
 
   // The API answered 401 to a logged-in request: the login expired, or ended elsewhere (password change, logout of all
   // devices).
   async loginEnded() {
-    this.user.set(null);
-    await this.router.navigateByUrl('/login');
+    await this.showLoggedOut();
   }
 }

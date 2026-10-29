@@ -38,7 +38,7 @@ public class MiddlewareResponsesTransformer : IOpenApiDocumentTransformer
 
             // In status code order, after the endpoint's own responses.
             operation.Responses ??= [];
-            if (!IsSafe(method))
+            if (!CsrfGuard.IsSafe(method.Method))
             {
                 AddProblem(operation, document, StatusCodes.Status403Forbidden, "Forbidden");
                 AddProblem(operation, document, StatusCodes.Status415UnsupportedMediaType, "Unsupported Media Type");
@@ -61,9 +61,4 @@ public class MiddlewareResponsesTransformer : IOpenApiDocumentTransformer
                 },
             },
         });
-
-    // The same methods the CSRF guard lets through.
-    private static bool IsSafe(HttpMethod method) =>
-        method == HttpMethod.Get || method == HttpMethod.Head || method == HttpMethod.Options
-        || method == HttpMethod.Trace;
 }

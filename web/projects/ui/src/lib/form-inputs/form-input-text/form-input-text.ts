@@ -1,7 +1,7 @@
 import { booleanAttribute, Component, computed, type ElementRef, input, model, output, viewChild } from '@angular/core';
 import { type FormValueControl } from '@angular/forms/signals';
 import { Icon } from '../../icon/icon';
-import { IconName } from '../../icon/icons';
+import { type IconName } from '../../icon/icons';
 
 export type FormInputTextType = 'text' | 'email' | 'password' | 'search' | 'tel' | 'url';
 

@@ -4,12 +4,8 @@
     [attr.aria-label]="t('nav.label')"
   >
     <a routerLink="/" class="flex items-center gap-2 px-2.5 pb-1.5">
-      <img [src]="'brand/logo-mark-' + (theme() === 'dark' ? 'teal' : 'navy') + '.png'" alt="" class="h-7.5" />
-      <img
-        [src]="'brand/logo-word-' + (theme() === 'dark' ? 'teal' : 'navy') + '.png'"
-        [alt]="t('app.name')"
-        class="h-3.75"
-      />
+      <img [src]="'brand/logo-mark-' + themeChoice().logoColour + '.png'" alt="" class="h-7.5" />
+      <img [src]="'brand/logo-word-' + themeChoice().logoColour + '.png'" [alt]="t('app.name')" class="h-3.75" />
     </a>
 
     <div class="flex flex-col gap-px">
@@ -40,8 +36,8 @@
         <span class="block truncate text-caption text-text-muted">{{ t('nav.noActivePlan') }}</span>
       </span>
       <rad-icon-button
-        [icon]="theme() === 'dark' ? 'sun' : 'moon'"
-        [label]="t(theme() === 'dark' ? 'nav.lightTheme' : 'nav.darkTheme')"
+        [icon]="themeChoice().toggleIcon"
+        [label]="t(themeChoice().toggleLabelKey)"
         (click)="toggleTheme()"
       />
       <rad-icon-button icon="log-out" [label]="t('nav.logout')" [loading]="loggingOut()" (click)="logout()" />
