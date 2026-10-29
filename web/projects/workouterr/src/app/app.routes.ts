@@ -9,6 +9,11 @@ export const routes: Routes = [
     loadComponent: () => import('./login/login').then((module) => module.Login),
     canActivate: [requireLoggedOut],
   },
+  // Shown when the API can't say who is logged in; no guard, so it never asks.
+  {
+    path: 'unreachable',
+    loadComponent: () => import('./unreachable/unreachable').then((module) => module.Unreachable),
+  },
   // Every page after login sits inside the shell, behind one guard.
   {
     path: '',

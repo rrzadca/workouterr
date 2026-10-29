@@ -11,6 +11,7 @@ import {
   LucidePlus,
   LucideRefreshCw,
   LucideSun,
+  LucideWifiOff,
   type LucideIcon,
 } from '@lucide/angular';
 
@@ -29,6 +30,7 @@ export const icons = {
   plus: LucidePlus,
   'refresh-cw': LucideRefreshCw,
   sun: LucideSun,
+  'wifi-off': LucideWifiOff,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof icons;

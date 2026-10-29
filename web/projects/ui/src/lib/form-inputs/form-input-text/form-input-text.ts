@@ -8,7 +8,7 @@ export type FormInputTextType = 'text' | 'email' | 'password' | 'search' | 'tel'
 // Full class names, so Tailwind finds them in this file.
 const boxClasses =
   'flex h-control-md items-center gap-2 rounded-sm border bg-surface-card px-3 ' +
-  'shadow-[inset_0_1px_1px_rgba(8,32,47,0.05)] [transition:var(--transition-control)] ' +
+  'shadow-field [transition:var(--transition-control)] ' +
   'focus-within:ring-3 focus-within:ring-accent-ring';
 const validBoxClasses = 'border-border-field focus-within:border-accent';
 const invalidBoxClasses = 'border-status-danger';

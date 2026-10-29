@@ -105,15 +105,38 @@ describe('Login', () => {
     expect(element.querySelector('[role="alert"]')).toBeNull();
   });
 
-  it('tells a connection problem apart from wrong credentials', async () => {
+  // Submits valid credentials, answers the login request the given way and resolves with the shown error, if any.
+  async function loginAnswering(answer: (request: ReturnType<typeof httpTesting.expectOne>) => void) {
     const { element, email, password, type, submit, settle } = await render();
     await type(email, 'me@example.com');
     await type(password, 'correct-horse-battery');
 
     await submit();
-    httpTesting.expectOne('/api/auth/login').error(new ProgressEvent('error'));
+    answer(httpTesting.expectOne('/api/auth/login'));
     await settle();
 
-    expect(element.querySelector('[role="alert"]')?.textContent).toContain("Couldn't log in.");
+    return element.querySelector('[role="alert"]')?.textContent ?? null;
+  }
+
+  it('blames the connection when the API never answers', async () => {
+    expect(await loginAnswering((login) => login.error(new ProgressEvent('error')))).toContain('Check your connection');
+  });
+
+  it('blames the server, not the connection, when the API answers with an error', async () => {
+    expect(
+      await loginAnswering((login) => login.flush(null, { status: 503, statusText: 'Service Unavailable' })),
+    ).toContain('Something went wrong on our side.');
+  });
+
+  it('blames the server when the answer breaks the contract', async () => {
+    expect(await loginAnswering((login) => login.flush({ email: 'me@example.com' }))).toContain(
+      'Something went wrong on our side.',
+    );
+  });
+
+  it('shows no error for an outdated build: the "new version" dialog says it', async () => {
+    expect(
+      await loginAnswering((login) => login.flush(null, { status: 426, statusText: 'Upgrade Required' })),
+    ).toBeNull();
   });
 });

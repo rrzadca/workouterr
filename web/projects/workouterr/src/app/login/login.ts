@@ -42,10 +42,33 @@ export class Login {
     try {
       await this.auth.login(this.credentials());
     } catch (error) {
-      const wrongCredentials = error instanceof HttpErrorResponse && error.status === HttpStatusCode.Unauthorized;
-      return { kind: wrongCredentials ? 'invalidCredentials' : 'failed' };
+      const kind = loginErrorKind(error);
+      return kind ? { kind } : undefined;
     }
     await this.router.navigateByUrl('/');
     return undefined;
+  }
+}
+
+// The form's own errors, each a key under `login.` in the translations.
+type LoginErrorKind = 'invalidCredentials' | 'unreachable' | 'serverError';
+
+// What a failed login shows on the form. A 426 shows nothing: the "new version" dialog already covers the page. A
+// response that isn't an HttpErrorResponse failed the contract's schema, a bug like a 403 or 415 from the CSRF guard:
+// the user can only try again later.
+function loginErrorKind(error: unknown): LoginErrorKind | null {
+  if (!(error instanceof HttpErrorResponse)) {
+    return 'serverError';
+  }
+  switch (error.status) {
+    // No response at all: no connection, or nothing answering at the server's address.
+    case 0:
+      return 'unreachable';
+    case HttpStatusCode.Unauthorized:
+      return 'invalidCredentials';
+    case HttpStatusCode.UpgradeRequired:
+      return null;
+    default:
+      return 'serverError';
   }
 }

@@ -1,4 +1,4 @@
-import { HttpClient, HttpContext, HttpContextToken } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpContextToken, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
@@ -26,7 +26,9 @@ export class AuthService {
   readonly currentUser = this.user.asReadonly();
   readonly isLoggedIn = computed(() => !!this.user());
 
-  // Asks the API once per app load; after that, login, logout and 401s keep `currentUser` up to date.
+  // Asks the API until it answers, then not again this load: login, logout and 401s keep `currentUser` up to date.
+  // Only a 401 means nobody is logged in. Any other failure (no connection, API down) rejects and leaves the user
+  // unknown, so the next call asks again: a working login cookie must not be taken for a logged-out device.
   async loadCurrentUser(): Promise<CurrentUserResponseOutput | null> {
     const knownUser = this.user();
     if (knownUser !== undefined) {
@@ -37,8 +39,10 @@ export class AuthService {
       user = GetCurrentUserResponse.parse(
         await firstValueFrom(this.http.get('/api/auth/me', { context: this.authContext })),
       );
-    } catch {
-      // 401, but also an API that can't be reached: either way the login page is where to go next.
+    } catch (error) {
+      if (!(error instanceof HttpErrorResponse && error.status === HttpStatusCode.Unauthorized)) {
+        throw error;
+      }
       user = null;
     }
     this.user.set(user);

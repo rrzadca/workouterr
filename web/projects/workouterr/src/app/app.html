@@ -1,1 +1,10 @@
 <router-outlet />
+@if (isOutdated()) {
+  <ng-container *transloco="let t">
+    <rad-dialog [title]="t('newVersion.title')" [description]="t('newVersion.description')">
+      <rad-button variant="primary" size="lg" icon="refresh-cw" (click)="reload()">
+        {{ t('newVersion.reload') }}
+      </rad-button>
+    </rad-dialog>
+  </ng-container>
+}

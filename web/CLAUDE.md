@@ -12,8 +12,11 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   `parse: GetHealthResponse.parse`, so a body the contract does not allow becomes the resource's error.
 - Every `/api` request carries the build version (`package.json` `version`) in the client version header
   (`src/app/api/client-version.ts`); the header name is checked against the contract's operation header schemas.
-- Auth (`src/app/auth/`): `AuthService` knows the current user from `/api/auth/me` (asked once per load) and logs in
-  and out; `requireLogin` / `requireLoggedOut` guard the routes; a 401 from any call not marked `handlesUnauthorized`
+  A `426` from any call marks the build outdated (`ClientVersionService`), and `App` covers every page with a
+  "new version" dialog whose only action is a reload.
+- Auth (`src/app/auth/`): `AuthService` knows the current user from `/api/auth/me` (asked once per load, until it
+  answers) and logs in and out; `requireLogin` / `requireLoggedOut` guard the routes. Only a 401 means logged out:
+  when the API can't be reached the guards show `/unreachable`, whose "Try again" asks again; a 401 from any call not marked `handlesUnauthorized`
   ends the login and shows the login page. Pages after login are children of the `Shell` route (sidebar layout);
   every page is lazy-loaded (`loadComponent`).
 - Forms are Signal Forms (`@angular/forms/signals`): `form(model, (path) => validateStandardSchema(path, SomeBody))`
@@ -33,8 +36,10 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   first.
 - UI text lives in `projects/workouterr/public/i18n/<lang>.json` (Transloco, loaded over HTTP before the first
   render); templates use `*transloco="let t"`, specs provide the same JSON through `TranslocoTestingModule`.
-- UI library: components follow `docs/design/components/`, one folder each in `projects/ui/src/lib/` with a spec and a
-  story (`*.stories.ts`). Components wrap the native element they stand for (`<rad-button>` renders a `<button>`), and
+- UI library: components follow `docs/design/components/`, one folder each with a spec and a story (`*.stories.ts`),
+  inside a folder for their kind in `projects/ui/src/lib/` (`buttons/`, `form-inputs/`, `feedback/`; `icon/` stands
+  alone). Form controls are named `FormInput*` after the input they wrap (`FormInputText` is the mockup's
+  `TextField`). Components wrap the native element they stand for (`<rad-button>` renders a `<button>`), and
   native events such as `(click)` reach the host by bubbling. Icons are Lucide (`@lucide/angular`, bundled, so
   self-hosted): `<rad-icon name="plus" />`, with the names allowed listed in `projects/ui/src/lib/icon/icons.ts` (add
   one there when a screen needs it). Storybook (`@storybook/angular-vite`) shows every story twice, in a light and a

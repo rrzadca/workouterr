@@ -23,6 +23,7 @@ describe('Auth', () => {
         provideHttpClientTesting(),
         provideRouter([
           { path: 'login', component: EmptyPage, canActivate: [requireLoggedOut] },
+          { path: 'unreachable', component: EmptyPage },
           { path: '', component: EmptyPage, canActivate: [requireLogin] },
         ]),
       ],
@@ -52,6 +53,23 @@ describe('Auth', () => {
     expect(await navigateAnsweringMe('/', (me) => me.flush(null, { status: 401, statusText: 'Unauthorized' }))).toBe(
       '/login',
     );
+  });
+
+  it('shows the unreachable page when the API is down, without taking the device for logged out', async () => {
+    expect(
+      await navigateAnsweringMe('/', (me) => me.flush(null, { status: 503, statusText: 'Service Unavailable' })),
+    ).toBe('/unreachable');
+    expect(TestBed.inject(AuthService).currentUser()).toBeUndefined();
+  });
+
+  it('shows the unreachable page without a connection, also from the login page', async () => {
+    expect(await navigateAnsweringMe('/login', (me) => me.error(new ProgressEvent('error')))).toBe('/unreachable');
+  });
+
+  it('asks the API again after a failure, and goes in once it answers', async () => {
+    await navigateAnsweringMe('/', (me) => me.error(new ProgressEvent('error')));
+
+    expect(await navigateAnsweringMe('/', (me) => me.flush(user))).toBe('/');
   });
 
   it('sends a logged-in user away from the login page', async () => {

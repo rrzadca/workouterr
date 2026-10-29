@@ -257,7 +257,8 @@ docs/                         design reference (`docs/design/`), server setup, i
   Scope: Tech stack and hosting → Transactional email.
   Done when: an API test reads a sent email from Mailpit, and a real email from production lands in the inbox.
 - [ ] **38. Rate limiting.** Failed attempts per email and per IP stored in PostgreSQL, applied to login (then to
-  registration, reset and invites as they arrive).
+  registration, reset and invites as they arrive). The login form shows its own message for `429` (today any
+  unexpected status reads "Something went wrong on our side").
   Scope: Tech stack and hosting → Auth (rate limiting).
   Done when: API tests show the limit kicks in and survives an API restart.
 - [ ] **39. Scheduled jobs.** `BackgroundService` with a daily `PeriodicTimer`; each job a class with its own test

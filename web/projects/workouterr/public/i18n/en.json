@@ -12,7 +12,8 @@
     "emailTooLong": "That email is too long.",
     "passwordRequired": "Enter your password.",
     "invalidCredentials": "Wrong email or password.",
-    "failed": "Couldn't log in. Check your connection and try again.",
+    "unreachable": "Couldn't reach Workouterr. Check your connection and try again.",
+    "serverError": "Something went wrong on our side. Try again in a moment.",
     "submit": "Log in"
   },
   "nav": {
@@ -26,5 +27,15 @@
   },
   "home": {
     "title": "Home"
+  },
+  "newVersion": {
+    "title": "New version available",
+    "description": "Workouterr has been updated. Reload to keep using it.",
+    "reload": "Reload"
+  },
+  "unreachable": {
+    "title": "Can't reach Workouterr",
+    "description": "Check your connection and try again.",
+    "tryAgain": "Try again"
   }
 }
