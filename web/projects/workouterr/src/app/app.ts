@@ -1,33 +1,25 @@
-import { HttpErrorResponse, HttpStatusCode, httpResource } from '@angular/common/http';
-import { Component, computed } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { GetHealthResponse } from '@workouterr/api-client';
-import { Button } from '@workouterr/ui';
+import { Button, Dialog } from '@workouterr/ui';
+import { ClientVersionService } from './api/client-version';
 
+// The login page or the shell, by route (app.routes.ts), and over either the "new version" prompt once the API has
+// turned this build away.
 @Component({
-  imports: [Button, RouterOutlet, TranslocoDirective],
+  imports: [Button, Dialog, RouterOutlet, TranslocoDirective],
   selector: 'app-root',
   templateUrl: './app.html',
 })
 export class App {
-  // A relative URL: the dev proxy (and Caddy in production) forwards /api to the API on the same origin.
-  // The generated schema checks the body at runtime: a response the contract does not allow becomes an error.
-  protected readonly health = httpResource(() => '/api/health', { parse: GetHealthResponse.parse });
+  private readonly document = inject(DOCUMENT);
+  private readonly clientVersion = inject(ClientVersionService);
 
-  // The translation key for the current health state.
-  protected readonly healthStatusKey = computed(() => {
-    if (this.health.isLoading()) {
-      return 'health.checking';
-    }
-    const error = this.health.error();
-    // The API answers 503 when it is up but a dependency (the database) is not.
-    if (error instanceof HttpErrorResponse && error.status === HttpStatusCode.ServiceUnavailable) {
-      return 'health.unhealthy';
-    }
-    if (error) {
-      return 'health.unreachable';
-    }
-    return this.health.value()?.status === 'Degraded' ? 'health.degraded' : 'health.healthy';
-  });
+  protected readonly isOutdated = this.clientVersion.isOutdated;
+
+  // A reload fetches the new build. Data not yet sent stays in browser storage.
+  protected reload() {
+    this.document.location.reload();
+  }
 }

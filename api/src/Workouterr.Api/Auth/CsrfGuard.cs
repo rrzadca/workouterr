@@ -41,7 +41,8 @@ public class CsrfGuard(RequestDelegate next)
         await next(context);
     }
 
-    private static bool IsSafe(string method) =>
+    // Also tells the OpenAPI document which operations can answer the guard's 403 and 415.
+    internal static bool IsSafe(string method) =>
         HttpMethods.IsGet(method) || HttpMethods.IsHead(method) || HttpMethods.IsOptions(method)
         || HttpMethods.IsTrace(method);
 

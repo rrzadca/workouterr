@@ -1,0 +1,12 @@
+<main class="flex min-h-dvh items-center justify-center p-10" *transloco="let t">
+  <div class="flex w-full max-w-sm flex-col items-center gap-6 text-center">
+    <rad-icon name="wifi-off" [size]="40" class="text-text-faint" />
+    <div>
+      <h1 class="text-title-1 font-semibold tracking-title text-text-strong">{{ t('unreachable.title') }}</h1>
+      <p class="mt-1.5 text-text-muted">{{ t('unreachable.description') }}</p>
+    </div>
+    <rad-button variant="primary" size="xl" fullWidth icon="refresh-cw" [loading]="retrying()" (click)="tryAgain()">
+      {{ t('unreachable.tryAgain') }}
+    </rad-button>
+  </div>
+</main>

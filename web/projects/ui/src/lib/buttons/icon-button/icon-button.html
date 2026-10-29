@@ -1,0 +1,14 @@
+<button
+  type="button"
+  [class]="cssClasses()"
+  [disabled]="disabled() || loading()"
+  [attr.aria-label]="label()"
+  [attr.aria-busy]="loading() || null"
+  [title]="label()"
+>
+  @if (loading()) {
+    <rad-icon name="loader-circle" [size]="iconSize()" class="animate-[spin_900ms_linear_infinite]" />
+  } @else {
+    <rad-icon [name]="icon()" [size]="iconSize()" />
+  }
+</button>

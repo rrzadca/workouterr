@@ -62,12 +62,40 @@ export const ProblemDetails = zod.object({
 
 export type ProblemDetails = zod.input<typeof ProblemDetails>;
 export type ProblemDetailsOutput = zod.output<typeof ProblemDetails>;
+export const GetHealthHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
+
 export const GetHealthResponse = HealthResponse;
+
+export const LoginHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
 
 export const LoginBody = LoginRequest;
 
 export const LoginResponse = CurrentUserResponse;
 
+export const LogoutHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
+
 export const LogoutResponse = zod.void();
+
+export const GetCurrentUserHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
 
 export const GetCurrentUserResponse = CurrentUserResponse;

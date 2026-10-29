@@ -11,6 +11,11 @@
           "Health"
         ],
         "operationId": "GetHealth",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ClientVersion"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -31,6 +36,16 @@
                 }
               }
             }
+          },
+          "426": {
+            "description": "Upgrade Required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -41,6 +56,11 @@
           "Auth"
         ],
         "operationId": "Login",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ClientVersion"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -81,6 +101,36 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "426": {
+            "description": "Upgrade Required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -91,9 +141,44 @@
           "Auth"
         ],
         "operationId": "Logout",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ClientVersion"
+          }
+        ],
         "responses": {
           "204": {
             "description": "No Content"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "426": {
+            "description": "Upgrade Required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -104,6 +189,11 @@
           "Auth"
         ],
         "operationId": "GetCurrentUser",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ClientVersion"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -117,6 +207,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "426": {
+            "description": "Upgrade Required",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -266,6 +366,16 @@
               "string"
             ]
           }
+        }
+      }
+    },
+    "parameters": {
+      "ClientVersion": {
+        "name": "X-Client-Version",
+        "in": "header",
+        "description": "The app's build version. A build older than the API accepts gets 426 Upgrade Required.",
+        "schema": {
+          "type": "string"
         }
       }
     }

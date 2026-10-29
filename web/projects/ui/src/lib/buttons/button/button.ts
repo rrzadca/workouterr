@@ -1,6 +1,6 @@
 import { booleanAttribute, Component, computed, input } from '@angular/core';
-import { Icon } from '../icon/icon';
-import { type IconName } from '../icon/icons';
+import { Icon } from '../../icon/icon';
+import { type IconName } from '../../icon/icons';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'highlight' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';

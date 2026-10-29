@@ -45,4 +45,17 @@ describe('ThemeService', () => {
 
     expect(startTheme()).toBe('light');
   });
+
+  it('switches to the other theme on toggle, saves it, and stops following the system', () => {
+    startTheme();
+    const themes = TestBed.inject(ThemeService);
+
+    themes.toggle();
+    TestBed.tick();
+    systemChangeListener!({ matches: false });
+    TestBed.tick();
+
+    expect(document.documentElement.dataset['theme']).toBe('dark');
+    expect(localStorage.getItem('workouterr.theme')).toBe('dark');
+  });
 });

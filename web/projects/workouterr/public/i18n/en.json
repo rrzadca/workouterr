@@ -2,12 +2,40 @@
   "app": {
     "name": "Workouterr"
   },
-  "health": {
-    "checking": "Checking the API…",
-    "healthy": "API: healthy",
-    "degraded": "API: degraded",
-    "unhealthy": "API unhealthy",
-    "unreachable": "API unreachable",
-    "checkAgain": "Check again"
+  "login": {
+    "tagline": "Track your workouts, volume and records, all in one place.",
+    "title": "Log in",
+    "subtitle": "Get back to your training plan.",
+    "email": "Email",
+    "password": "Password",
+    "emailRequired": "Enter your email.",
+    "emailTooLong": "That email is too long.",
+    "passwordRequired": "Enter your password.",
+    "invalidCredentials": "Wrong email or password.",
+    "unreachable": "Couldn't reach Workouterr. Check your connection and try again.",
+    "serverError": "Something went wrong on our side. Try again in a moment.",
+    "submit": "Log in"
+  },
+  "nav": {
+    "label": "Main",
+    "training": "Training",
+    "home": "Home",
+    "noActivePlan": "No active plan",
+    "lightTheme": "Light theme",
+    "darkTheme": "Dark theme",
+    "logout": "Log out"
+  },
+  "home": {
+    "title": "Home"
+  },
+  "newVersion": {
+    "title": "New version available",
+    "description": "Workouterr has been updated. Reload to keep using it.",
+    "reload": "Reload"
+  },
+  "unreachable": {
+    "title": "Can't reach Workouterr",
+    "description": "Check your connection and try again.",
+    "tryAgain": "Try again"
   }
 }

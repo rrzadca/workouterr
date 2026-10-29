@@ -10,6 +10,20 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   `@workouterr/api-client` (a `tsconfig.json` path, like the UI library). A schema per component (`HealthResponse`)
   and per operation response (`GetHealthResponse`); calls pass the response schema to `httpResource` as
   `parse: GetHealthResponse.parse`, so a body the contract does not allow becomes the resource's error.
+- Every `/api` request carries the build version (`package.json` `version`) in the client version header
+  (`src/app/api/client-version.ts`); the header name is checked against the contract's operation header schemas.
+  A `426` from any call marks the build outdated (`ClientVersionService`), and `App` covers every page with a
+  "new version" dialog whose only action is a reload.
+- Auth (`src/app/auth/`): `AuthService` knows the current user from `/api/auth/me` (asked once per load, until it
+  answers) and logs in and out; `requireLogin` / `requireLoggedOut` guard the routes. Only a 401 means logged out:
+  when the API can't be reached the guards show `/unreachable`, whose "Try again" asks again; a 401 from any call not marked `handlesUnauthorized`
+  ends the login and shows the login page. Pages after login are children of the `Shell` route (sidebar layout);
+  every page is lazy-loaded (`loadComponent`).
+- Forms are Signal Forms (`@angular/forms/signals`): `form(model, (path) => validateStandardSchema(path, SomeBody))`
+  with the generated zod schema, so the API's limits are the form's; `[formRoot]` on the `<form>`, `[formField]` on
+  each control. UI library controls are Signal Forms controls (`FormValueControl`: a `value` model, plus the state
+  inputs `[formField]` fills, such as `touched` and `invalid`), so `<rad-form-input-text [formField]="…" />` binds
+  like a native input; the page passes only the translated `error` message.
 - The app imports the library as `@workouterr/ui`, mapped in `tsconfig.json` to its source (`src/public-api.ts`), so it
   builds with the app and never needs building first.
 - Calls to the API use relative `/api/...` URLs: `ng serve` proxies them to the API (`proxy.conf.json`), Caddy does the
@@ -22,12 +36,15 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   first.
 - UI text lives in `projects/workouterr/public/i18n/<lang>.json` (Transloco, loaded over HTTP before the first
   render); templates use `*transloco="let t"`, specs provide the same JSON through `TranslocoTestingModule`.
-- UI library: components follow `docs/design/components/`, one folder each in `projects/ui/src/lib/` with a spec and a
-  story (`*.stories.ts`). Components wrap the native element they stand for (`<rad-button>` renders a `<button>`), and
+- UI library: components follow `docs/design/components/`, one folder each with a spec and a story (`*.stories.ts`),
+  inside a folder for their kind in `projects/ui/src/lib/` (`buttons/`, `form-inputs/`, `feedback/`; `icon/` stands
+  alone). Form controls are named `FormInput*` after the input they wrap (`FormInputText` is the mockup's
+  `TextField`). Components wrap the native element they stand for (`<rad-button>` renders a `<button>`), and
   native events such as `(click)` reach the host by bubbling. Icons are Lucide (`@lucide/angular`, bundled, so
   self-hosted): `<rad-icon name="plus" />`, with the names allowed listed in `projects/ui/src/lib/icon/icons.ts` (add
   one there when a screen needs it). Storybook (`@storybook/angular-vite`) shows every story twice, in a light and a
-  dark panel (`.storybook/preview.ts`).
+  dark panel (`.storybook/preview.ts`); a story covering the whole viewport (a modal) sets
+  `parameters: { singleThemePanel: true }` and renders once, in the theme picked in the toolbar.
 - Global styles live in the library: `projects/ui/src/styles/global.css` (Tailwind, fonts, tokens, theme), loaded by
   the app's `styles.css` and by Storybook. PostCSS (Tailwind) is configured once, in `.postcssrc.json` at the
   workspace root.
@@ -39,7 +56,8 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   outside Angular touches the theme. Critical-CSS inlining is off in production: it leaves the
   `[data-theme='dark']` rules out of the inlined CSS.
 - Unit tests run on Vitest through Angular's runner (`ng test`), with `jsdom`; HTTP is faked with
-  `provideHttpClientTesting`.
+  `provideHttpClientTesting`. jsdom has no modal dialogs: `projects/ui/testing/html-dialog.ts` stubs `showModal()` /
+  `close()`, loaded by both projects' tests (`setupFiles` in `angular.json`).
 
 ## Commands
 

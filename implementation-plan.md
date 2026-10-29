@@ -106,7 +106,7 @@ docs/                         design reference (`docs/design/`), server setup, i
   `Origin`; the client version header is read (the `426` path is in place but unused).
   Scope: Tech stack and hosting → Auth (CSRF); Non-functional requirements → old clients.
   Done when: API tests reject a cross-origin login POST and a form-encoded one.
-- [ ] **14. Login screen and app shell.** Login page, auth guard, 401 handling, logout; tablet-first app layout with
+- [x] **14. Login screen and app shell.** Login page, auth guard, 401 handling, logout; tablet-first app layout with
   navigation (sidebar with logo, sections and a footer with the user, active plan, sun / moon theme button and
   logout). The theme button saves to `localStorage` only; task 18 saves it on the account. Every request carries
   the app's build version in the client version header; an OpenAPI transformer adds that header and the guard's
@@ -257,7 +257,8 @@ docs/                         design reference (`docs/design/`), server setup, i
   Scope: Tech stack and hosting → Transactional email.
   Done when: an API test reads a sent email from Mailpit, and a real email from production lands in the inbox.
 - [ ] **38. Rate limiting.** Failed attempts per email and per IP stored in PostgreSQL, applied to login (then to
-  registration, reset and invites as they arrive).
+  registration, reset and invites as they arrive). The login form shows its own message for `429` (today any
+  unexpected status reads "Something went wrong on our side").
   Scope: Tech stack and hosting → Auth (rate limiting).
   Done when: API tests show the limit kicks in and survives an API restart.
 - [ ] **39. Scheduled jobs.** `BackgroundService` with a daily `PeriodicTimer`; each job a class with its own test

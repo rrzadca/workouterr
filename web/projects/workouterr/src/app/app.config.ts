@@ -1,4 +1,4 @@
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
   inject,
@@ -9,7 +9,9 @@ import {
 import { provideRouter } from '@angular/router';
 import { provideTransloco, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
+import { clientVersionInterceptor } from './api/client-version';
 import { routes } from './app.routes';
+import { loginEndedInterceptor } from './auth/login-ended-interceptor';
 import { ThemeService } from './theme';
 import { TranslocoHttpLoader } from './transloco-loader';
 
@@ -17,7 +19,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withFetch()),
+    provideHttpClient(withFetch(), withInterceptors([clientVersionInterceptor, loginEndedInterceptor])),
     provideTransloco({
       config: {
         availableLangs: ['en'],

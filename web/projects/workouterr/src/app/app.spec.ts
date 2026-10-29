@@ -1,13 +1,11 @@
-import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import english from '../../public/i18n/en.json';
+import { ClientVersionService } from './api/client-version';
 import { App } from './app';
 
 describe('App', () => {
-  let httpTesting: HttpTestingController;
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -18,79 +16,31 @@ describe('App', () => {
           preloadLangs: true,
         }),
       ],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideRouter([])],
     });
-    httpTesting = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpTesting.verify());
-
-  it('shows the API status from /api/health', async () => {
+  async function render() {
     const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-
-    httpTesting.expectOne('/api/health').flush({ status: 'Healthy' });
     await fixture.whenStable();
+    return { fixture, page: fixture.nativeElement as HTMLElement };
+  }
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API: healthy');
+  it('shows no prompt while the API accepts this build', async () => {
+    const { page } = await render();
+
+    expect(page.querySelector('dialog')).toBeNull();
   });
 
-  it('shows the API as degraded when the health check says so', async () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
+  it('asks for a reload once the API has turned this build away', async () => {
+    const { fixture, page } = await render();
 
-    httpTesting.expectOne('/api/health').flush({ status: 'Degraded' });
+    TestBed.inject(ClientVersionService).markOutdated();
     await fixture.whenStable();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API: degraded');
-  });
-
-  it('shows the API as unhealthy when the health check answers 503', async () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-
-    httpTesting
-      .expectOne('/api/health')
-      .flush({ title: 'Unhealthy' }, { status: 503, statusText: 'Service Unavailable' });
-    await fixture.whenStable();
-
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API unhealthy');
-  });
-
-  it('shows the API as unreachable when the request fails', async () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-
-    httpTesting.expectOne('/api/health').error(new ProgressEvent('error'));
-    await fixture.whenStable();
-
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API unreachable');
-  });
-
-  it('shows the API as unreachable when the body breaks the contract', async () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-
-    httpTesting.expectOne('/api/health').flush({ status: 'Fine' });
-    await fixture.whenStable();
-
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API unreachable');
-  });
-
-  it('checks the API again when the button is pressed', async () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-    httpTesting.expectOne('/api/health').error(new ProgressEvent('error'));
-    await fixture.whenStable();
-
-    const checkAgainButton = (fixture.nativeElement as HTMLElement).querySelector('button') as HTMLButtonElement;
-    expect(checkAgainButton.textContent).toContain('Check again');
-    checkAgainButton.click();
-    fixture.detectChanges();
-
-    httpTesting.expectOne('/api/health').flush({ status: 'Healthy' });
-    await fixture.whenStable();
-
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('API: healthy');
+    const dialog = page.querySelector('dialog');
+    expect(dialog?.hasAttribute('open')).toBe(true);
+    expect(dialog?.textContent).toContain('New version available');
+    expect(dialog?.querySelector('button')?.textContent).toContain('Reload');
   });
 });
