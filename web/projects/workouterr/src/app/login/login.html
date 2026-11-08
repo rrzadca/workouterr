@@ -13,29 +13,34 @@
       </div>
 
       <form [formRoot]="loginForm" class="flex flex-col gap-4">
-        <rad-form-input-text
-          type="email"
-          autocomplete="username"
-          icon="mail"
-          [label]="t('login.email')"
-          [error]="t(emailErrorKey())"
-          [formField]="loginForm.email"
-        />
-        <rad-form-input-text
-          type="password"
-          autocomplete="current-password"
-          icon="lock"
-          [label]="t('login.password')"
-          [error]="t('login.passwordRequired')"
-          [formField]="loginForm.password"
-        />
+        <!-- Large inputs: 56 px for touch, and 17 px text, below which Safari zooms into a focused input. -->
+        @let emailError = emailErrorKey();
+        <rad-form-field [label]="t('login.email')" [error]="emailError ? t(emailError) : undefined">
+          <rad-form-input-text
+            type="email"
+            autocomplete="username"
+            icon="mail"
+            size="lg"
+            [formField]="loginForm.email"
+          />
+        </rad-form-field>
+        @let passwordError = passwordErrorKey();
+        <rad-form-field [label]="t('login.password')" [error]="passwordError ? t(passwordError) : undefined">
+          <rad-form-input-text
+            type="password"
+            autocomplete="current-password"
+            icon="lock"
+            size="lg"
+            [formField]="loginForm.password"
+          />
+        </rad-form-field>
 
         @if (loginErrorKey(); as loginError) {
           <p
             role="alert"
             class="flex items-center gap-2 rounded-md bg-status-danger-soft px-3 py-2.5 text-status-danger"
           >
-            <rad-icon name="circle-alert" [size]="18" />
+            <rad-icon name="circle-alert" class="[--rad-icon-size:18px]" />
             {{ t(loginError) }}
           </p>
         }

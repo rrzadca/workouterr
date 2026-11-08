@@ -9,7 +9,6 @@ node_modules/
 dist/
 .angular/
 coverage/
-storybook-static/
 playwright-report/
 test-results/
 
@@ -27,4 +26,4 @@ test-results/
 # Claude Code: personal settings stay local; .claude/settings.json is shared
 .claude/settings.local.json
 
-*storybook.log
+.fake

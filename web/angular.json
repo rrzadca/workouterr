@@ -33,7 +33,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
+                  "maximumWarning": "600kB",
                   "maximumError": "1MB"
                 },
                 {
@@ -76,68 +76,13 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test",
-          "options": {
-            "setupFiles": ["projects/ui/testing/html-dialog.ts"]
-          }
+          "builder": "@angular/build:unit-test"
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
             "lintFilePatterns": ["projects/workouterr/**/*.ts", "projects/workouterr/**/*.html"],
             "eslintConfig": "projects/workouterr/eslint.config.js"
-          }
-        }
-      }
-    },
-    "ui": {
-      "projectType": "library",
-      "root": "projects/ui",
-      "sourceRoot": "projects/ui/src",
-      "prefix": "rad",
-      "architect": {
-        "build": {
-          "builder": "@angular/build:ng-packagr",
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/ui/tsconfig.lib.prod.json"
-            },
-            "development": {
-              "tsConfig": "projects/ui/tsconfig.lib.json"
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular/build:unit-test",
-          "options": {
-            "tsConfig": "projects/ui/tsconfig.spec.json",
-            "setupFiles": ["projects/ui/testing/html-dialog.ts"]
-          }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": ["projects/ui/**/*.ts", "projects/ui/**/*.html"],
-            "eslintConfig": "projects/ui/eslint.config.js"
-          }
-        },
-        "storybook": {
-          "builder": "@storybook/angular-vite:start-storybook",
-          "options": {
-            "configDir": "projects/ui/.storybook",
-            "port": 6006,
-            "styles": ["projects/ui/src/styles/global.css"],
-            "tsConfig": "projects/ui/.storybook/tsconfig.json"
-          }
-        },
-        "build-storybook": {
-          "builder": "@storybook/angular-vite:build-storybook",
-          "options": {
-            "configDir": "projects/ui/.storybook",
-            "outputDir": "dist/storybook",
-            "styles": ["projects/ui/src/styles/global.css"],
-            "tsConfig": "projects/ui/.storybook/tsconfig.json"
           }
         }
       }

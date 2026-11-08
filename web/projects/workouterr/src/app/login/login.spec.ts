@@ -1,10 +1,16 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { RadButtonHarness } from '@rrzadca/radinf-ui/button/testing';
+import { RadFormFieldHarness } from '@rrzadca/radinf-ui/form-field/testing';
+import { RadFormInputTextHarness } from '@rrzadca/radinf-ui/form-inputs/form-input-text/testing';
+import { provideRadIcons } from '@rrzadca/radinf-ui/icon';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import english from '../../../public/i18n/en.json';
+import { appIcons } from '../icons';
 import { Login } from './login';
 
 @Component({ template: '' })
@@ -29,6 +35,7 @@ describe('Login', () => {
           { path: '', component: EmptyPage },
           { path: 'login', component: EmptyPage },
         ]),
+        provideRadIcons(appIcons),
       ],
     });
     httpTesting = TestBed.inject(HttpTestingController);
@@ -39,15 +46,15 @@ describe('Login', () => {
   async function render() {
     await TestBed.inject(Router).navigateByUrl('/login');
     const fixture = TestBed.createComponent(Login);
-    await fixture.whenStable();
     const element = fixture.nativeElement as HTMLElement;
-    const [email, password] = Array.from(element.querySelectorAll('input'));
-
-    async function type(input: HTMLInputElement, value: string) {
-      input.value = value;
-      input.dispatchEvent(new Event('input'));
-      await fixture.whenStable();
-    }
+    // Harnesses find radinf-ui's components the way a user would (by label or text), and wait for the page to settle
+    // after every action.
+    const loader = TestbedHarnessEnvironment.loader(fixture);
+    const emailField = await loader.getHarness(RadFormFieldHarness.with({ label: 'Email' }));
+    const passwordField = await loader.getHarness(RadFormFieldHarness.with({ label: 'Password' }));
+    const email = await emailField.getHarness(RadFormInputTextHarness);
+    const password = await passwordField.getHarness(RadFormInputTextHarness);
+    const submitButton = await loader.getHarness(RadButtonHarness.with({ text: 'Log in' }));
 
     // The submission's action runs over several promises after the response arrives.
     async function settle() {
@@ -55,30 +62,48 @@ describe('Login', () => {
       await fixture.whenStable();
     }
 
-    async function submit() {
-      (element.querySelector('button[type="submit"]') as HTMLButtonElement).click();
-      await fixture.whenStable();
-    }
+    const submit = () => submitButton.click();
 
-    return { element, email, password, type, submit, settle };
+    return { element, emailField, passwordField, email, password, submitButton, submit, settle };
   }
 
+  it('shows each field with its icon and no errors at first', async () => {
+    const { emailField, passwordField, email, password } = await render();
+
+    expect(await email.getType()).toBe('email');
+    expect(await email.getIcon()).toBe('mail');
+    expect(await password.getType()).toBe('password');
+    expect(await password.getIcon()).toBe('lock');
+    expect(await emailField.hasErrors()).toBe(false);
+    expect(await passwordField.hasErrors()).toBe(false);
+  });
+
+  it('asks for a field once it is left empty', async () => {
+    const { emailField, passwordField, email } = await render();
+
+    await email.blur();
+
+    expect(await emailField.getErrors()).toEqual(['Enter your email.']);
+    expect(await passwordField.hasErrors()).toBe(false);
+  });
+
   it('asks for both fields before sending anything', async () => {
-    const { element, submit } = await render();
+    const { emailField, passwordField, submit } = await render();
 
     await submit();
 
-    expect(element.textContent).toContain('Enter your email.');
-    expect(element.textContent).toContain('Enter your password.');
+    expect(await emailField.getErrors()).toEqual(['Enter your email.']);
+    expect(await passwordField.getErrors()).toEqual(['Enter your password.']);
     httpTesting.expectNone('/api/auth/login');
   });
 
   it('logs in with the typed credentials and goes home', async () => {
-    const { email, password, type, submit, settle } = await render();
-    await type(email, 'me@example.com');
-    await type(password, 'correct-horse-battery');
+    const { email, password, submitButton, submit, settle } = await render();
+    await email.setValue('me@example.com');
+    await password.setValue('correct-horse-battery');
 
     await submit();
+    expect(await submitButton.isLoading()).toBe(true);
     const request = httpTesting.expectOne('/api/auth/login');
     expect(request.request.body).toEqual({ email: 'me@example.com', password: 'correct-horse-battery' });
     request.flush({ id: '0b5f6c1e-6d3a-4f43-9c56-2f1c6f1d8e01', email: 'me@example.com' });
@@ -88,9 +113,9 @@ describe('Login', () => {
   });
 
   it('says so when the email or password is wrong, until a field changes', async () => {
-    const { element, email, password, type, submit, settle } = await render();
-    await type(email, 'me@example.com');
-    await type(password, 'wrong-password');
+    const { element, email, password, submit, settle } = await render();
+    await email.setValue('me@example.com');
+    await password.setValue('wrong-password');
 
     await submit();
     httpTesting
@@ -100,16 +125,16 @@ describe('Login', () => {
 
     expect(element.querySelector('[role="alert"]')?.textContent).toContain('Wrong email or password.');
 
-    await type(password, 'correct-horse-battery');
+    await password.setValue('correct-horse-battery');
 
     expect(element.querySelector('[role="alert"]')).toBeNull();
   });
 
   // Submits valid credentials, answers the login request the given way and resolves with the shown error, if any.
   async function loginAnswering(answer: (request: ReturnType<typeof httpTesting.expectOne>) => void) {
-    const { element, email, password, type, submit, settle } = await render();
-    await type(email, 'me@example.com');
-    await type(password, 'correct-horse-battery');
+    const { element, email, password, submit, settle } = await render();
+    await email.setValue('me@example.com');
+    await password.setValue('correct-horse-battery');
 
     await submit();
     answer(httpTesting.expectOne('/api/auth/login'));

@@ -1,0 +1,9 @@
+<ng-container *transloco="let t">
+  <h2 radDialogTitle>{{ t('newVersion.title') }}</h2>
+  <p class="text-pretty text-text-muted" [id]="descriptionId">{{ t('newVersion.description') }}</p>
+  <rad-dialog-footer>
+    <rad-button variant="primary" size="lg" icon="refresh-cw" (click)="reload()">
+      {{ t('newVersion.reload') }}
+    </rad-button>
+  </rad-dialog-footer>
+</ng-container>

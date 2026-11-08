@@ -297,12 +297,14 @@ The project is also a learning path for building REST APIs with .NET and ASP.NET
 - Frontend: newest Angular (Signals, SignalStore, SignalForm) + Tailwind CSS. Node.js 24 LTS (in `.nvmrc`) is
   used only for frontend tooling; nothing runs on Node in production
 - Translations: Transloco (runtime; language switches without reloading)
-- UI component library (buttons, inputs, selects, etc.): Angular library project in the same workspace, built on
-  Angular CDK + Tailwind, developed in Storybook
+- UI components: generic ones (buttons, inputs, selects, dialogs, etc.) come from the owner's own library,
+  `@rrzadca/radinf-ui` (Angular CDK, private on GitHub Packages); features it lacks are added there, through issues
+  in its repository. Workout-specific components live in the app, built with Tailwind
   - Semantic tokens only, ported from `docs/design/tokens.css` (`--surface-*`, `--text-*`, `--accent`, …, mapped in
-    Tailwind), never raw colours; dark theme through `[data-theme="dark"]` on `<html>`; every story shown in both
-    themes
-  - Fonts (Geist, Geist Mono, Black Ops One) and Lucide icons are self-hosted, nothing loaded from third-party CDNs
+    Tailwind), never raw colours; radinf-ui's `--rad-*` tokens point at them, so its components match the mockups;
+    dark theme through `[data-theme="dark"]` on `<html>`
+  - Fonts (Geist, Geist Mono, Black Ops One) and Lucide icons (as path data) are self-hosted, nothing loaded from
+    third-party CDNs
 - Database: PostgreSQL (Entity Framework Core 10 with the Npgsql provider, EF Core migrations). Moving to a new
   EF Core major version is a deliberate upgrade
 - Domain rules are implemented twice, because the browser needs them offline:
@@ -348,7 +350,7 @@ The project is also a learning path for building REST APIs with .NET and ASP.NET
   - Angular: unit tests (Vitest) with Angular's default test runner for logic-heavy services (offline storage, sync with
     retries and 409 / 401 handling, rest timer, wake lock), using fake timers and a fake IndexedDB; component
     tests only for screens with logic (live session). No snapshot tests
-  - UI library: Storybook stories, no tests in V1
+  - UI components: tested in radinf-ui; the app's specs use its component harnesses
   - End to end: a few Playwright tests on WebKit with an iPad viewport (live session from start to finish; going
     offline mid-session and syncing afterwards)
   - The deploy script runs lint (`dotnet format --verify-no-changes`, ESLint), build and type check, the OpenAPI

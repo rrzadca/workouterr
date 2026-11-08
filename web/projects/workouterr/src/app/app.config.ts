@@ -7,11 +7,13 @@ import {
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideRadIcons } from '@rrzadca/radinf-ui/icon';
 import { provideTransloco, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { clientVersionInterceptor } from './api/client-version';
 import { routes } from './app.routes';
 import { loginEndedInterceptor } from './auth/login-ended-interceptor';
+import { appIcons } from './icons';
 import { ThemeService } from './theme';
 import { TranslocoHttpLoader } from './transloco-loader';
 
@@ -19,6 +21,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
+    provideRadIcons(appIcons),
     provideHttpClient(withFetch(), withInterceptors([clientVersionInterceptor, loginEndedInterceptor])),
     provideTransloco({
       config: {

@@ -1,0 +1,82 @@
+/*
+ * Workouterr's look for radinf-ui: its public tokens (`--rad-*`) pointed at our design tokens (tokens.css).
+ * Loaded after `@rrzadca/radinf-ui/styles.css`, so at equal specificity these declarations win.
+ */
+
+/* Colours. On every element that carries a theme as well as :root, because radinf-ui declares its semantic tokens
+   on `:root, [data-rad-theme]`, and `var()` resolves where the token is declared: a `[data-theme='dark']` section
+   needs the mapping re-declared on it to pick up its dark values. */
+:root,
+[data-theme],
+[data-rad-theme] {
+  --rad-color-background: var(--surface-app);
+  --rad-color-surface: var(--surface-card);
+  --rad-color-surface-hover: var(--surface-hover);
+
+  --rad-color-text: var(--text-default);
+  --rad-color-text-muted: var(--text-muted);
+  --rad-color-text-disabled: var(--text-faint);
+
+  --rad-color-border: var(--border-subtle);
+  /* The mockup's field edge (owner's choice), though it is lighter than the 3:1 contrast radinf-ui's default gives. */
+  --rad-color-border-control: var(--border-field);
+
+  --rad-color-primary: var(--accent);
+  --rad-color-primary-hover: var(--accent-hover);
+  --rad-color-primary-active: var(--accent-press);
+  --rad-color-on-primary: var(--text-on-accent);
+
+  --rad-color-danger: var(--status-danger);
+  /* The design has no danger hover: mix towards the strong text colour, darker in light, lighter in dark. */
+  --rad-color-danger-hover: color-mix(in oklab, var(--status-danger), var(--text-strong) 15%);
+  --rad-color-on-danger: var(--text-on-accent);
+
+  --rad-color-highlight: var(--highlight);
+  /* No highlight hover in the design either: the same mix as the danger hover. */
+  --rad-color-highlight-hover: color-mix(in oklab, var(--highlight), var(--text-strong) 15%);
+  --rad-color-on-highlight: var(--text-on-amber);
+
+  --rad-color-success: var(--status-success);
+  --rad-color-warning: var(--status-warn);
+
+  /* Soft tints for badges and toasts, with the strong text colour on them in both themes. */
+  --rad-color-primary-subtle: var(--accent-soft);
+  --rad-color-on-primary-subtle: var(--text-strong);
+  --rad-color-success-subtle: var(--status-success-soft);
+  --rad-color-on-success-subtle: var(--text-strong);
+  --rad-color-warning-subtle: var(--status-warn-soft);
+  --rad-color-on-warning-subtle: var(--text-strong);
+  --rad-color-danger-subtle: var(--status-danger-soft);
+  --rad-color-on-danger-subtle: var(--text-strong);
+
+  /* The mockup's translucent focus ring. radinf-ui draws it as a 2 px outline (the mockup: a 3 px ring); the width
+     is not a token yet (rrzadca/radinf-ui#38). */
+  --rad-color-focus-ring: var(--accent-ring);
+}
+
+/* Sizes and type: the same in both themes. Touch sizes, as for the rest of the app (docs/design/README.md). */
+:root {
+  --rad-control-height-sm: var(--spacing-control-sm);
+  --rad-control-height-md: var(--spacing-control-md);
+  --rad-control-height-lg: var(--spacing-control-lg);
+  --rad-control-height-xl: var(--spacing-control-xl);
+
+  --rad-font-family: var(--font-ui);
+  --rad-font-size-xs: var(--text-caption);
+  --rad-font-size-sm: var(--text-label);
+  /* 17 px, as the old inputs and large buttons: Safari zooms into a focused input with text under 16 px. */
+  --rad-font-size-md: var(--text-body-lg);
+  --rad-font-size-lg: var(--text-body-lg);
+  --rad-line-height: var(--leading-normal);
+
+  /* Same pixel values under different names: radinf-ui's sm / md / lg are our xs / sm / md (4, 6, 8 px). */
+  --rad-radius-sm: var(--radius-xs);
+  --rad-radius-md: var(--radius-sm);
+  --rad-radius-lg: var(--radius-md);
+  /* The mockup's modal corner. */
+  --rad-dialog-radius: var(--radius-xl);
+
+  --rad-shadow-sm: var(--shadow-control);
+  --rad-shadow-md: var(--shadow-popover);
+  --rad-duration-fast: var(--dur-fast);
+}

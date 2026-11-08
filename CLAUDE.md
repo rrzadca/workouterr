@@ -24,9 +24,10 @@ screen's file before building any UI.
 - **Descriptive names**: identifiers and import aliases say what they hold or do. Common short forms are fine
   (`err`, `app`, `tseslint`); avoid cryptic or invented abbreviations.
 - Angular components keep their template in a sibling `.html` file (`templateUrl`). Test host components in specs
-  and Storybook `render` templates may stay inline.
+  may stay inline.
 - UI text goes through Transloco keys. Colours come from the semantic tokens (`--surface-*`, `--text-*`, `--accent`,
-  …) and work in both themes.
+  …) and work in both themes. Generic components come from `@rrzadca/radinf-ui`, styled only through its `--rad-*`
+  tokens (`web/projects/workouterr/src/styles/rad-theme.css`).
 - Weights are exact decimals everywhere: `numeric` in PostgreSQL, `decimal` in C#, exact handling in TypeScript.
 - **Limits** and validation rules live once, in the API's request types; zod schemas reach the browser through the
   OpenAPI document.
