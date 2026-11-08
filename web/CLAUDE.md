@@ -45,12 +45,16 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   one there when a screen needs it). Storybook (`@storybook/angular-vite`) shows every story twice, in a light and a
   dark panel (`.storybook/preview.ts`); a story covering the whole viewport (a modal) sets
   `parameters: { singleThemePanel: true }` and renders once, in the theme picked in the toolbar.
-- Global styles live in the library: `projects/ui/src/styles/global.css` (Tailwind, fonts, tokens, theme), loaded by
-  the app's `styles.css` and by Storybook. PostCSS (Tailwind) is configured once, in `.postcssrc.json` at the
-  workspace root.
-- Design tokens are in `projects/ui/src/styles/tokens.css`. Semantic colours are Tailwind colours named after
+- Global styles live in the app: `projects/workouterr/src/styles/global.css` (Tailwind, fonts, radinf-ui's
+  stylesheet, tokens, theme), loaded by the app's `styles.css` and, until task 14d, by the UI library's Storybook.
+  PostCSS (Tailwind) is configured once, in `.postcssrc.json` at the workspace root.
+- Design tokens are in `projects/workouterr/src/styles/tokens.css`. Semantic colours are Tailwind colours named after
   the token (`bg-surface-card`, `text-text-muted`); Tailwind's default palette, font sizes, radii and shadows are
   removed, so only the design scales exist.
+- radinf-ui (`@rrzadca/radinf-ui`, private, from GitHub Packages through `.npmrc`) is styled only through its
+  `--rad-*` tokens: `styles/rad-theme.css` points them at ours (colours on every themed element, sizes and type on
+  `:root`), loaded after radinf-ui's stylesheet so it wins. Never style its components' inner markup. A feature it
+  lacks becomes an issue in `rrzadca/radinf-ui`.
 - Theme: `data-theme="light" | "dark"` on `<html>`, set by `ThemeService` (`src/app/theme.ts`) when the app starts,
   from `localStorage['workouterr.theme']`, else the system theme. `dark:` utilities follow the attribute; nothing
   outside Angular touches the theme. Critical-CSS inlining is off in production: it leaves the
@@ -61,7 +65,8 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
 
 ## Commands
 
-- `npm ci`: install the exact dependencies from `package-lock.json`.
+- `npm ci`: install the exact dependencies from `package-lock.json`. Needs `GITHUB_PACKAGES_TOKEN` (a GitHub token
+  with `read:packages`) in the environment, for `@rrzadca/radinf-ui`.
 - `npm start`: serve the app on `http://localhost:4200`, proxying `/api` to the API on `http://localhost:5080` (start
   the API first, see `api/CLAUDE.md`).
 - `npm run lint`: ESLint over every project.

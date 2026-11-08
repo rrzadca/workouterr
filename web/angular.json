@@ -127,7 +127,7 @@
           "options": {
             "configDir": "projects/ui/.storybook",
             "port": 6006,
-            "styles": ["projects/ui/src/styles/global.css"],
+            "styles": ["projects/workouterr/src/styles/global.css"],
             "tsConfig": "projects/ui/.storybook/tsconfig.json"
           }
         },
@@ -136,7 +136,7 @@
           "options": {
             "configDir": "projects/ui/.storybook",
             "outputDir": "dist/storybook",
-            "styles": ["projects/ui/src/styles/global.css"],
+            "styles": ["projects/workouterr/src/styles/global.css"],
             "tsConfig": "projects/ui/.storybook/tsconfig.json"
           }
         }

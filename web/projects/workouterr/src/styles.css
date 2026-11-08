@@ -1,2 +1,2 @@
-/* Tailwind, fonts, design tokens and theme come from the UI library; app-wide styles go below. */
-@import '../../ui/src/styles/global.css';
+/* Tailwind, fonts, design tokens, radinf-ui and the theme come from `styles/global.css`; app-wide styles go below. */
+@import './styles/global.css';

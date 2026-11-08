@@ -116,10 +116,30 @@ docs/                         design reference (`docs/design/`), server setup, i
   Done when: you can log in on an iPad-sized viewport, reach an empty home page, switch the theme and log out; the
   layout is checked on the real iPad; the API's requests carry the version header.
 
+### UI library migration
+
+Generic components come from `@rrzadca/radinf-ui` (private, GitHub Packages), styled through its `--rad-*` tokens;
+features it lacks are raised as issues there (button: rrzadca/radinf-ui#30, input icon: rrzadca/radinf-ui#31).
+
+- [x] **14a. Install radinf-ui and map the tokens.** `.npmrc` for GitHub Packages (token from
+  `GITHUB_PACKAGES_TOKEN`); `@rrzadca/radinf-ui` and `@angular/cdk` installed; global styles and tokens move into
+  the app; `rad-theme.css` maps radinf-ui's semantic tokens onto Workouterr's, in both themes, at touch sizes.
+  Done when: the app builds and runs with radinf-ui's stylesheet loaded and the existing screens look unchanged.
+- [ ] **14b. Icons.** The app's Lucide icons as path data in `src/app/icons.ts`, registered with
+  `provideRadIcons`; every `<rad-icon>` is radinf-ui's.
+  Done when: the shell, login and unreachable pages show the same icons as before.
+- [ ] **14c. Buttons and form fields.** Login, unreachable and shell use `<rad-button>`, `<rad-form-field>` and
+  `<rad-form-input-text>`; specs use radinf-ui's harnesses.
+  Done when: logging in, retrying and the theme and logout buttons work as before, in both themes.
+- [ ] **14d. Dialog, then remove `projects/ui`.** The "new version" dialog opens through `RadDialog`; the `ui`
+  project, its Storybook and `@lucide/angular` are removed; docs updated.
+  Done when: the dialog can't be dismissed and reloads the page, and nothing references `@workouterr/ui`.
+
 ### Deploy
 
 - [ ] **15. Container images.** Multi-stage API Dockerfile, Caddy image with the built Angular app, `compose.yaml` with
-  `caddy`, `api`, `postgres` (named volume, no exposed port), EF Core migration bundle.
+  `caddy`, `api`, `postgres` (named volume, no exposed port), EF Core migration bundle. The web build reads
+  `GITHUB_PACKAGES_TOKEN` as a BuildKit secret (`RUN --mount=type=secret`), never as a build argument or in a layer.
   Scope: Tech stack and hosting → Hosting.
   Done when: the app as built so far (login and the shell) runs locally from `compose.yaml` over HTTPS.
 - [ ] **16. Server.** Hetzner EU VPS; `A` / `AAAA` records in the domain's OVH DNS zone pointing at it (check

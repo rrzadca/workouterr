@@ -1,4 +1,4 @@
-/* The design system's global stylesheet, loaded by the app (`styles.css`) and by Storybook (`angular.json`). */
+/* The app's global stylesheet, loaded by `styles.css` (and by the UI library's Storybook until task 14d removes it). */
 @import 'tailwindcss';
 
 /* Self-hosted fonts: the build copies the woff2 files from node_modules into the app, nothing comes from a CDN.
@@ -7,7 +7,10 @@
 @import '@fontsource-variable/geist-mono';
 @import '@fontsource/black-ops-one';
 
+/* radinf-ui's tokens and base rules first, then ours, then the mapping of its tokens onto ours: the later file wins. */
+@import '@rrzadca/radinf-ui/styles.css';
 @import './tokens.css';
+@import './rad-theme.css';
 
 /* `dark:` utilities follow the theme attribute set by ThemeService, not the OS setting. */
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
