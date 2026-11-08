@@ -49,8 +49,9 @@
   --rad-color-danger-subtle: var(--status-danger-soft);
   --rad-color-on-danger-subtle: var(--text-strong);
 
-  /* radinf-ui draws focus as a solid outline, so the solid accent rather than the translucent `--accent-ring`. */
-  --rad-color-focus-ring: var(--accent);
+  /* The mockup's translucent focus ring. radinf-ui draws it as a 2 px outline (the mockup: a 3 px ring); the width
+     is not a token yet (rrzadca/radinf-ui#38). */
+  --rad-color-focus-ring: var(--accent-ring);
 }
 
 /* Sizes and type: the same in both themes. Touch sizes, as for the rest of the app (docs/design/README.md). */

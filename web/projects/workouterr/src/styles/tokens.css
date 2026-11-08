@@ -55,7 +55,7 @@
   --brand-amber: var(--amber-500);
 }
 
-/* ---- Light theme (default; also under `[data-theme='light']`, so any subtree can be themed, as in Storybook) ---- */
+/* ---- Light theme (default; also under `[data-theme='light']`, so any subtree can be themed) ---- */
 :root,
 [data-theme='light'] {
   --surface-app: #eceff2;
