@@ -28,3 +28,5 @@ test-results/
 .claude/settings.local.json
 
 *storybook.log
+
+.fake
