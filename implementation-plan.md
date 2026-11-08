@@ -119,7 +119,7 @@ docs/                         design reference (`docs/design/`), server setup, i
 
 Generic components come from `@rrzadca/radinf-ui` (private, GitHub Packages), styled through its `--rad-*` tokens;
 features it lacks are raised as issues there (button: rrzadca/radinf-ui#30, input icon: rrzadca/radinf-ui#31,
-focus ring width: rrzadca/radinf-ui#38).
+focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
 
 - [x] **14a. Install radinf-ui and map the tokens.** `.npmrc` for GitHub Packages (token from
   `GITHUB_PACKAGES_TOKEN`); `@rrzadca/radinf-ui` and `@angular/cdk` installed; global styles and tokens move into
