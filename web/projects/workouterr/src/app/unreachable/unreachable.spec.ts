@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { provideRadIcons } from '@rrzadca/radinf-ui/icon';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import english from '../../../public/i18n/en.json';
+import { appIcons } from '../icons';
 import { Unreachable } from './unreachable';
 
 @Component({ template: '' })
@@ -23,6 +25,7 @@ describe('Unreachable', () => {
           { path: '', component: EmptyPage },
           { path: 'unreachable', component: Unreachable },
         ]),
+        provideRadIcons(appIcons),
       ],
     });
   });
@@ -34,6 +37,10 @@ describe('Unreachable', () => {
     const page = fixture.nativeElement as HTMLElement;
 
     expect(page.querySelector('h1')?.textContent).toContain("Can't reach Workouterr");
+    // The icon comes from the app's registered set: an unknown name would render no paths.
+    expect(page.querySelectorAll('rad-icon[data-rad-icon="wifi-off"] path').length).toBe(
+      appIcons['wifi-off'].paths.length,
+    );
 
     page.querySelector('button')?.click();
     await fixture.whenStable();

@@ -125,7 +125,7 @@ features it lacks are raised as issues there (button: rrzadca/radinf-ui#30, inpu
   `GITHUB_PACKAGES_TOKEN`); `@rrzadca/radinf-ui` and `@angular/cdk` installed; global styles and tokens move into
   the app; `rad-theme.css` maps radinf-ui's semantic tokens onto Workouterr's, in both themes, at touch sizes.
   Done when: the app builds and runs with radinf-ui's stylesheet loaded and the existing screens look unchanged.
-- [ ] **14b. Icons.** The app's Lucide icons as path data in `src/app/icons.ts`, registered with
+- [x] **14b. Icons.** The app's Lucide icons as path data in `src/app/icons.ts`, registered with
   `provideRadIcons`; every `<rad-icon>` is radinf-ui's.
   Done when: the shell, login and unreachable pages show the same icons as before.
 - [ ] **14c. Buttons and form fields.** Login, unreachable and shell use `<rad-button>`, `<rad-form-field>` and

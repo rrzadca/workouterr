@@ -1,7 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { Icon, IconButton, type IconName } from '@workouterr/ui';
+import { RadIcon } from '@rrzadca/radinf-ui/icon';
+import { IconButton, type IconName } from '@workouterr/ui';
 import { AuthService } from '../auth/auth';
 import { type Theme, ThemeService } from '../theme';
 
@@ -23,7 +24,7 @@ const themeChoices = {
 
 // The layout around every page once logged in: the sidebar (iPad landscape first) and the page beside it.
 @Component({
-  imports: [Icon, IconButton, RouterLink, RouterLinkActive, RouterOutlet, TranslocoDirective],
+  imports: [IconButton, RadIcon, RouterLink, RouterLinkActive, RouterOutlet, TranslocoDirective],
   selector: 'app-shell',
   templateUrl: './shell.html',
 })

@@ -4,11 +4,12 @@ import { form, FormField, FormRoot, validateStandardSchema } from '@angular/form
 import { Router } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { LoginBody, type LoginRequest } from '@workouterr/api-client';
-import { Button, FormInputText, Icon } from '@workouterr/ui';
+import { RadIcon } from '@rrzadca/radinf-ui/icon';
+import { Button, FormInputText } from '@workouterr/ui';
 import { AuthService } from '../auth/auth';
 
 @Component({
-  imports: [Button, FormField, FormInputText, FormRoot, Icon, TranslocoDirective],
+  imports: [Button, FormField, FormInputText, FormRoot, RadIcon, TranslocoDirective],
   selector: 'app-login',
   templateUrl: './login.html',
 })

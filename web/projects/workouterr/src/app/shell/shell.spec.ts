@@ -3,9 +3,11 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { provideRouter, Router } from '@angular/router';
+import { provideRadIcons } from '@rrzadca/radinf-ui/icon';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import english from '../../../public/i18n/en.json';
 import { AuthService } from '../auth/auth';
+import { appIcons } from '../icons';
 import { ThemeService } from '../theme';
 import { Shell } from './shell';
 
@@ -30,7 +32,12 @@ describe('Shell', () => {
           preloadLangs: true,
         }),
       ],
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([{ path: '', component: EmptyPage }])],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([{ path: '', component: EmptyPage }]),
+        provideRadIcons(appIcons),
+      ],
     });
     httpTesting = TestBed.inject(HttpTestingController);
   });

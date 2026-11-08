@@ -3,8 +3,10 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { provideRadIcons } from '@rrzadca/radinf-ui/icon';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import english from '../../../public/i18n/en.json';
+import { appIcons } from '../icons';
 import { Login } from './login';
 
 @Component({ template: '' })
@@ -29,6 +31,7 @@ describe('Login', () => {
           { path: '', component: EmptyPage },
           { path: 'login', component: EmptyPage },
         ]),
+        provideRadIcons(appIcons),
       ],
     });
     httpTesting = TestBed.inject(HttpTestingController);
