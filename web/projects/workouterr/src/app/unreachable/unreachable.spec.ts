@@ -1,6 +1,8 @@
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { RadButtonHarness } from '@rrzadca/radinf-ui/button/testing';
 import { provideRadIcons } from '@rrzadca/radinf-ui/icon';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import english from '../../../public/i18n/en.json';
@@ -42,8 +44,11 @@ describe('Unreachable', () => {
       appIcons['wifi-off'].paths.length,
     );
 
-    page.querySelector('button')?.click();
-    await fixture.whenStable();
+    const tryAgain = await TestbedHarnessEnvironment.loader(fixture).getHarness(
+      RadButtonHarness.with({ text: 'Try again' }),
+    );
+    expect(await tryAgain.getIcon()).toBe('refresh-cw');
+    await tryAgain.click();
 
     expect(router.url).toBe('/');
   });

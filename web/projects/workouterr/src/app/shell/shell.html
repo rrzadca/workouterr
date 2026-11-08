@@ -35,12 +35,21 @@
         <span class="block truncate text-label font-semibold text-text-strong">{{ user()?.email }}</span>
         <span class="block truncate text-caption text-text-muted">{{ t('nav.noActivePlan') }}</span>
       </span>
-      <rad-icon-button
+      <rad-button
+        variant="ghost"
+        size="sm"
         [icon]="themeChoice().toggleIcon"
-        [label]="t(themeChoice().toggleLabelKey)"
+        [ariaLabel]="t(themeChoice().toggleLabelKey)"
         (click)="toggleTheme()"
       />
-      <rad-icon-button icon="log-out" [label]="t('nav.logout')" [loading]="loggingOut()" (click)="logout()" />
+      <rad-button
+        variant="ghost"
+        size="sm"
+        icon="log-out"
+        [ariaLabel]="t('nav.logout')"
+        [loading]="loggingOut()"
+        (click)="logout()"
+      />
     </div>
   </nav>
 

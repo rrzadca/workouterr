@@ -4,12 +4,14 @@ import { form, FormField, FormRoot, validateStandardSchema } from '@angular/form
 import { Router } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { LoginBody, type LoginRequest } from '@workouterr/api-client';
+import { RadButton } from '@rrzadca/radinf-ui/button';
+import { RadFormField } from '@rrzadca/radinf-ui/form-field';
+import { RadFormInputText } from '@rrzadca/radinf-ui/form-inputs/form-input-text';
 import { RadIcon } from '@rrzadca/radinf-ui/icon';
-import { Button, FormInputText } from '@workouterr/ui';
 import { AuthService } from '../auth/auth';
 
 @Component({
-  imports: [Button, FormField, FormInputText, FormRoot, RadIcon, TranslocoDirective],
+  imports: [FormField, FormRoot, RadButton, RadFormField, RadFormInputText, RadIcon, TranslocoDirective],
   selector: 'app-login',
   templateUrl: './login.html',
 })
@@ -27,11 +29,19 @@ export class Login {
     },
   );
 
-  // The email field's message, shown by the field once it is touched and invalid: the schema's only email rules are
-  // "not empty" and the length limit.
-  protected readonly emailErrorKey = computed(() =>
-    this.loginForm.email().value() ? 'login.emailTooLong' : 'login.emailRequired',
-  );
+  // Each field's message, once it is touched (left, or the form submitted) and invalid; `<rad-form-field>` shows any
+  // `error` it is given, so the page decides when. The schema's only email rules are "not empty" and the length limit.
+  protected readonly emailErrorKey = computed(() => {
+    const email = this.loginForm.email();
+    if (!email.touched() || !email.invalid()) {
+      return null;
+    }
+    return email.value() ? 'login.emailTooLong' : 'login.emailRequired';
+  });
+  protected readonly passwordErrorKey = computed(() => {
+    const password = this.loginForm.password();
+    return password.touched() && password.invalid() ? 'login.passwordRequired' : null;
+  });
   // The login's own errors, set by `login()`; editing a field clears them.
   protected readonly loginErrorKey = computed(() => {
     const error = this.loginForm().errors()[0];

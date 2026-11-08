@@ -128,7 +128,7 @@ features it lacks are raised as issues there (button: rrzadca/radinf-ui#30, inpu
 - [x] **14b. Icons.** The app's Lucide icons as path data in `src/app/icons.ts`, registered with
   `provideRadIcons`; every `<rad-icon>` is radinf-ui's.
   Done when: the shell, login and unreachable pages show the same icons as before.
-- [ ] **14c. Buttons and form fields.** Login, unreachable and shell use `<rad-button>`, `<rad-form-field>` and
+- [x] **14c. Buttons and form fields.** Login, unreachable and shell use `<rad-button>`, `<rad-form-field>` and
   `<rad-form-input-text>`; specs use radinf-ui's harnesses.
   Done when: logging in, retrying and the theme and logout buttons work as before, in both themes.
 - [ ] **14d. Dialog, then remove `projects/ui`.** The "new version" dialog opens through `RadDialog`; the `ui`

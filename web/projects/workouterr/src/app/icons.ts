@@ -64,3 +64,5 @@ export const appIcons = {
     ],
   },
 } as const satisfies RadIconSet;
+
+export type AppIconName = keyof typeof appIcons;

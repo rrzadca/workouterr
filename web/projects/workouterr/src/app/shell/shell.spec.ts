@@ -1,8 +1,10 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { provideRouter, Router } from '@angular/router';
+import { RadButtonHarness } from '@rrzadca/radinf-ui/button/testing';
 import { provideRadIcons } from '@rrzadca/radinf-ui/icon';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import english from '../../../public/i18n/en.json';
@@ -57,7 +59,9 @@ describe('Shell', () => {
     const fixture = TestBed.createComponent(Shell);
     await fixture.whenStable();
     const element = fixture.nativeElement as HTMLElement;
-    const button = (label: string) => element.querySelector(`button[aria-label="${label}"]`) as HTMLButtonElement;
+    // The sidebar's icon-only buttons, found by their accessible name.
+    const loader = TestbedHarnessEnvironment.loader(fixture);
+    const button = (ariaLabel: string) => loader.getHarness(RadButtonHarness.with({ ariaLabel }));
     return { fixture, element, button };
   }
 
@@ -69,24 +73,27 @@ describe('Shell', () => {
   });
 
   it('switches the theme with the sun / moon button', async () => {
-    const { fixture, element, button } = await render();
+    const { element, button } = await render();
     const logoSources = () => Array.from(element.querySelectorAll('nav img'), (logo) => logo.getAttribute('src'));
     expect(document.documentElement.dataset['theme']).toBe('light');
     expect(logoSources()).toEqual(['brand/logo-mark-navy.png', 'brand/logo-word-navy.png']);
 
-    button('Dark theme').click();
-    await fixture.whenStable();
+    expect(await (await button('Dark theme')).getIcon()).toBe('moon');
+
+    await (await button('Dark theme')).click();
 
     expect(TestBed.inject(ThemeService).theme()).toBe('dark');
     expect(document.documentElement.dataset['theme']).toBe('dark');
-    expect(button('Light theme').querySelector('svg')?.classList).toContain('lucide-sun');
+    expect(await (await button('Light theme')).getIcon()).toBe('sun');
     expect(logoSources()).toEqual(['brand/logo-mark-teal.png', 'brand/logo-word-teal.png']);
   });
 
   it('logs out with the log-out button', async () => {
     const { fixture, button } = await render();
+    const logOut = await button('Log out');
 
-    button('Log out').click();
+    await logOut.click();
+    expect(await logOut.isLoading()).toBe(true);
     httpTesting.expectOne('/api/auth/logout').flush(null, { status: 204, statusText: 'No Content' });
     await fixture.whenStable();
 

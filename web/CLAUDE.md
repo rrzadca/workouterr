@@ -21,9 +21,11 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   every page is lazy-loaded (`loadComponent`).
 - Forms are Signal Forms (`@angular/forms/signals`): `form(model, (path) => validateStandardSchema(path, SomeBody))`
   with the generated zod schema, so the API's limits are the form's; `[formRoot]` on the `<form>`, `[formField]` on
-  each control. UI library controls are Signal Forms controls (`FormValueControl`: a `value` model, plus the state
-  inputs `[formField]` fills, such as `touched` and `invalid`), so `<rad-form-input-text [formField]="…" />` binds
-  like a native input; the page passes only the translated `error` message.
+  each control. radinf-ui's controls are Signal Forms controls (`FormValueControl`), so
+  `<rad-form-input-text [formField]="…" />` binds like a native input. Each sits in a `<rad-form-field>`, whose
+  `label` and `error` it links to the input. The field shows any `error` it is given, so the page passes
+  the translated message only once the field is touched and invalid (a `computed` per field, as in `login.ts`).
+  Text inputs are `size="lg"`: 17 px text, below 16 px Safari zooms into a focused input.
 - The app imports the library as `@workouterr/ui`, mapped in `tsconfig.json` to its source (`src/public-api.ts`), so it
   builds with the app and never needs building first.
 - Calls to the API use relative `/api/...` URLs: `ng serve` proxies them to the API (`proxy.conf.json`), Caddy does the

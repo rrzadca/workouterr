@@ -63,7 +63,8 @@
   --rad-font-family: var(--font-ui);
   --rad-font-size-xs: var(--text-caption);
   --rad-font-size-sm: var(--text-label);
-  --rad-font-size-md: var(--text-body);
+  /* 17 px, as the old inputs and large buttons: Safari zooms into a focused input with text under 16 px. */
+  --rad-font-size-md: var(--text-body-lg);
   --rad-font-size-lg: var(--text-body-lg);
   --rad-line-height: var(--leading-normal);
 

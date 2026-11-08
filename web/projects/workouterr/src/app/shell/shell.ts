@@ -1,9 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
+import { RadButton } from '@rrzadca/radinf-ui/button';
 import { RadIcon } from '@rrzadca/radinf-ui/icon';
-import { IconButton, type IconName } from '@workouterr/ui';
 import { AuthService } from '../auth/auth';
+import type { AppIconName } from '../icons';
 import { type Theme, ThemeService } from '../theme';
 
 // A sidebar link, 44 px tall for touch. RouterLinkActive marks the current page with aria-current="page", which both
@@ -20,11 +21,11 @@ const navLinkClasses =
 const themeChoices = {
   light: { logoColour: 'navy', toggleIcon: 'moon', toggleLabelKey: 'nav.darkTheme' },
   dark: { logoColour: 'teal', toggleIcon: 'sun', toggleLabelKey: 'nav.lightTheme' },
-} as const satisfies Record<Theme, { logoColour: string; toggleIcon: IconName; toggleLabelKey: string }>;
+} as const satisfies Record<Theme, { logoColour: string; toggleIcon: AppIconName; toggleLabelKey: string }>;
 
 // The layout around every page once logged in: the sidebar (iPad landscape first) and the page beside it.
 @Component({
-  imports: [IconButton, RadIcon, RouterLink, RouterLinkActive, RouterOutlet, TranslocoDirective],
+  imports: [RadButton, RadIcon, RouterLink, RouterLinkActive, RouterOutlet, TranslocoDirective],
   selector: 'app-shell',
   templateUrl: './shell.html',
 })

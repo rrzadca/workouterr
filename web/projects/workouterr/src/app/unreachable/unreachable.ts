@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
+import { RadButton } from '@rrzadca/radinf-ui/button';
 import { RadIcon } from '@rrzadca/radinf-ui/icon';
-import { Button } from '@workouterr/ui';
 
 // Where the guards send the app when the API can't be reached. Offline use comes with the service worker.
 @Component({
-  imports: [Button, RadIcon, TranslocoDirective],
+  imports: [RadButton, RadIcon, TranslocoDirective],
   selector: 'app-unreachable',
   templateUrl: './unreachable.html',
 })
