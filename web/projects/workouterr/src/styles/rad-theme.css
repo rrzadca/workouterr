@@ -31,6 +31,11 @@
   --rad-color-danger-hover: color-mix(in oklab, var(--status-danger), var(--text-strong) 15%);
   --rad-color-on-danger: var(--text-on-accent);
 
+  --rad-color-highlight: var(--highlight);
+  /* No highlight hover in the design either: the same mix as the danger hover. */
+  --rad-color-highlight-hover: color-mix(in oklab, var(--highlight), var(--text-strong) 15%);
+  --rad-color-on-highlight: var(--text-on-amber);
+
   --rad-color-success: var(--status-success);
   --rad-color-warning: var(--status-warn);
 
@@ -53,6 +58,7 @@
   --rad-control-height-sm: var(--spacing-control-sm);
   --rad-control-height-md: var(--spacing-control-md);
   --rad-control-height-lg: var(--spacing-control-lg);
+  --rad-control-height-xl: var(--spacing-control-xl);
 
   --rad-font-family: var(--font-ui);
   --rad-font-size-xs: var(--text-caption);
