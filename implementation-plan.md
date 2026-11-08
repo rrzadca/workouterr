@@ -24,7 +24,6 @@ web/                          Angular workspace, self-contained
   CLAUDE.md                   Angular conventions and commands
   angular.json, package.json, .nvmrc
   projects/workouterr/        the app
-  projects/ui/                UI component library + Storybook
   projects/domain/            TypeScript domain rules for offline sessions
   projects/api-client/        generated TypeScript types and zod schemas (orval), never edited by hand
   e2e/                        Playwright (WebKit, iPad viewport)
@@ -131,7 +130,7 @@ features it lacks are raised as issues there (button: rrzadca/radinf-ui#30, inpu
 - [x] **14c. Buttons and form fields.** Login, unreachable and shell use `<rad-button>`, `<rad-form-field>` and
   `<rad-form-input-text>`; specs use radinf-ui's harnesses.
   Done when: logging in, retrying and the theme and logout buttons work as before, in both themes.
-- [ ] **14d. Dialog, then remove `projects/ui`.** The "new version" dialog opens through `RadDialog`; the `ui`
+- [x] **14d. Dialog, then remove `projects/ui`.** The "new version" dialog opens through `RadDialog`; the `ui`
   project, its Storybook and `@lucide/angular` are removed; docs updated.
   Done when: the dialog can't be dismissed and reloads the page, and nothing references `@workouterr/ui`.
 
@@ -186,7 +185,7 @@ features it lacks are raised as issues there (button: rrzadca/radinf-ui#30, inpu
   Scope: Exercises (starter set); Accounts → Language setting.
   Done when: a new user has the starter set in their language, and a broken JSON entry fails the test.
 - [ ] **23. Exercise screens.** List with muscle-group filter, create / edit form (generated zod schema), archive and
-  restore, the "used in routines" message. UI components added to `ui` as needed.
+  restore, the "used in routines" message. UI components from radinf-ui, missing features raised there.
   Scope: Exercises.
   Design: `docs/design/screens/ExercisesScreen.jsx`, `ExercisePicker.jsx`.
   Done when: you can manage exercises on an iPad-sized viewport.

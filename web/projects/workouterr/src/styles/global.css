@@ -1,4 +1,4 @@
-/* The app's global stylesheet, loaded by `styles.css` (and by the UI library's Storybook until task 14d removes it). */
+/* The app's global stylesheet, loaded by `styles.css`. */
 @import 'tailwindcss';
 
 /* Self-hosted fonts: the build copies the woff2 files from node_modules into the app, nothing comes from a CDN.

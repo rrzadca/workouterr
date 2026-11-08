@@ -72,6 +72,8 @@
   --rad-radius-sm: var(--radius-xs);
   --rad-radius-md: var(--radius-sm);
   --rad-radius-lg: var(--radius-md);
+  /* The mockup's modal corner. */
+  --rad-dialog-radius: var(--radius-xl);
 
   --rad-shadow-sm: var(--shadow-control);
   --rad-shadow-md: var(--shadow-popover);
