@@ -373,7 +373,9 @@ The project is also a learning path for building REST APIs with .NET and ASP.NET
   - The deploy script builds the images locally after all checks pass (multi-stage API image; Caddy image with the
     built Angular app) and sends them with `docker save | ssh docker load`. No registry until CI exists, then GHCR
   - Migrations: an EF Core migration bundle, run once by the deploy script before the new API starts, never at
-    startup
+    startup. It ships inside the API image and runs as a one-off Compose service (`migrations`)
+  - ASP.NET Core Data Protection keys (they encrypt the login cookie) live in a named volume, so logins survive a
+    new API container
   - Secrets (database password, email credentials) in an `.env` file on the server, outside the repo, `chmod 600`
   - Server basics: SSH keys only, firewall allowing only 22, 80 and 443, automatic security updates
 - Transactional email (invites, verification, password reset, email change to both addresses, registration

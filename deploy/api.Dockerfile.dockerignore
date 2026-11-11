@@ -1,0 +1,8 @@
+# Keeps the api/ build context to what the image needs (BuildKit reads <Dockerfile>.dockerignore).
+**/bin/
+**/obj/
+**/TestResults/
+tests/
+scripts/
+*.user
+CLAUDE.md

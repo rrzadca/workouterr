@@ -1,0 +1,25 @@
+# One site: the Angular app and, under /api, the API. HTTPS is automatic: a Let's Encrypt certificate for a public
+# domain, a certificate from Caddy's own local authority for `localhost`.
+{$WORKOUTERR_DOMAIN:localhost} {
+	encode zstd gzip
+
+	# The API checks Origin against Host (CSRF guard), so Host passes through unchanged (reverse_proxy's default).
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	handle {
+		root * /srv
+
+		# File names with Angular's content hash never change their content; everything else (index.html,
+		# translations, icons) is checked on every load, so a deploy is picked up at once.
+		@hashed path_regexp -[0-9A-Za-z]{8}\.(js|css|woff2?)$
+		@unhashed not path_regexp -[0-9A-Za-z]{8}\.(js|css|woff2?)$
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		header @unhashed Cache-Control "no-cache"
+
+		# Client-side routes (/login, …) are served index.html; Angular's router takes it from there.
+		try_files {path} /index.html
+		file_server
+	}
+}
