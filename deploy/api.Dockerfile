@@ -4,8 +4,9 @@
 #   docker compose build api   (from deploy/)
 
 # Build stage on the machine's own platform; `-a` / `--target-runtime` cross-compile for the target one, so an
-# arm64 Mac builds an amd64 image without emulating the SDK.
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+# arm64 Mac builds an amd64 image without emulating the SDK. The SDK tag is the version in api/global.json: a floating
+# `10.0` tag would move to the next feature band (10.0.5xx), which global.json's `latestPatch` refuses.
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0.401 AS build
 ARG TARGETARCH
 WORKDIR /source
 
