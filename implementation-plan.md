@@ -137,7 +137,7 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
 
 ### Deploy
 
-- [ ] **15. Container images.** Multi-stage API Dockerfile, Caddy image with the built Angular app, `compose.yaml` with
+- [x] **15. Container images.** Multi-stage API Dockerfile, Caddy image with the built Angular app, `compose.yaml` with
   `caddy`, `api`, `postgres` (named volume, no exposed port), EF Core migration bundle. The web build reads
   `GITHUB_PACKAGES_TOKEN` as a BuildKit secret (`RUN --mount=type=secret`), never as a build argument or in a layer.
   Scope: Tech stack and hosting → Hosting.

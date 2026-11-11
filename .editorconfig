@@ -12,6 +12,10 @@ max_line_length = 120
 [*.cs]
 indent_size = 4
 
+# Caddy's own formatter (`caddy fmt`) indents with tabs.
+[Caddyfile]
+indent_style = tab
+
 [*.md]
 trim_trailing_whitespace = false
 

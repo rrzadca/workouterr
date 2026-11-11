@@ -45,3 +45,17 @@ Run from the side's own folder. Each plan task that adds a command adds it here 
 
 - API: see `api/CLAUDE.md`.
 - Web: see `web/CLAUDE.md`.
+
+The production stack (`deploy/compose.yaml`: `caddy`, `api`, `postgres`), run from `deploy/`. It needs `.env` beside
+it (from `.env.example`). Locally it serves https://localhost and uses the same project name as the server, so its
+volumes are `workouterr_*`.
+
+- `docker compose build`: build both images. The Caddy image's `npm ci` reads `GITHUB_PACKAGES_TOKEN` from the
+  environment as a BuildKit secret.
+- `docker compose run --rm migrations`: apply pending migrations with the EF Core migration bundle (starts
+  `postgres` if needed). Run it before starting a new API.
+- `docker compose up -d --wait`: start the stack and wait until it is running; `down` stops it and keeps the
+  volumes.
+- `docker compose run --rm api user create <email>`: the API's CLI commands, inside the stack.
+- `docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt .`: Caddy's local root certificate. Trust it in
+  the system keychain so the browser accepts https://localhost.

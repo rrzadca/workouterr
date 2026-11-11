@@ -1,0 +1,9 @@
+# Keeps the web/ build context to sources: dependencies are installed and the app is built inside the image.
+**/node_modules/
+dist/
+.angular/
+coverage/
+e2e/
+playwright-report/
+test-results/
+CLAUDE.md

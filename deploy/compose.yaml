@@ -1,0 +1,86 @@
+# The production stack, also runnable locally over HTTPS on https://localhost. Run from deploy/, with the values from
+# .env.example in .env (beside this file, never committed).
+name: workouterr
+
+# The API and the migration bundle connect to the database the same way. GSS encryption (Kerberos) is off: the
+# runtime image has no Kerberos library, and Npgsql would try it, and log the failure, on every new connection.
+x-api-environment: &api-environment
+  ConnectionStrings__Workouterr: >-
+    Host=postgres; Port=5432; Database=workouterr; Username=workouterr;
+    Password=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}; GSS Encryption Mode=Disable
+
+services:
+  caddy:
+    build:
+      context: ../web
+      dockerfile: ../deploy/caddy.Dockerfile
+      # The Caddyfile lives here, outside the web/ context; the Dockerfile copies it `--from=deploy`.
+      additional_contexts:
+        deploy: .
+      secrets:
+        - github_packages_token
+    image: workouterr-caddy
+    restart: unless-stopped
+    environment:
+      WORKOUTERR_DOMAIN: ${WORKOUTERR_DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    volumes:
+      - caddy-data:/data # certificates and their keys: keep them, or Let's Encrypt's rate limits bite
+      - caddy-config:/config
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ../api
+      dockerfile: ../deploy/api.Dockerfile
+    image: workouterr-api
+    restart: unless-stopped
+    environment: *api-environment
+    volumes:
+      - data-protection-keys:/home/app/.aspnet/DataProtection-Keys
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # The migration bundle in the API image, run once before a new API starts, never at startup:
+  #   docker compose run --rm migrations
+  # The profile keeps `docker compose up` from starting it.
+  migrations:
+    image: workouterr-api
+    profiles: [migrations]
+    entrypoint: ["./efbundle"]
+    environment: *api-environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: workouterr
+      POSTGRES_USER: workouterr
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    # No ports: only the services on this Compose network reach the database.
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username workouterr --dbname workouterr"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+secrets:
+  # Read from the environment of whoever runs the build; only the web build's `npm ci` sees it.
+  github_packages_token:
+    environment: GITHUB_PACKAGES_TOKEN
+
+volumes:
+  postgres-data:
+  caddy-data:
+  caddy-config:
+  data-protection-keys:
