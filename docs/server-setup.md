@@ -183,8 +183,9 @@ ssh -t workouterr 'cd ~/workouterr && docker compose run --rm api user create <e
 ## 9. Uptime check
 
 A free external monitor (UptimeRobot) requests `https://workouterr.app/api/health` every 5 minutes and emails when it
-fails: a non-200 means the API or the database is down, a timeout means the server or Caddy is. Monitor type HTTP(s),
-alert contact the owner's email. The endpoint returns only `{"status":"Healthy"}`, so nothing personal leaves the
+fails: a non-200 means the API or the database is down, a timeout means the server or Caddy is. Monitor type Keyword
+(`Healthy`, alert when it is missing), alert contact the owner's email. A plain HTTP(s) monitor would only check for a
+200, which another server answering for the domain (the old hosting, after a DNS change) gives too. The endpoint returns only `{"status":"Healthy"}`, so nothing personal leaves the
 server.
 
 ## Rebuilding
