@@ -147,6 +147,40 @@ ssh workouterr 'mkdir -p ~/workouterr && umask 077 \
 in the connection string. Keep a copy of the file in a password manager: the password is fixed into the database when
 its volume is first created.
 
+## 7. Deploying
+
+`deploy/deploy.sh` (from `deploy/`) deploys the current commit; nothing is built on the server. The script:
+
+1. Refuses a dirty working tree, checks for `GITHUB_PACKAGES_TOKEN`, Docker and the SSH alias.
+2. Runs every check: `dotnet format --verify-no-changes`, `dotnet build`, the OpenAPI check, `dotnet test`, then
+   `npm ci`, ESLint, Prettier, the API client check, `npm run build` and the unit tests (and the end-to-end tests
+   once they exist, unless `--skip-e2e`). A failure stops it before anything leaves the Mac.
+3. Builds both images for `linux/amd64` (`DOCKER_DEFAULT_PLATFORM`), with the same tags as a local build.
+4. Streams them with `docker save | gzip | ssh workouterr 'gunzip | docker load'` (about 150 MB) and copies
+   `compose.yaml` into `~/workouterr`.
+5. On the server: `docker compose run --rm --no-build migrations`, then `docker compose up -d --wait --no-build`, then
+   `docker image prune -f` (the replaced images, now untagged). `--no-build` because the server has no source; the
+   `build:` sections in `compose.yaml` are ignored.
+6. `curl https://<domain>/api/health`, with the domain read from the server's `.env`.
+
+The first deploy is also when Caddy gets its Let's Encrypt certificate (DNS must resolve, section 3).
+
+## 8. First user
+
+The API's CLI runs in a one-off `api` container; `-t` gives it a terminal, so the password is asked for with hidden
+input:
+
+```sh
+ssh -t workouterr 'cd ~/workouterr && docker compose run --rm --no-build api user create <email>'
+```
+
+## 9. Uptime check
+
+A free external monitor (UptimeRobot) requests `https://workouterr.app/api/health` every 5 minutes and emails when it
+fails: a non-200 means the API or the database is down, a timeout means the server or Caddy is. Monitor type HTTP(s),
+alert contact the owner's email. The endpoint returns only `{"status":"Healthy"}`, so nothing personal leaves the
+server.
+
 ## Rebuilding
 
 The server holds no state that the repo or the password manager can't restore, apart from the database itself (see

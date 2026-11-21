@@ -60,5 +60,9 @@ volumes are `workouterr_*`.
 - `docker compose up -d --wait`: start the stack and wait until it is running; `down` stops it and keeps the
   volumes.
 - `docker compose run --rm api user create <email>`: the API's CLI commands, inside the stack.
+- `./deploy.sh [--skip-e2e]`: deploy the current commit to the server (clean working tree, `GITHUB_PACKAGES_TOKEN`
+  set, Docker running). Runs every check and test first and stops on the first failure, before anything is built or
+  sent; then builds the images for `linux/amd64`, loads them on the server over SSH, runs the migrations, starts the
+  stack and checks `/api/health`. `--skip-e2e` skips the end-to-end tests (once task 35 adds them).
 - `docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt .`: Caddy's local root certificate. Trust it in
   the system keychain so the browser accepts https://localhost.
