@@ -73,9 +73,10 @@ docker save --platform "$platform" "${images[@]}" | gzip | ssh "$server" 'gunzip
 scp -q compose.yaml "$server:$server_folder/compose.yaml"
 
 step "Migrate the database and start the new containers"
-# --no-build: the server has no source, only the loaded images. The migrations run before the new API starts.
+# The server has no source, only the loaded images: `up --no-build` never tries to build, and `run` (which has no
+# such flag) builds only when an image is missing. The migrations run before the new API starts.
 ssh "$server" "cd $server_folder \
-  && docker compose run --rm --no-build migrations \
+  && docker compose run --rm migrations \
   && docker compose up -d --wait --no-build \
   && docker image prune -f > /dev/null"
 

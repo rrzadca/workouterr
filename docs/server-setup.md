@@ -158,9 +158,9 @@ its volume is first created.
 3. Builds both images for `linux/amd64` (`DOCKER_DEFAULT_PLATFORM`), with the same tags as a local build.
 4. Streams them with `docker save | gzip | ssh workouterr 'gunzip | docker load'` (about 150 MB) and copies
    `compose.yaml` into `~/workouterr`.
-5. On the server: `docker compose run --rm --no-build migrations`, then `docker compose up -d --wait --no-build`, then
-   `docker image prune -f` (the replaced images, now untagged). `--no-build` because the server has no source; the
-   `build:` sections in `compose.yaml` are ignored.
+5. On the server: `docker compose run --rm migrations`, then `docker compose up -d --wait --no-build`, then
+   `docker image prune -f` (the replaced images, now untagged). The server has no source: `up --no-build`
+   ignores the `build:` sections in `compose.yaml`, and `run` (no such flag) builds only when an image is missing.
 6. `curl https://<domain>/api/health`, with the domain read from the server's `.env`.
 
 The first deploy is also when Caddy gets its Let's Encrypt certificate (DNS must resolve, section 3).
@@ -171,15 +171,15 @@ The API's CLI runs in a one-off `api` container; `-t` gives it a terminal, so th
 input:
 
 ```sh
-ssh -t workouterr 'cd ~/workouterr && docker compose run --rm --no-build api user create <email>'
+ssh -t workouterr 'cd ~/workouterr && docker compose run --rm api user create <email>'
 ```
 
 ## 9. Uptime check
 
 A free external monitor (UptimeRobot) requests `https://workouterr.app/api/health` every 5 minutes and emails when it
 fails: a non-200 means the API or the database is down, a timeout means the server or Caddy is. Monitor type HTTP(s),
-alert contact the owner's email. The endpoint returns only `{"status":"Healthy"}`, so nothing personal leaves the
-server.
+alert contact the owner's email. The endpoint returns only the status, the app version and whether the database is
+up, so nothing personal leaves the server.
 
 ## Rebuilding
 
