@@ -142,7 +142,7 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
   `GITHUB_PACKAGES_TOKEN` as a BuildKit secret (`RUN --mount=type=secret`), never as a build argument or in a layer.
   Scope: Tech stack and hosting → Hosting.
   Done when: the app as built so far (login and the shell) runs locally from `compose.yaml` over HTTPS.
-- [ ] **16. Server.** Hetzner EU VPS; `A` / `AAAA` records in the domain's OVH DNS zone pointing at it (check
+- [x] **16. Server.** Hetzner EU VPS; `A` / `AAAA` records in the domain's OVH DNS zone pointing at it (check
   the zone's existing records first, or use a subdomain); SSH keys only, firewall (22, 80, 443), automatic
   security updates, Docker; written down in `docs/server-setup.md`. `.env` with secrets (`chmod 600`).
   Scope: Tech stack and hosting → Hosting.

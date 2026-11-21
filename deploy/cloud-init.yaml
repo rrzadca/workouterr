@@ -1,0 +1,75 @@
+#cloud-config
+# First-boot setup of the server (Ubuntu LTS on Hetzner Cloud). Pasted into "Cloud config" when the server is created;
+# cloud-init runs it once. Before pasting, replace the public key below with yours (`cat ~/.ssh/id_ed25519.pub`).
+# See docs/server-setup.md.
+#
+# Everything here is a setting cloud-init applies itself, with no `runcmd`: Hetzner's own cloud config (its vendor
+# data) has a `runcmd`, which replaces ours whenever this file is placed in /etc/cloud/cloud.cfg.d/ instead of being
+# pasted at creation.
+
+# The one login: `deploy`, by SSH key. It runs Docker without sudo (the docker group, created here so the user can
+# join it before Docker is installed) and may sudo without a password, since it has none.
+groups:
+  - docker
+users:
+  - name: deploy
+    shell: /bin/bash
+    groups: [sudo, docker]
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAA...replace-with-your-public-key
+
+# No root login and no passwords over SSH. cloud-init writes these to its own sshd drop-in, and Hetzner's vendor data
+# overrides `disable_root`; the drop-in below repeats them under a name that sorts first, because for each setting
+# sshd keeps the first value it reads.
+disable_root: true
+ssh_pwauth: false
+
+# A swap file, so a memory spike (a deploy loading images while the old containers still run) slows the 1 GB server
+# down instead of waking the kernel's out-of-memory killer.
+swap:
+  filename: /swapfile
+  size: 1G
+  maxsize: 1G
+
+# Docker Engine and the Compose plugin from Docker's own apt repository (Ubuntu's docker.io package has no Compose
+# v2). cloud-init fills in the release name ($RELEASE) and the downloaded key's path ($KEY_FILE); the key ID is the
+# fingerprint of Docker's signing key, https://docs.docker.com/engine/install/ubuntu/.
+apt:
+  sources:
+    docker:
+      source: deb [signed-by=$KEY_FILE] https://download.docker.com/linux/ubuntu $RELEASE stable
+      keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+
+package_update: true
+package_upgrade: true
+packages:
+  - unattended-upgrades
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/00-workouterr.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      AllowUsers deploy
+
+  # Security updates install every night (Ubuntu's default); a kernel update reboots the server at 04:00 UTC, and the
+  # containers come back by themselves (`restart: unless-stopped`).
+  - path: /etc/apt/apt.conf.d/52workouterr-unattended-upgrades
+    content: |
+      Unattended-Upgrade::Automatic-Reboot "true";
+      Unattended-Upgrade::Automatic-Reboot-Time "04:00";
+      Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+  # Container logs in Docker's `local` format, which rotates them (5 files of 20 MB per container), so they never fill
+  # the disk.
+  - path: /etc/docker/daemon.json
+    content: |
+      { "log-driver": "local" }
