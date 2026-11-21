@@ -148,7 +148,7 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
   Scope: Tech stack and hosting → Hosting.
   Done when: you can SSH in with a key, password login is refused, `docker compose version` works, and the domain
   resolves to the server.
-- [ ] **17. Deploy script.** `deploy/deploy.sh`: lint, build and type check, OpenAPI and client checks, all tests
+- [x] **17. Deploy script.** `deploy/deploy.sh`: lint, build and type check, OpenAPI and client checks, all tests
   (E2E too once task 35 adds them, unless an explicit flag skips them), build images,
   `docker save | ssh docker load`, run the migration bundle, `docker compose up -d`. External uptime check on
   `/api/health`; your account created with the CLI on the server. From here on, each finished task can be deployed.

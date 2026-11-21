@@ -147,6 +147,47 @@ ssh workouterr 'mkdir -p ~/workouterr && umask 077 \
 in the connection string. Keep a copy of the file in a password manager: the password is fixed into the database when
 its volume is first created.
 
+## 7. Deploying
+
+`deploy/deploy.sh` (from `deploy/`) deploys the current commit; nothing is built on the server. The script:
+
+1. Refuses a dirty working tree, checks for `GITHUB_PACKAGES_TOKEN`, Docker and the SSH alias.
+2. Runs every check: `dotnet format --verify-no-changes`, `dotnet build`, the OpenAPI check, `dotnet test`, then
+   `npm ci`, ESLint, Prettier, the API client check, `npm run build` and the unit tests (and the end-to-end tests
+   once they exist, unless `--skip-e2e`). A failure stops it before anything leaves the Mac.
+3. Builds both images for `linux/amd64` (`DOCKER_DEFAULT_PLATFORM`), with the same tags as a local build.
+4. Streams them with `docker save | gzip | ssh workouterr 'gunzip | docker load'` (about 150 MB) and copies
+   `compose.yaml` into `~/workouterr`.
+5. On the server: `docker compose run --rm migrations`, then `docker compose up -d --wait --no-build`, then
+   `docker image prune -f` (the replaced images, now untagged). The server has no source: `up --no-build`
+   ignores the `build:` sections in `compose.yaml`, and `run` (no such flag) builds only when an image is missing.
+6. `curl https://<domain>/api/health` must answer `{"status":"Healthy"}`. The domain comes from the server's `.env`,
+   and the request goes to the server's address from the SSH config (`curl --resolve`), so a stale DNS cache can't
+   send the check to another machine.
+
+After a DNS change, caches (the router's too) keep the old record until its TTL runs out. Then the browser reaches
+the old address, while public resolvers (`dig @1.1.1.1 workouterr.app`) already give the new one. `server: Kestrel`
+in the response headers (`curl -sI https://workouterr.app/api/health`) shows the request reached this server.
+
+The first deploy is also when Caddy gets its Let's Encrypt certificate (DNS must resolve, section 3).
+
+## 8. First user
+
+The API's CLI runs in a one-off `api` container; `-t` gives it a terminal, so the password is asked for with hidden
+input:
+
+```sh
+ssh -t workouterr 'cd ~/workouterr && docker compose run --rm api user create <email>'
+```
+
+## 9. Uptime check
+
+A free external monitor (UptimeRobot) requests `https://workouterr.app/api/health` every 5 minutes and emails when it
+fails: a non-200 means the API or the database is down, a timeout means the server or Caddy is. Monitor type Keyword
+(`Healthy`, alert when it is missing), alert contact the owner's email. A plain HTTP(s) monitor would only check for a
+200, which another server answering for the domain (the old hosting, after a DNS change) gives too. The endpoint returns only `{"status":"Healthy"}`, so nothing personal leaves the
+server.
+
 ## Rebuilding
 
 The server holds no state that the repo or the password manager can't restore, apart from the database itself (see
