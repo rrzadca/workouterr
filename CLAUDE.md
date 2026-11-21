@@ -13,6 +13,9 @@ folder. `contracts/` holds the only files they share: the OpenAPI document and t
 `docs/design/`: the visual reference (tokens, components, a JSX source per screen). Read its `README.md` and the
 screen's file before building any UI.
 
+`docs/server-setup.md`: how the production server is built (Hetzner, OVH DNS, `deploy/cloud-init.yaml`). Update it
+with any change made on the server.
+
 ## How we work
 
 - Work as a **lesson**: one plan task per turn. Do the task, then explain each command, file and concept and why,
