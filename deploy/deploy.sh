@@ -82,6 +82,14 @@ ssh "$server" "cd $server_folder \
 
 step "Health check"
 domain=$(ssh "$server" "sed -n 's/^WORKOUTERR_DOMAIN=//p' $server_folder/.env")
-curl --fail --silent --show-error --retry 5 --retry-delay 2 --retry-all-errors "https://$domain/api/health"
-echo
+# Asked at the server's own address (from the SSH config), with the domain kept for TLS: a stale DNS cache on the
+# way (the router's, after a DNS change) would otherwise send the check to whatever the old record points at.
+server_address=$(ssh -G "$server" 2> /dev/null | awk '/^hostname /{print $2}')
+health=$(curl --fail --silent --show-error --retry 5 --retry-delay 2 --retry-all-errors \
+  --resolve "$domain:443:$server_address" "https://$domain/api/health")
+echo "$health"
+if [ "$health" != '{"status":"Healthy"}' ]; then
+  echo "Unexpected health response from $server_address." >&2
+  exit 1
+fi
 echo "Deployed $commit to https://$domain."

@@ -161,7 +161,13 @@ its volume is first created.
 5. On the server: `docker compose run --rm migrations`, then `docker compose up -d --wait --no-build`, then
    `docker image prune -f` (the replaced images, now untagged). The server has no source: `up --no-build`
    ignores the `build:` sections in `compose.yaml`, and `run` (no such flag) builds only when an image is missing.
-6. `curl https://<domain>/api/health`, with the domain read from the server's `.env`.
+6. `curl https://<domain>/api/health` must answer `{"status":"Healthy"}`. The domain comes from the server's `.env`,
+   and the request goes to the server's address from the SSH config (`curl --resolve`), so a stale DNS cache can't
+   send the check to another machine.
+
+After a DNS change, caches (the router's too) keep the old record until its TTL runs out. Then the browser reaches
+the old address, while public resolvers (`dig @1.1.1.1 workouterr.app`) already give the new one. `server: Kestrel`
+in the response headers (`curl -sI https://workouterr.app/api/health`) shows the request reached this server.
 
 The first deploy is also when Caddy gets its Let's Encrypt certificate (DNS must resolve, section 3).
 
@@ -178,8 +184,8 @@ ssh -t workouterr 'cd ~/workouterr && docker compose run --rm api user create <e
 
 A free external monitor (UptimeRobot) requests `https://workouterr.app/api/health` every 5 minutes and emails when it
 fails: a non-200 means the API or the database is down, a timeout means the server or Caddy is. Monitor type HTTP(s),
-alert contact the owner's email. The endpoint returns only the status, the app version and whether the database is
-up, so nothing personal leaves the server.
+alert contact the owner's email. The endpoint returns only `{"status":"Healthy"}`, so nothing personal leaves the
+server.
 
 ## Rebuilding
 
