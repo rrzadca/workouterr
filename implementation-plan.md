@@ -165,7 +165,7 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
   Design: `docs/design/screens/SettingsScreen.jsx` (preferences card; email, password, export and delete come
   later).
   Done when: a theme chosen on one browser applies on another after login.
-- [ ] **18b. CI and automatic deploy.** GitHub Actions workflow (`.github/workflows/ci.yml`): the deploy script's
+- [x] **18b. CI and automatic deploy.** GitHub Actions workflow (`.github/workflows/ci.yml`): the deploy script's
   checks on every pull request into main, required by branch protection; after a merge, the checks again, then the
   images are built, pushed to GHCR (tagged with the commit), pulled on the server with the job's own token,
   migrated, started and health-checked. `production` environment (main only) holds a dedicated SSH key; the last 10
