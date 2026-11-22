@@ -64,5 +64,7 @@ volumes are `workouterr_*`.
   set, Docker running). Runs every check and test first and stops on the first failure, before anything is built or
   sent; then builds the images for `linux/amd64`, loads them on the server over SSH, runs the migrations, starts the
   stack and checks `/api/health`. `--skip-e2e` skips the end-to-end tests (once task 35 adds them).
+- Merging a pull request into main deploys it: `.github/workflows/ci.yml` (checks on every pull request, then
+  build, push to GHCR and deploy after the merge). `deploy.sh` is the manual path.
 - `docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt .`: Caddy's local root certificate. Trust it in
   the system keychain so the browser accepts https://localhost.

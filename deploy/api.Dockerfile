@@ -30,6 +30,8 @@ RUN runtime=linux-$([ "$TARGETARCH" = amd64 ] && echo x64 || echo "$TARGETARCH")
        --target-runtime "$runtime" --output /app/efbundle
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+# Links the image in GHCR to this repository, so CI can push and clean up its versions.
+LABEL org.opencontainers.image.source="https://github.com/rrzadca/workouterr"
 WORKDIR /app
 
 # Data Protection keys encrypt the login cookie; compose mounts a volume here so they outlive the container. Created
