@@ -177,8 +177,8 @@ The first deploy is also when Caddy gets its Let's Encrypt certificate (DNS must
 `Web`). A merge into main runs them again on main, then the `Deploy` job:
 
 1. Builds both images on the runner (already `linux/amd64`) and pushes them to GHCR as
-   `ghcr.io/rrzadca/workouterr-{api,caddy}:<commit SHA>`. The packages are private: the Caddy image bundles
-   radinf-ui.
+   `ghcr.io/rrzadca/workouterr-{api,caddy}:<commit SHA>`. The packages are private (made so by hand
+   once, setup step 5): the Caddy image bundles radinf-ui.
 2. On the server, logs in to GHCR with the job's own `GITHUB_TOKEN` (it expires when the job ends) into a throwaway
    Docker config, pulls the images and tags them `workouterr-api` / `workouterr-caddy`, the names `compose.yaml` and
    `deploy.sh` use. No registry credential stays on the server.
@@ -213,8 +213,12 @@ ssh-keygen -F "$address" | grep -v '^#' | gh secret set DEPLOY_SSH_KNOWN_HOSTS -
 
 4. radinf-ui's package (github.com/users/rrzadca/packages/npm/radinf-ui/settings) → Manage Actions access → add
    `workouterr` with Read, so the workflow's token can install it.
-5. After the first deploy: check that `workouterr-api` and `workouterr-caddy` under the account's Packages are
-   private and linked to the repository (the images' `org.opencontainers.image.source` label links them).
+5. After the first deploy, make both packages private. The images' `org.opencontainers.image.source` label links
+   them to this repository, and a package linked to a public repository is created public. For each of
+   `workouterr-api` and `workouterr-caddy`: github.com/users/rrzadca/packages/container/<name>/settings → Danger
+   Zone → Change visibility → Private (the API has no call for this). They stay linked, so the workflow's token
+   still pushes, pulls and deletes versions. Check: `gh api /user/packages/container/<name> --jq .visibility`
+   prints `private` (needs `gh auth refresh -h github.com -s read:packages` once).
 6. Branch protection on main, once the checks have run on a pull request, so GitHub knows their names:
 
 ```sh
