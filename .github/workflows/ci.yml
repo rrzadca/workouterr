@@ -1,0 +1,177 @@
+# Checks every pull request into main; after a merge, checks main again and deploys it.
+# The same checks as deploy/deploy.sh; the one-time setup (secrets, SSH key, package access) is in
+# docs/server-setup.md, section 7.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Each job asks for what it needs on top of this.
+permissions:
+  contents: read
+
+# A new push to a pull request cancels its older run. On main nothing is cancelled mid-deploy; a run waiting behind
+# a running one is replaced by a newer one, so the latest commit is what gets deployed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  api:
+    name: API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: api/global.json
+      - run: dotnet format --verify-no-changes
+      - run: dotnet build --nologo
+      - run: scripts/check-openapi.sh
+      # The API tests start PostgreSQL with Testcontainers; the runner has Docker.
+      - run: dotnet test
+
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read # @rrzadca/radinf-ui from GitHub Packages
+    defaults:
+      run:
+        working-directory: web
+    env:
+      # web/.npmrc reads it. The workflow's own token works once radinf-ui's package grants this repository read
+      # access (docs/server-setup.md, section 7).
+      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: web/.nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: scripts/check-api-client.sh
+      - run: npm run build
+      - run: npm test -- --watch=false
+
+  deploy:
+    name: Deploy
+    needs: [api, web]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # The environment holds the SSH secrets and only accepts runs from main.
+    environment:
+      name: production
+      url: https://workouterr.app
+    permissions:
+      contents: read
+      packages: write # push the images to GHCR and delete old versions
+    defaults:
+      run:
+        working-directory: deploy
+    env:
+      REGISTRY: ghcr.io/${{ github.repository_owner }}
+      IMAGES: workouterr-api workouterr-caddy
+      TAG: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build the images
+        # The runner is linux/amd64 like the server, so nothing is cross-compiled. compose.yaml requires
+        # POSTGRES_PASSWORD even to build; the build itself never reads it.
+        run: docker compose build
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          POSTGRES_PASSWORD: not-used-by-the-build
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push the images to GHCR
+        run: |
+          for image in $IMAGES; do
+            docker tag "$image" "$REGISTRY/$image:$TAG"
+            docker push --quiet "$REGISTRY/$image:$TAG"
+          done
+
+      - name: Set up SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          DEPLOY_SSH_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+        # The same `workouterr` alias the Mac has, so the commands below read like deploy.sh's.
+        run: |
+          install -m 700 -d ~/.ssh
+          (umask 077 && printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/workouterr)
+          printf '%s\n' "$DEPLOY_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf 'Host workouterr\n  HostName %s\n  User deploy\n  IdentityFile ~/.ssh/workouterr\n' \
+            "$DEPLOY_SSH_HOST" > ~/.ssh/config
+          ssh workouterr true
+
+      - name: Pull the images on the server
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY_USER: ${{ github.actor }}
+        # The server logs in with this job's token, which expires when the job ends, into a throwaway Docker config:
+        # no registry credential stays on the server. Each image is tagged with the local name compose.yaml uses
+        # (what deploy.sh loads too), and the registry tag is dropped so `docker image prune` can clean up.
+        # The unquoted heredoc expands $REGISTRY, $TAG, … here on the runner; \$ is left for the server's shell.
+        run: |
+          ssh workouterr bash -s <<EOF
+          set -euo pipefail
+          export DOCKER_CONFIG=\$(mktemp -d)
+          trap 'rm -rf "\$DOCKER_CONFIG"' EXIT
+          printf '%s' '$REGISTRY_TOKEN' | docker login ghcr.io --username '$REGISTRY_USER' --password-stdin > /dev/null
+          for image in $IMAGES; do
+            docker pull --quiet "$REGISTRY/\$image:$TAG"
+            docker tag "$REGISTRY/\$image:$TAG" "\$image"
+            docker rmi "$REGISTRY/\$image:$TAG" > /dev/null
+          done
+          EOF
+
+      - name: Migrate the database and start the new containers
+        run: |
+          scp -q compose.yaml workouterr:workouterr/compose.yaml
+          ssh workouterr "cd workouterr \
+            && docker compose run --rm migrations \
+            && docker compose up -d --wait --no-build \
+            && docker image prune -f > /dev/null"
+
+      - name: Health check
+        env:
+          DEPLOY_SSH_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+        # At the server's own address, with the domain kept for TLS, like deploy.sh.
+        run: |
+          domain=$(ssh workouterr "sed -n 's/^WORKOUTERR_DOMAIN=//p' workouterr/.env")
+          health=$(curl --fail --silent --show-error --retry 5 --retry-delay 2 --retry-all-errors \
+            --resolve "$domain:443:$DEPLOY_SSH_HOST" "https://$domain/api/health")
+          echo "$health"
+          if [ "$health" != '{"status":"Healthy"}' ]; then
+            echo "Unexpected health response." >&2
+            exit 1
+          fi
+
+      # The last 10 versions of each image stay in GHCR for a rollback; older ones are deleted.
+      - uses: actions/delete-package-versions@v5
+        with:
+          package-name: workouterr-api
+          package-type: container
+          min-versions-to-keep: 10
+      - uses: actions/delete-package-versions@v5
+        with:
+          package-name: workouterr-caddy
+          package-type: container
+          min-versions-to-keep: 10

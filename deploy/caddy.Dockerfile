@@ -19,5 +19,7 @@ COPY . .
 RUN npm run build
 
 FROM caddy:2
+# Links the image in GHCR to this repository, so CI can push and clean up its versions.
+LABEL org.opencontainers.image.source="https://github.com/rrzadca/workouterr"
 COPY --from=build /source/dist/workouterr/browser /srv
 COPY --from=deploy Caddyfile /etc/caddy/Caddyfile

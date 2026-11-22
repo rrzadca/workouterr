@@ -356,7 +356,8 @@ The project is also a learning path for building REST APIs with .NET and ASP.NET
     offline mid-session and syncing afterwards)
   - The deploy script runs lint (`dotnet format --verify-no-changes`, ESLint), build and type check, the OpenAPI
     up-to-date check and all tests (E2E included; skipping them needs an explicit flag)
-    and stops on any failure. CI (GitHub Actions) is added once the repo is on GitHub
+    and stops on any failure. CI (GitHub Actions) runs the same checks on every pull request into main, and branch
+    protection requires them before a merge
   - Real iPad: a short manual checklist (`docs/ipad-checklist.md`: screen stays awake, sound at rest end, correct
     timer after locking, airplane mode mid-session and sync, touch targets, decimal comma input) before deploys
     that touch the session screen or offline code
@@ -372,7 +373,10 @@ The project is also a learning path for building REST APIs with .NET and ASP.NET
     `api` and `postgres` (official image pinned to a major version, named volume, port not exposed outside the
     Docker network)
   - The deploy script builds the images locally after all checks pass (multi-stage API image; Caddy image with the
-    built Angular app) and sends them with `docker save | ssh docker load`. No registry until CI exists, then GHCR
+    built Angular app) and sends them with `docker save | ssh docker load`: the manual path
+  - A merge into main deploys automatically: CI runs the checks, builds the images, pushes them to GHCR (private,
+    tagged with the commit, last 10 kept), and the server pulls them with the job's short-lived token, then
+    migrates and starts them like the deploy script
   - Migrations: an EF Core migration bundle, run once by the deploy script before the new API starts, never at
     startup. It ships inside the API image and runs as a one-off Compose service (`migrations`)
   - ASP.NET Core Data Protection keys (they encrypt the login cookie) live in a named volume, so logins survive a

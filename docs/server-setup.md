@@ -14,7 +14,7 @@ the Compose stack from `deploy/compose.yaml`; the domain stays at OVH and its DN
 | Updates      | `unattended-upgrades`, kernel updates reboot at 04:00 UTC                 |
 | App folder   | `/home/deploy/workouterr` (`compose.yaml`, `.env`)                        |
 
-**Why so small:** nothing is built on the server; the images are built on the Mac and only loaded and run here.
+**Why so small:** nothing is built on the server; the images are built on the Mac or in GitHub Actions and only loaded and run here.
 At idle Ubuntu with Docker, PostgreSQL, the API and Caddy use about 500–600 MB, which serves a single user. The swap
 file absorbs short spikes. When it gets tight, Rescale with "CPU and RAM only" keeps the disk at 20 GB, so the server
 can be scaled back down later. (The Arm types and the larger x86 ones were unavailable or expensive when it was
@@ -170,6 +170,63 @@ the old address, while public resolvers (`dig @1.1.1.1 workouterr.app`) already 
 in the response headers (`curl -sI https://workouterr.app/api/health`) shows the request reached this server.
 
 The first deploy is also when Caddy gets its Let's Encrypt certificate (DNS must resolve, section 3).
+
+### Automatic deploy from GitHub Actions
+
+`.github/workflows/ci.yml` runs the same checks as the script on every pull request into main (jobs `API` and
+`Web`). A merge into main runs them again on main, then the `Deploy` job:
+
+1. Builds both images on the runner (already `linux/amd64`) and pushes them to GHCR as
+   `ghcr.io/rrzadca/workouterr-{api,caddy}:<commit SHA>`. The packages are private: the Caddy image bundles
+   radinf-ui.
+2. On the server, logs in to GHCR with the job's own `GITHUB_TOKEN` (it expires when the job ends) into a throwaway
+   Docker config, pulls the images and tags them `workouterr-api` / `workouterr-caddy`, the names `compose.yaml` and
+   `deploy.sh` use. No registry credential stays on the server.
+3. Copies `compose.yaml`, runs the migrations, `up -d --wait --no-build`, prunes, and checks `/api/health`, as in
+   steps 5 and 6 above.
+4. Deletes all but the last 10 versions of each image in GHCR.
+
+The run is under Actions → CI; a failed check stops it before anything is pushed. `deploy.sh` still works from the
+Mac, and both leave the server in the same state. A rollback is a revert merged into main; re-running an old run's
+`Deploy` job also works while its images are among the last 10, but the migrations only go forward, so an older API
+then runs against the newer schema.
+
+One-time setup, from the Mac:
+
+```sh
+# 1. A key only for CI, without a passphrase (a runner can't type one), allowed to log in as deploy
+ssh-keygen -t ed25519 -N '' -C workouterr-github-actions -f ~/.ssh/workouterr-github-actions
+ssh workouterr 'cat >> ~/.ssh/authorized_keys' < ~/.ssh/workouterr-github-actions.pub
+
+# 2. The production environment: only main may deploy to it, and only its jobs see its secrets
+gh api -X PUT repos/rrzadca/workouterr/environments/production --input - <<'EOF'
+{"deployment_branch_policy": {"protected_branches": false, "custom_branch_policies": true}}
+EOF
+gh api -X POST repos/rrzadca/workouterr/environments/production/deployment-branch-policies -f name=main -f type=branch
+
+# 3. Its secrets: the key, the server's address and its host key (from the Mac's known_hosts, already trusted)
+address=$(ssh -G workouterr | awk '/^hostname /{print $2}')
+gh secret set DEPLOY_SSH_KEY --env production < ~/.ssh/workouterr-github-actions
+gh secret set DEPLOY_SSH_HOST --env production --body "$address"
+ssh-keygen -F "$address" | grep -v '^#' | gh secret set DEPLOY_SSH_KNOWN_HOSTS --env production
+```
+
+4. radinf-ui's package (github.com/users/rrzadca/packages/npm/radinf-ui/settings) → Manage Actions access → add
+   `workouterr` with Read, so the workflow's token can install it.
+5. After the first deploy: check that `workouterr-api` and `workouterr-caddy` under the account's Packages are
+   private and linked to the repository (the images' `org.opencontainers.image.source` label links them).
+6. Branch protection on main, once the checks have run on a pull request, so GitHub knows their names:
+
+```sh
+gh api -X PUT repos/rrzadca/workouterr/branches/main/protection --input - <<'EOF'
+{"required_status_checks": {"strict": false, "contexts": ["API", "Web"]},
+ "enforce_admins": true, "required_pull_request_reviews": null, "restrictions": null}
+EOF
+```
+
+`enforce_admins` applies the rule to the owner too, so nothing reaches main (and the server) without passing the
+checks. To replace the CI key: generate a new one, swap the line in `~/.ssh/authorized_keys` and set
+`DEPLOY_SSH_KEY` again.
 
 ## 8. First user
 
