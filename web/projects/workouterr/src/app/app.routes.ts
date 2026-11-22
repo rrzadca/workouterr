@@ -19,7 +19,10 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./shell/shell').then((module) => module.Shell),
     canActivate: [requireLogin],
-    children: [{ path: '', loadComponent: () => import('./home/home').then((module) => module.Home) }],
+    children: [
+      { path: '', loadComponent: () => import('./home/home').then((module) => module.Home) },
+      { path: 'settings', loadComponent: () => import('./settings/settings').then((module) => module.Settings) },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

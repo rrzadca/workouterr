@@ -1,0 +1,85 @@
+<div *transloco="let t">
+  <div class="flex h-toolbar items-center border-b border-border-hairline px-4">
+    <h1 class="text-title-2 font-semibold tracking-title text-text-strong">{{ t('settings.title') }}</h1>
+  </div>
+
+  @if (settings.hasValue()) {
+    <!-- Two columns, as in the mockup: the account (profile, later email and password) and the preferences. -->
+    <div class="grid grid-cols-1 items-start gap-4 p-gutter-screen md:grid-cols-2">
+      <rad-card class="shadow-card">
+        <rad-card-header>
+          <h2 class="text-title-3 font-semibold tracking-title text-text-strong">{{ t('settings.profile') }}</h2>
+        </rad-card-header>
+        <form [formRoot]="profileForm" class="flex flex-col gap-3">
+          @let displayNameError = displayNameErrorKey();
+          <rad-form-field
+            [label]="t('settings.displayName')"
+            [hint]="t('settings.displayNameHint')"
+            [error]="displayNameError ? t(displayNameError, { max: displayNameMaxLength }) : undefined"
+          >
+            <rad-form-input-text autocomplete="nickname" size="lg" [formField]="profileForm.displayName" />
+          </rad-form-field>
+
+          @if (profileErrorKey(); as profileError) {
+            <p
+              role="alert"
+              class="flex items-center gap-2 rounded-md bg-status-danger-soft px-3 py-2.5 text-status-danger"
+            >
+              <rad-icon name="circle-alert" class="[--rad-icon-size:18px]" />
+              {{ t(profileError) }}
+            </p>
+          }
+
+          <rad-button type="submit" variant="primary" class="self-start" [loading]="profileForm().submitting()">
+            {{ t('settings.save') }}
+          </rad-button>
+        </form>
+      </rad-card>
+
+      <rad-card class="shadow-card">
+        <rad-card-header>
+          <h2 class="text-title-3 font-semibold tracking-title text-text-strong">{{ t('settings.preferences') }}</h2>
+        </rad-card-header>
+        <div class="flex flex-col gap-3">
+          <div class="flex min-h-10 items-center gap-3">
+            <span class="flex-1 text-text-default">{{ t('settings.weightUnit') }}</span>
+            <span class="font-mono text-label font-medium text-text-muted">{{ t('settings.weightUnitValue') }}</span>
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <rad-form-input-switch
+              size="lg"
+              ariaDescribedby="rest-timer-sound-description"
+              [(checked)]="restTimerSound"
+              (checkedChange)="saveRestTimerSound($event)"
+            >
+              {{ t('settings.restTimerSound') }}
+            </rad-form-input-switch>
+            <span id="rest-timer-sound-description" class="text-caption text-text-muted">
+              {{ t('settings.restTimerSoundDescription') }}
+            </span>
+          </div>
+
+          @if (restTimerSoundErrorKey(); as restTimerSoundError) {
+            <p
+              role="alert"
+              class="flex items-center gap-2 rounded-md bg-status-danger-soft px-3 py-2.5 text-status-danger"
+            >
+              <rad-icon name="circle-alert" class="[--rad-icon-size:18px]" />
+              {{ t(restTimerSoundError) }}
+            </p>
+          }
+        </div>
+      </rad-card>
+    </div>
+  } @else if (settings.error()) {
+    <div class="flex flex-col items-start gap-3 p-gutter-screen">
+      <p role="alert" class="text-text-muted">{{ t('settings.loadFailed') }}</p>
+      <rad-button icon="refresh-cw" (click)="retry()">{{ t('settings.tryAgain') }}</rad-button>
+    </div>
+  } @else {
+    <div class="flex justify-center p-gutter-section">
+      <rad-spinner [label]="t('settings.loading')" />
+    </div>
+  }
+</div>

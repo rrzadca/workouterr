@@ -62,6 +62,31 @@ export const ProblemDetails = zod.object({
 
 export type ProblemDetails = zod.input<typeof ProblemDetails>;
 export type ProblemDetailsOutput = zod.output<typeof ProblemDetails>;
+
+export const Theme = zod.union([zod.literal('light'), zod.literal('dark'), zod.literal(null)]);
+
+export type Theme = zod.input<typeof Theme>;
+export type ThemeOutput = zod.output<typeof Theme>;
+
+export const SettingsResponse = zod.object({
+  displayName: zod.string().nullable(),
+  theme: zod.union([zod.null(), Theme]),
+  restTimerSound: zod.boolean(),
+});
+
+export type SettingsResponse = zod.input<typeof SettingsResponse>;
+export type SettingsResponseOutput = zod.output<typeof SettingsResponse>;
+
+export const updateSettingsRequestDisplayNameMax = 50;
+
+export const UpdateSettingsRequest = zod.object({
+  displayName: zod.string().max(updateSettingsRequestDisplayNameMax).nullish(),
+  theme: zod.union([zod.null(), Theme]).optional(),
+  restTimerSound: zod.boolean().nullish(),
+});
+
+export type UpdateSettingsRequest = zod.input<typeof UpdateSettingsRequest>;
+export type UpdateSettingsRequestOutput = zod.output<typeof UpdateSettingsRequest>;
 export const GetHealthHeader = zod.object({
   'X-Client-Version': zod
     .string()
@@ -99,3 +124,23 @@ export const GetCurrentUserHeader = zod.object({
 });
 
 export const GetCurrentUserResponse = CurrentUserResponse;
+
+export const GetSettingsHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
+
+export const GetSettingsResponse = SettingsResponse;
+
+export const UpdateSettingsHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
+
+export const UpdateSettingsBody = UpdateSettingsRequest;
+
+export const UpdateSettingsResponse = SettingsResponse;

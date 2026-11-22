@@ -17,8 +17,9 @@ Public product, free to use. Anyone can register.
 ### Accounts
 
 - Register with email / password (with email verification)
-- Optional display name (1–50 characters), asked at registration and editable in settings. Used for the avatar
-  initials and the greeting in emails; without one the app shows the email address and its first letter
+- Optional display name (1–50 characters, trimmed), asked at registration and editable in settings; saving it empty
+  removes it. Used for the avatar initials and the greeting in emails; without one the app shows the email address
+  and its first letter
   - No login until the email is verified: the login form gives the same generic error, with a "resend
     verification email" link that always answers "if the account exists, we've sent an email"
   - The verification link is valid for 24 hours and can be resent (rate limited like the other auth endpoints)

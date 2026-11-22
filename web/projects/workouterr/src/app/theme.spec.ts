@@ -58,4 +58,25 @@ describe('ThemeService', () => {
     expect(document.documentElement.dataset['theme']).toBe('dark');
     expect(localStorage.getItem('workouterr.theme')).toBe('dark');
   });
+
+  it("takes the account's theme and keeps a copy of it", () => {
+    startTheme();
+
+    TestBed.inject(ThemeService).useAccountTheme('dark');
+    TestBed.tick();
+
+    expect(document.documentElement.dataset['theme']).toBe('dark');
+    expect(localStorage.getItem('workouterr.theme')).toBe('dark');
+  });
+
+  it('follows the system theme again for an account with no theme, forgetting the copy', () => {
+    localStorage.setItem('workouterr.theme', 'dark');
+    startTheme();
+
+    TestBed.inject(ThemeService).useAccountTheme(null);
+    TestBed.tick();
+
+    expect(document.documentElement.dataset['theme']).toBe('light');
+    expect(localStorage.getItem('workouterr.theme')).toBeNull();
+  });
 });
