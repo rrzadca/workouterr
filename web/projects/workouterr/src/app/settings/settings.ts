@@ -9,7 +9,7 @@ import { RadFormInputSwitch } from '@rrzadca/radinf-ui/form-inputs/form-input-sw
 import { RadFormInputText } from '@rrzadca/radinf-ui/form-inputs/form-input-text';
 import { RadIcon } from '@rrzadca/radinf-ui/icon';
 import { RadSpinner } from '@rrzadca/radinf-ui/spinner';
-import { UpdateSettingsBody } from '@workouterr/api-client';
+import { UpdateSettingsBody, updateSettingsRequestDisplayNameMax } from '@workouterr/api-client';
 import { AccountSettingsService } from './account-settings';
 
 // The account's settings. So far the profile (display name) and the preferences (rest-timer sound); email, password,
@@ -35,6 +35,8 @@ export class Settings {
   private readonly accountSettings = inject(AccountSettingsService);
 
   protected readonly settings = this.accountSettings.settings;
+  // For the "too long" message: the contract's limit, so the text never repeats the number.
+  protected readonly displayNameMaxLength = updateSettingsRequestDisplayNameMax;
 
   // The form starts from the saved name, and starts again from it after each save (the API's trimmed value).
   protected readonly profile = linkedSignal(() => ({

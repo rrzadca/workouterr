@@ -15,7 +15,7 @@
           <rad-form-field
             [label]="t('settings.displayName')"
             [hint]="t('settings.displayNameHint')"
-            [error]="displayNameError ? t(displayNameError) : undefined"
+            [error]="displayNameError ? t(displayNameError, { max: displayNameMaxLength }) : undefined"
           >
             <rad-form-input-text autocomplete="nickname" size="lg" [formField]="profileForm.displayName" />
           </rad-form-field>

@@ -38,7 +38,7 @@
     "profile": "Profile",
     "displayName": "Display name",
     "displayNameHint": "Shown instead of your email. Leave it empty to show the email.",
-    "displayNameTooLong": "Use at most 50 characters.",
+    "displayNameTooLong": "Use at most {{max}} characters.",
     "save": "Save",
     "preferences": "Preferences",
     "weightUnit": "Weight unit",

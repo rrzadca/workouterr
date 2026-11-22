@@ -49,8 +49,8 @@ describe('Shell', () => {
 
   const defaultSettings: SettingsResponse = { displayName: null, theme: null, restTimerSound: true };
 
-  // Logs in the way the guard would have, then shows the shell, which loads the account's settings.
-  async function render(settings: SettingsResponse = defaultSettings) {
+  // Logs in the way the guard would have, then shows the shell, which starts loading the account's settings.
+  async function renderLoading() {
     const auth = TestBed.inject(AuthService);
     const loading = auth.loadCurrentUser();
     httpTesting
@@ -61,13 +61,24 @@ describe('Shell', () => {
 
     const fixture = TestBed.createComponent(Shell);
     fixture.detectChanges();
-    httpTesting.expectOne('/api/settings').flush(settings);
-    await fixture.whenStable();
     const element = fixture.nativeElement as HTMLElement;
     // The sidebar's icon-only buttons, found by their accessible name.
     const loader = TestbedHarnessEnvironment.loader(fixture);
     const button = (ariaLabel: string) => loader.getHarness(RadButtonHarness.with({ ariaLabel }));
-    return { fixture, element, button };
+    // A save's answer reaches the page through a promise: let it run, then render.
+    async function settle() {
+      await new Promise((resolve) => setTimeout(resolve));
+      await fixture.whenStable();
+    }
+    return { fixture, element, button, settle, settingsRequest: httpTesting.expectOne('/api/settings') };
+  }
+
+  // The shell once the account's settings have arrived.
+  async function render(settings: SettingsResponse = defaultSettings) {
+    const { settingsRequest, ...rendered } = await renderLoading();
+    settingsRequest.flush(settings);
+    await rendered.fixture.whenStable();
+    return rendered;
   }
 
   it('shows the logged-in user and the home link as the current page', async () => {
@@ -125,6 +136,47 @@ describe('Shell', () => {
     await fixture.whenStable();
 
     expect(document.documentElement.dataset['theme']).toBe('dark');
+  });
+
+  it('keeps a theme chosen while the settings are still loading', async () => {
+    const { fixture, element, settle, settingsRequest } = await renderLoading();
+
+    // Clicked directly: the harness would wait for the settings, which are still loading.
+    element.querySelector<HTMLButtonElement>('button[aria-label="Dark theme"]')?.click();
+    fixture.detectChanges();
+    // The settings were read before the tap, so they still hold the old theme.
+    settingsRequest.flush({ ...defaultSettings, theme: 'light' });
+    await settle();
+
+    expect(document.documentElement.dataset['theme']).toBe('dark');
+
+    httpTesting.expectOne({ method: 'PATCH', url: '/api/settings' }).flush({ ...defaultSettings, theme: 'dark' });
+    await settle();
+
+    expect(document.documentElement.dataset['theme']).toBe('dark');
+  });
+
+  it('saves only the last of several quick taps, one save at a time', async () => {
+    const { button, settle } = await render();
+
+    await (await button('Dark theme')).click();
+    await (await button('Light theme')).click();
+    // The first tap's answer arrives after the second tap: the screen stays on the second.
+    const firstSave = httpTesting.expectOne({ method: 'PATCH', url: '/api/settings' });
+    expect(firstSave.request.body).toEqual({ theme: 'dark' });
+    firstSave.flush({ ...defaultSettings, theme: 'dark' });
+    await settle();
+
+    expect(document.documentElement.dataset['theme']).toBe('light');
+
+    // Sent only once the first save is done, so the account ends with the last tap.
+    const secondSave = httpTesting.expectOne({ method: 'PATCH', url: '/api/settings' });
+    expect(secondSave.request.body).toEqual({ theme: 'light' });
+    secondSave.flush({ ...defaultSettings, theme: 'light' });
+    await settle();
+
+    expect(document.documentElement.dataset['theme']).toBe('light');
+    expect(localStorage.getItem('workouterr.theme')).toBe('light');
   });
 
   it('logs out with the log-out button', async () => {

@@ -3,7 +3,7 @@ import { effect, inject, Injectable } from '@angular/core';
 import { GetSettingsResponse, type UpdateSettingsRequest, UpdateSettingsResponse } from '@workouterr/api-client';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../auth/auth';
-import { ThemeService } from '../theme';
+import { type Theme, ThemeService } from '../theme';
 
 // The logged-in account's settings (display name, theme, rest-timer sound), the same on every device. Loaded when
 // someone logs in, and again when someone else does; every change goes to the API and comes back as the new settings.
@@ -13,6 +13,11 @@ export class AccountSettingsService {
   private readonly http = inject(HttpClient);
   private readonly themes = inject(ThemeService);
 
+  // The theme button's latest choice while it is being saved, else null. Plain fields, not signals: the effect below
+  // must not run again when a save ends, or a failed save would bring back the account's older theme.
+  private themeToSave: Theme | null = null;
+  private savingTheme = false;
+
   // Nobody logged in, no request. Re-runs whenever the current user changes: a logout drops the settings, so the next
   // login (whoever it is) asks again.
   readonly settings = httpResource(() => (this.auth.currentUser() ? '/api/settings' : undefined), {
@@ -21,8 +26,10 @@ export class AccountSettingsService {
 
   constructor() {
     // The account's theme wins over the device's copy, so a theme chosen on another device applies here after login.
+    // Not while the button's choice is being saved: settings loaded meanwhile, or the answer to an earlier tap, hold a
+    // theme older than the one on screen.
     effect(() => {
-      if (this.settings.hasValue()) {
+      if (this.settings.hasValue() && !this.savingTheme) {
         this.themes.useAccountTheme(this.settings.value().theme);
       }
     });
@@ -35,13 +42,26 @@ export class AccountSettingsService {
     this.settings.set(UpdateSettingsResponse.parse(response));
   }
 
-  // The theme button's choice, already applied on this device. A failed save only means other devices don't get it;
-  // this one keeps it, until the account's theme comes back on the next load.
-  async saveTheme(theme: 'light' | 'dark') {
+  // The theme button's choice, already applied on this device. One save at a time: taps during a save only change what
+  // is sent next, so the account ends with the last tap whatever order the API handles them in. A failed save only
+  // means other devices don't get it; this one keeps it, until the account's theme comes back on the next load.
+  async saveTheme(theme: Theme) {
+    this.themeToSave = theme;
+    if (this.savingTheme) {
+      return;
+    }
+    this.savingTheme = true;
     try {
-      await this.update({ theme });
+      let sentTheme: Theme | null = null;
+      while (this.themeToSave !== sentTheme) {
+        sentTheme = this.themeToSave;
+        await this.update({ theme: sentTheme });
+      }
     } catch {
       // Offline or API down: nothing to show, the theme already switched.
+    } finally {
+      this.themeToSave = null;
+      this.savingTheme = false;
     }
   }
 }
