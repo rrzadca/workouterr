@@ -237,6 +237,11 @@ namespace Workouterr.Api.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("concurrency_stamp");
 
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("display_name");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)")
@@ -276,9 +281,20 @@ namespace Workouterr.Api.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("phone_number_confirmed");
 
+                    b.Property<bool>("RestTimerSound")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("rest_timer_sound");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text")
                         .HasColumnName("security_stamp");
+
+                    b.Property<string>("Theme")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("theme");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean")

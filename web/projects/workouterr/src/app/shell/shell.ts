@@ -5,6 +5,7 @@ import { RadButton } from '@rrzadca/radinf-ui/button';
 import { RadIcon } from '@rrzadca/radinf-ui/icon';
 import { AuthService } from '../auth/auth';
 import type { AppIconName } from '../icons';
+import { AccountSettingsService } from '../settings/account-settings';
 import { type Theme, ThemeService } from '../theme';
 
 // A sidebar link, 44 px tall for touch. RouterLinkActive marks the current page with aria-current="page", which both
@@ -30,6 +31,7 @@ const themeChoices = {
   templateUrl: './shell.html',
 })
 export class Shell {
+  private readonly accountSettings = inject(AccountSettingsService);
   private readonly auth = inject(AuthService);
   private readonly themes = inject(ThemeService);
 
@@ -37,12 +39,20 @@ export class Shell {
 
   protected readonly loggingOut = signal(false);
   protected readonly themeChoice = computed(() => themeChoices[this.themes.theme()]);
-  // Null only for the moment between logout and leaving the page. Display names come with the account settings.
-  protected readonly user = this.auth.currentUser;
-  protected readonly initial = computed(() => this.user()?.email.charAt(0).toUpperCase());
+  // The display name, else the email. Blank while the settings load, so a name never flashes in after the email; the
+  // email when they can't be loaded. Undefined only between logout and leaving the page.
+  protected readonly userName = computed(() => {
+    const settings = this.accountSettings.settings;
+    if (settings.isLoading()) {
+      return '';
+    }
+    return (settings.hasValue() ? settings.value().displayName : null) ?? this.auth.currentUser()?.email;
+  });
+  protected readonly initial = computed(() => this.userName()?.charAt(0).toUpperCase());
 
+  // Switches on this device at once, then saves the choice on the account for the other devices.
   protected toggleTheme() {
-    this.themes.toggle();
+    void this.accountSettings.saveTheme(this.themes.toggle());
   }
 
   protected async logout() {

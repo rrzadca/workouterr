@@ -158,7 +158,7 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
 
 ### Settings and operations basics
 
-- [ ] **18. Account settings.** Settings endpoint and page: optional display name, rest-timer sound on/off; the
+- [x] **18. Account settings.** Settings endpoint and page: optional display name, rest-timer sound on/off; the
   sidebar theme button now also saves the theme on the account, and it comes back from the same endpoint.
   Scope: Accounts (display name, theme); Session tracking → Rest timer (sound).
   Design: `docs/design/screens/SettingsScreen.jsx` (preferences card; email, password, export and delete come

@@ -4,6 +4,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { provideRouter, Router } from '@angular/router';
+import type { SettingsResponse } from '@workouterr/api-client';
 import { RadButtonHarness } from '@rrzadca/radinf-ui/button/testing';
 import { provideRadIcons } from '@rrzadca/radinf-ui/icon';
 import { TranslocoTestingModule } from '@jsverse/transloco';
@@ -46,8 +47,10 @@ describe('Shell', () => {
 
   afterEach(() => httpTesting.verify());
 
-  // Logs in the way the guard would have, then shows the shell.
-  async function render() {
+  const defaultSettings: SettingsResponse = { displayName: null, theme: null, restTimerSound: true };
+
+  // Logs in the way the guard would have, then shows the shell, which loads the account's settings.
+  async function render(settings: SettingsResponse = defaultSettings) {
     const auth = TestBed.inject(AuthService);
     const loading = auth.loadCurrentUser();
     httpTesting
@@ -57,6 +60,8 @@ describe('Shell', () => {
     await TestBed.inject(Router).navigateByUrl('/');
 
     const fixture = TestBed.createComponent(Shell);
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/settings').flush(settings);
     await fixture.whenStable();
     const element = fixture.nativeElement as HTMLElement;
     // The sidebar's icon-only buttons, found by their accessible name.
@@ -70,6 +75,23 @@ describe('Shell', () => {
 
     expect(element.querySelector('nav')?.textContent).toContain('me@example.com');
     expect(element.querySelector('a[aria-current="page"]')?.textContent).toContain('Home');
+  });
+
+  it('shows the display name, and its initial, instead of the email', async () => {
+    const { element } = await render({ ...defaultSettings, displayName: 'rad' });
+
+    expect(element.querySelector('nav')?.textContent).toContain('rad');
+    expect(element.querySelector('nav')?.textContent).not.toContain('me@example.com');
+    expect(element.querySelector('[aria-hidden="true"].rounded-pill')?.textContent?.trim()).toBe('R');
+  });
+
+  it("applies the account's theme over this device's copy", async () => {
+    localStorage.setItem('workouterr.theme', 'light');
+
+    await render({ ...defaultSettings, theme: 'dark' });
+
+    expect(document.documentElement.dataset['theme']).toBe('dark');
+    expect(localStorage.getItem('workouterr.theme')).toBe('dark');
   });
 
   it('switches the theme with the sun / moon button', async () => {
@@ -86,6 +108,23 @@ describe('Shell', () => {
     expect(document.documentElement.dataset['theme']).toBe('dark');
     expect(await (await button('Light theme')).getIcon()).toBe('sun');
     expect(logoSources()).toEqual(['brand/logo-mark-teal.png', 'brand/logo-word-teal.png']);
+
+    // Saved on the account, so the other devices get it after login.
+    const save = httpTesting.expectOne({ method: 'PATCH', url: '/api/settings' });
+    expect(save.request.body).toEqual({ theme: 'dark' });
+    save.flush({ ...defaultSettings, theme: 'dark' });
+  });
+
+  it('keeps the new theme on this device when saving it fails', async () => {
+    const { fixture, button } = await render();
+
+    await (await button('Dark theme')).click();
+    httpTesting
+      .expectOne({ method: 'PATCH', url: '/api/settings' })
+      .flush(null, { status: 0, statusText: 'Unknown Error' });
+    await fixture.whenStable();
+
+    expect(document.documentElement.dataset['theme']).toBe('dark');
   });
 
   it('logs out with the log-out button', async () => {

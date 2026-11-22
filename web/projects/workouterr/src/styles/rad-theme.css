@@ -73,8 +73,11 @@
   --rad-radius-sm: var(--radius-xs);
   --rad-radius-md: var(--radius-sm);
   --rad-radius-lg: var(--radius-md);
-  /* The mockup's modal corner. */
+  /* The mockup's modal and card corner. */
   --rad-dialog-radius: var(--radius-xl);
+  --rad-card-radius: var(--radius-xl);
+  /* The mockup's cards run the title straight into the body, with no rule between them. */
+  --rad-card-header-divider: 0;
 
   --rad-shadow-sm: var(--shadow-control);
   --rad-shadow-md: var(--shadow-popover);

@@ -20,6 +20,8 @@
     "label": "Main",
     "training": "Training",
     "home": "Home",
+    "account": "Account",
+    "settings": "Settings",
     "noActivePlan": "No active plan",
     "lightTheme": "Light theme",
     "darkTheme": "Dark theme",
@@ -27,6 +29,24 @@
   },
   "home": {
     "title": "Home"
+  },
+  "settings": {
+    "title": "Settings",
+    "loading": "Loading your settings…",
+    "loadFailed": "Couldn't load your settings.",
+    "tryAgain": "Try again",
+    "profile": "Profile",
+    "displayName": "Display name",
+    "displayNameHint": "Shown instead of your email. Leave it empty to show the email.",
+    "displayNameTooLong": "Use at most 50 characters.",
+    "save": "Save",
+    "preferences": "Preferences",
+    "weightUnit": "Weight unit",
+    "weightUnitValue": "kg · 2 decimal places",
+    "restTimerSound": "Sound when rest ends",
+    "restTimerSoundDescription": "The full-screen cue always shows.",
+    "unreachable": "Couldn't reach Workouterr. Check your connection and try again.",
+    "serverError": "Something went wrong on our side. Try again in a moment."
   },
   "newVersion": {
     "title": "New version available",

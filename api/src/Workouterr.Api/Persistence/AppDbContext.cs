@@ -16,7 +16,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         base.OnModelCreating(builder);
 
         // Identity names its tables explicitly (AspNetUsers, …), which the snake_case convention leaves alone.
-        builder.Entity<User>().ToTable("users");
+        builder.Entity<User>(user =>
+        {
+            user.ToTable("users");
+            user.Property(u => u.DisplayName).HasMaxLength(User.DisplayNameMaxLength);
+            // Stored by name, so the column reads "Light" / "Dark" rather than a number.
+            user.Property(u => u.Theme).HasConversion<string>().HasMaxLength(16);
+            // Existing accounts get the sound on. The sentinel tells EF that `true` is "not set" and leaves it to the
+            // database default, while `false` is always written.
+            user.Property(u => u.RestTimerSound).HasDefaultValue(true).HasSentinel(true);
+        });
         builder.Entity<IdentityUserClaim<Guid>>().ToTable("user_claims");
         builder.Entity<IdentityUserLogin<Guid>>().ToTable("user_logins");
         builder.Entity<IdentityUserToken<Guid>>().ToTable("user_tokens");

@@ -5,6 +5,7 @@ using Workouterr.Api.Auth;
 using Workouterr.Api.Compatibility;
 using Workouterr.Api.Health;
 using Workouterr.Api.Persistence;
+using Workouterr.Api.Settings;
 using Workouterr.Api.Users;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,6 +63,7 @@ if (application.Environment.IsDevelopment())
 
 application.MapHealthEndpoints();
 application.MapAuthEndpoints();
+application.MapSettingsEndpoints();
 
 application.Run();
 return 0;

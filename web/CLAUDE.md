@@ -54,10 +54,14 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   `--rad-*` tokens: `styles/rad-theme.css` points them at ours (colours on every themed element, sizes and type on
   `:root`), loaded after radinf-ui's stylesheet so it wins. Never style its components' inner markup. A feature it
   lacks becomes an issue in `rrzadca/radinf-ui`.
+- Account settings (`src/app/settings/account-settings.ts`): `AccountSettingsService` loads `/api/settings` (an
+  `httpResource`) whenever someone is logged in, and `update()` PATCHes only the fields it is given, keeping the
+  settings the API answers with. The sidebar's name and the settings page read it.
 - Theme: `data-theme="light" | "dark"` on `<html>`, set by `ThemeService` (`src/app/theme.ts`) when the app starts,
-  from `localStorage['workouterr.theme']`, else the system theme. `dark:` utilities follow the attribute; nothing
-  outside Angular touches the theme. Critical-CSS inlining is off in production: it leaves the
-  `[data-theme='dark']` rules out of the inlined CSS.
+  from `localStorage['workouterr.theme']`, else the system theme. Once the account's settings arrive, their theme
+  replaces that copy (`null`, never chosen, clears it); the sun / moon button switches at once and saves the choice
+  on the account. `dark:` utilities follow the attribute; nothing outside Angular touches the theme. Critical-CSS
+  inlining is off in production: it leaves the `[data-theme='dark']` rules out of the inlined CSS.
 - Unit tests run on Vitest through Angular's runner (`ng test`), with `jsdom`; HTTP is faked with
   `provideHttpClientTesting`. Specs drive radinf-ui's components through its component harnesses, from each
   family's `testing` entry point (`@rrzadca/radinf-ui/button/testing`) on `TestbedHarnessEnvironment`; dialogs
