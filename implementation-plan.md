@@ -172,10 +172,11 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
   versions of each image are kept. `deploy/deploy.sh` stays as the manual path.
   Scope: Tech stack and hosting → Tests (deploy script), Hosting.
   Done when: a pull request can't be merged with a failing check, and merging one deploys it without the Mac.
-- [ ] **19. Logs and error tracking.** Structured JSON logs through `ILogger` with user ID only; error tracker (Sentry
-  EU or GlitchTip) for the API and the app.
+- [x] **19. Logs and error tracking.** Structured JSON logs through `ILogger` with user ID only, kept in the server's
+  journal (journald) for 14 days; errors from the API and the app (`POST /api/client-errors`) in the same log, no
+  external tracker.
   Scope: Tech stack and hosting → Operations.
-  Done when: a thrown test exception from each side appears in the tracker, and the log line has no email.
+  Done when: a thrown test exception from each side appears in the error log, and the log line has no email.
 
 ### Exercises
 

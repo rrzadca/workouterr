@@ -12,6 +12,7 @@ the Compose stack from `deploy/compose.yaml`; the domain stays at OVH and its DN
 | Login        | `deploy` by SSH key; no root login, no passwords                          |
 | Firewall     | Hetzner Cloud Firewall: TCP 22, 80, 443, UDP 443, ICMP                    |
 | Updates      | `unattended-upgrades`, kernel updates reboot at 04:00 UTC                 |
+| Logs         | Containers log to journald, kept 14 days (at most 1 GB)                   |
 | App folder   | `/home/deploy/workouterr` (`compose.yaml`, `.env`)                        |
 
 **Why so small:** nothing is built on the server; the images are built on the Mac or in GitHub Actions and only loaded and run here.
@@ -123,6 +124,9 @@ ssh -o PubkeyAuthentication=no workouterr           # Permission denied (publick
 ssh root@<IPv4 address>                             # Permission denied (publickey).
 ssh workouterr 'systemctl is-active unattended-upgrades'   # active
 ssh workouterr 'swapon --show && free -h'           # /swapfile 1024M; about 700 MB available before the stack
+ssh workouterr 'docker info --format {{.LoggingDriver}}'   # journald
+ssh workouterr 'systemd-analyze cat-config systemd/journald.conf | grep -E "^(Storage|MaxRetentionSec|SystemMaxUse)="'
+                                                    # persistent, 14day, 1G
 nc -z -v -w 5 <IPv4 address> 8080                   # Operation timed out: the firewall drops it
 dig +short A workouterr.app; dig +short AAAA workouterr.app   # the server's two addresses
 ```
@@ -248,6 +252,55 @@ fails: a non-200 means the API or the database is down, a timeout means the serv
 (`Healthy`, alert when it is missing), alert contact the owner's email. A plain HTTP(s) monitor would only check for a
 200, which another server answering for the domain (the old hosting, after a DNS change) gives too. The endpoint returns only `{"status":"Healthy"}`, so nothing personal leaves the
 server.
+
+## 10. Logs and errors
+
+The API writes one JSON object per log line to its console; Docker's journald log driver (`/etc/docker/daemon.json`)
+hands every container's output to the system journal, which keeps 14 days and at most 1 GB
+(`/etc/systemd/journald.conf.d/00-workouterr.conf`). The journal belongs to the server, so the logs outlive the
+containers each deploy replaces. Both files come from `deploy/cloud-init.yaml`, which also puts `deploy` in the
+`systemd-journal` group: without it, `journalctl` shows a user only their own entries.
+
+There is no external error tracker: the error log is the tracker. The API logs every unhandled exception at `Error`,
+and the Angular app sends the errors nothing in it caught to `POST /api/client-errors`, which logs them the same way
+(category `Workouterr.ClientErrors`). A line carries the user's ID (`UserId` in `Scopes`) when someone is logged in,
+never an email.
+
+```sh
+# The last hour, as the API wrote it (-o cat: the message only, without journald's own prefix)
+ssh workouterr 'journalctl CONTAINER_NAME=workouterr-api-1 --since "1 hour ago" -o cat'
+# Follow new lines as they arrive (Ctrl+C stops)
+ssh workouterr 'journalctl CONTAINER_NAME=workouterr-api-1 -f -o cat'
+# Errors of the last 7 days, API and app, one compact line each; `fromjson?` skips any line that isn't JSON
+ssh workouterr "journalctl CONTAINER_NAME=workouterr-api-1 --since -7d -o cat \
+  | jq -cR 'fromjson? | select(.LogLevel == \"Error\" or .LogLevel == \"Critical\")
+            | {Timestamp, Category, Message, Exception, UserId: ([.Scopes[]? | .UserId? // empty] | first)}'"
+# Caddy and PostgreSQL log to the journal too
+ssh workouterr 'journalctl CONTAINER_NAME=workouterr-caddy-1 --since today -o cat'
+# How much disk the journal uses
+ssh workouterr 'journalctl --disk-usage'
+```
+
+`--since` takes `today`, `yesterday`, `"2026-11-23 18:00"` or relative times (`-2h`, `-7d`); `-u` and `-p` filter
+by unit and priority. Times print in the server's zone (UTC), the same as the JSON's `Timestamp`.
+
+### Switching a server built before this
+
+Servers built before the logs task use Docker's `local` driver and journald's defaults. A new log driver only
+applies to containers created after Docker restarts, so the stack is recreated (a few seconds of downtime; the
+`local` logs of the old containers go with them):
+
+```sh
+ssh workouterr 'sudo apt-get install -y jq && sudo usermod -aG systemd-journal deploy \
+  && echo "{ \"log-driver\": \"journald\" }" | sudo tee /etc/docker/daemon.json \
+  && sudo mkdir -p /etc/systemd/journald.conf.d \
+  && printf "[Journal]\nStorage=persistent\nMaxRetentionSec=14day\nSystemMaxUse=1G\n" \
+     | sudo tee /etc/systemd/journald.conf.d/00-workouterr.conf \
+  && sudo systemctl restart systemd-journald docker \
+  && cd ~/workouterr && docker compose up -d --force-recreate --wait'
+```
+
+The group applies from the next SSH login. Then the two log checks under "Check the server".
 
 ## Rebuilding
 

@@ -1,6 +1,7 @@
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
+  ErrorHandler,
   inject,
   isDevMode,
   provideAppInitializer,
@@ -13,6 +14,7 @@ import { firstValueFrom } from 'rxjs';
 import { clientVersionInterceptor } from './api/client-version';
 import { routes } from './app.routes';
 import { loginEndedInterceptor } from './auth/login-ended-interceptor';
+import { ClientErrorHandler } from './diagnostics/client-error-handler';
 import { appIcons } from './icons';
 import { ThemeService } from './theme';
 import { TranslocoHttpLoader } from './transloco-loader';
@@ -20,6 +22,8 @@ import { TranslocoHttpLoader } from './transloco-loader';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    // Uncaught errors also go to the API's log.
+    { provide: ErrorHandler, useClass: ClientErrorHandler },
     provideRouter(routes),
     provideRadIcons(appIcons),
     provideHttpClient(withFetch(), withInterceptors([clientVersionInterceptor, loginEndedInterceptor])),

@@ -26,6 +26,10 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   `label` and `error` it links to the input. The field shows any `error` it is given, so the page passes
   the translated message only once the field is touched and invalid (a `computed` per field, as in `login.ts`).
   Text inputs are `size="lg"`: 17 px text, below 16 px Safari zooms into a focused input.
+- Uncaught errors: `ClientErrorHandler` (`src/app/diagnostics/`) replaces Angular's `ErrorHandler`. It still writes
+  each error to the console and sends its message, stack and page path to `POST /api/client-errors` (at most 10 per
+  page load; failed API calls are left to the API's own log). Never put typed-in values in an error's message: the
+  API removes only email addresses from it.
 - Calls to the API use relative `/api/...` URLs: `ng serve` proxies them to the API (`proxy.conf.json`), Caddy does the
   same in production, so the app and the API always share one origin.
 - Formatting is Prettier's alone (`.prettierrc`, Angular parser for `.html`); ESLint checks code, with

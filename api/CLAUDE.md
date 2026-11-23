@@ -9,6 +9,14 @@ ASP.NET Core Minimal API on .NET 10. Run every command from `api/`.
 - Shared build settings (target framework, nullable, warnings as errors) live in `Directory.Build.props`; project
   files only add what is specific to them.
 - Errors are Problem Details (`application/problem+json`), never ad-hoc error bodies.
+- Logging (`Diagnostics/`): `ILogger` with `[LoggerMessage]` methods. Outside Development the console writes one
+  JSON object per line (`appsettings.json`; Development keeps the readable `simple` format). `UserLogScope` adds the
+  logged-in user's `UserId` to every line of a request; never log an email, a note or a workout value.
+  `UnhandledExceptionLogger` logs each unhandled exception once, at Error, with the user's ID, and answers 500 Problem
+  Details. `POST /api/client-errors` logs the Angular app's uncaught errors the same way, at most 30 a minute for
+  all callers together (rate limiter, 429). `EmailRedaction` replaces anything shaped like an email with `[email]` in
+  text the API doesn't write itself (the browser's errors, Identity's messages in the CLI). API tests read the logs
+  through `factory.Services.GetFakeLogCollector()`; `TestUsers` creates and logs in test users.
 - Endpoints are Minimal API handlers with typed results (`Results<Ok<T>, ProblemHttpResult>`), a name
   (`WithName`, the client's function name) and a tag, so the OpenAPI document describes them fully.
 - What middleware adds to every endpoint is described in the document by `MiddlewareResponsesTransformer`: the client

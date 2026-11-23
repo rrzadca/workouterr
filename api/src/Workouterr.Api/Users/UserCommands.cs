@@ -1,5 +1,6 @@
 using System.CommandLine;
 using System.Text;
+using Workouterr.Api.Diagnostics;
 
 namespace Workouterr.Api.Users;
 
@@ -28,9 +29,10 @@ public static class UserCommands
             var (result, user) = await userCreation.CreateAsync(email, password);
             if (!result.Succeeded)
             {
+                // The output lands in the server's journal, which never holds an email ("Email '…' is already taken").
                 foreach (var error in result.Errors)
                 {
-                    Console.Error.WriteLine(error.Description);
+                    Console.Error.WriteLine(EmailRedaction.Redact(error.Description));
                 }
 
                 return 1;

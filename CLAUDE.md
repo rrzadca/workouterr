@@ -66,5 +66,8 @@ volumes are `workouterr_*`.
   stack and checks `/api/health`. `--skip-e2e` skips the end-to-end tests (once task 35 adds them).
 - Merging a pull request into main deploys it: `.github/workflows/ci.yml` (checks on every pull request, then
   build, push to GHCR and deploy after the merge). `deploy.sh` is the manual path.
+- `docker compose logs api`: the API's JSON log lines, locally. On the server the containers log to journald:
+  `ssh workouterr 'journalctl CONTAINER_NAME=workouterr-api-1 --since -1h -o cat'`; the error query is in
+  `docs/server-setup.md` (Logs and errors).
 - `docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt .`: Caddy's local root certificate. Trust it in
   the system keychain so the browser accepts https://localhost.

@@ -8,15 +8,13 @@ namespace Workouterr.Api.Tests;
 
 public class UserCreationTests(ApiFactory factory)
 {
-    private const string Password = "Correct-horse-1";
-
     [Fact]
     public async Task Create_StoresTheUserWithAHashedPassword()
     {
         using var scope = factory.Services.CreateScope();
         var userCreation = scope.ServiceProvider.GetRequiredService<UserCreationService>();
 
-        var (result, user) = await userCreation.CreateAsync("stored@example.com", Password);
+        var (result, user) = await userCreation.CreateAsync("stored@example.com", TestUsers.Password);
 
         Assert.True(result.Succeeded);
         var storedUser = await scope.ServiceProvider.GetRequiredService<AppDbContext>().Users
@@ -24,11 +22,11 @@ public class UserCreationTests(ApiFactory factory)
             .SingleAsync(candidate => candidate.Id == user.Id, TestContext.Current.CancellationToken);
         Assert.Equal("stored@example.com", storedUser.Email);
         Assert.True(storedUser.EmailConfirmed);
-        Assert.NotEqual(Password, storedUser.PasswordHash);
+        Assert.NotEqual(TestUsers.Password, storedUser.PasswordHash);
         var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>();
         Assert.Equal(
             PasswordVerificationResult.Success,
-            passwordHasher.VerifyHashedPassword(storedUser, storedUser.PasswordHash!, Password));
+            passwordHasher.VerifyHashedPassword(storedUser, storedUser.PasswordHash!, TestUsers.Password));
     }
 
     [Fact]
@@ -36,9 +34,9 @@ public class UserCreationTests(ApiFactory factory)
     {
         using var scope = factory.Services.CreateScope();
         var userCreation = scope.ServiceProvider.GetRequiredService<UserCreationService>();
-        await userCreation.CreateAsync("taken@example.com", Password);
+        await userCreation.CreateAsync("taken@example.com", TestUsers.Password);
 
-        var (result, _) = await userCreation.CreateAsync("taken@example.com", Password);
+        var (result, _) = await userCreation.CreateAsync("taken@example.com", TestUsers.Password);
 
         Assert.False(result.Succeeded);
     }
