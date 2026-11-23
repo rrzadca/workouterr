@@ -8,13 +8,14 @@
 # pasted at creation.
 
 # The one login: `deploy`, by SSH key. It runs Docker without sudo (the docker group, created here so the user can
-# join it before Docker is installed) and may sudo without a password, since it has none.
+# join it before Docker is installed), reads the whole journal, the containers' logs included (systemd-journal), and
+# may sudo without a password, since it has none.
 groups:
   - docker
 users:
   - name: deploy
     shell: /bin/bash
-    groups: [sudo, docker]
+    groups: [sudo, docker, systemd-journal]
     sudo: "ALL=(ALL) NOPASSWD:ALL"
     lock_passwd: true
     ssh_authorized_keys:
@@ -51,6 +52,7 @@ packages:
   - containerd.io
   - docker-buildx-plugin
   - docker-compose-plugin
+  - jq # reads the API's JSON log lines
 
 write_files:
   - path: /etc/ssh/sshd_config.d/00-workouterr.conf
@@ -68,8 +70,17 @@ write_files:
       Unattended-Upgrade::Automatic-Reboot-Time "04:00";
       Unattended-Upgrade::Remove-Unused-Dependencies "true";
 
-  # Container logs in Docker's `local` format, which rotates them (5 files of 20 MB per container), so they never fill
-  # the disk.
+  # Container logs go to the system journal (journald), not to files Docker keeps beside each container: they outlive
+  # the containers a deploy replaces, and `journalctl CONTAINER_NAME=workouterr-api-1` reads them.
   - path: /etc/docker/daemon.json
     content: |
-      { "log-driver": "local" }
+      { "log-driver": "journald" }
+
+  # The journal (the containers' logs and the system's own) keeps 14 days, on disk so it survives a reboot, and never
+  # more than 1 GB of the 20 GB disk, whichever limit comes first.
+  - path: /etc/systemd/journald.conf.d/00-workouterr.conf
+    content: |
+      [Journal]
+      Storage=persistent
+      MaxRetentionSec=14day
+      SystemMaxUse=1G

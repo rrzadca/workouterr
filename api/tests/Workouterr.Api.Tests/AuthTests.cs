@@ -10,15 +10,13 @@ namespace Workouterr.Api.Tests;
 
 public class AuthTests(ApiFactory factory)
 {
-    private const string Password = "Correct-horse-1";
-
     [Fact]
     public async Task Login_SignsInAUserCreatedLikeTheCliDoes()
     {
-        var user = await CreateUserAsync("login@example.com");
+        var user = await factory.CreateUserAsync("login@example.com");
         using var client = factory.CreateClient();
 
-        using var response = await LoginAsync(client, "login@example.com", Password);
+        using var response = await LoginAsync(client, "login@example.com", TestUsers.Password);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var loggedIn = await response.Content.ReadFromJsonAsync<CurrentUserResponse>(
@@ -34,7 +32,7 @@ public class AuthTests(ApiFactory factory)
     [Fact]
     public async Task Login_Fails_WithAWrongPassword()
     {
-        await CreateUserAsync("wrong-password@example.com");
+        await factory.CreateUserAsync("wrong-password@example.com");
         using var client = factory.CreateClient();
 
         using var response = await LoginAsync(client, "wrong-password@example.com", "Wrong-horse-12");
@@ -47,7 +45,7 @@ public class AuthTests(ApiFactory factory)
     [Fact]
     public async Task Login_AnswersAnUnknownEmailExactlyLikeAWrongPassword()
     {
-        await CreateUserAsync("known@example.com");
+        await factory.CreateUserAsync("known@example.com");
         using var client = factory.CreateClient();
 
         using var wrongPassword = await LoginAsync(client, "known@example.com", "Wrong-horse-12");
@@ -65,14 +63,14 @@ public class AuthTests(ApiFactory factory)
         {
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             var unverified = new User { UserName = "unverified@example.com", Email = "unverified@example.com" };
-            Assert.True((await userManager.CreateAsync(unverified, Password)).Succeeded);
+            Assert.True((await userManager.CreateAsync(unverified, TestUsers.Password)).Succeeded);
         }
 
-        await CreateUserAsync("verified@example.com");
+        await factory.CreateUserAsync("verified@example.com");
         using var client = factory.CreateClient();
 
         using var wrongPassword = await LoginAsync(client, "verified@example.com", "Wrong-horse-12");
-        using var unverifiedEmail = await LoginAsync(client, "unverified@example.com", Password);
+        using var unverifiedEmail = await LoginAsync(client, "unverified@example.com", TestUsers.Password);
 
         Assert.Equal(wrongPassword.StatusCode, unverifiedEmail.StatusCode);
         Assert.Equal(await ReadProblemAsync(wrongPassword), await ReadProblemAsync(unverifiedEmail));
@@ -83,7 +81,7 @@ public class AuthTests(ApiFactory factory)
     {
         using var client = factory.CreateClient();
 
-        using var response = await LoginAsync(client, "", Password);
+        using var response = await LoginAsync(client, "", TestUsers.Password);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -92,9 +90,9 @@ public class AuthTests(ApiFactory factory)
     [Fact]
     public async Task Logout_EndsTheLogin()
     {
-        await CreateUserAsync("logout@example.com");
+        await factory.CreateUserAsync("logout@example.com");
         using var client = factory.CreateClient();
-        using var login = await LoginAsync(client, "logout@example.com", Password);
+        using var login = await LoginAsync(client, "logout@example.com", TestUsers.Password);
         Assert.Equal(HttpStatusCode.OK, login.StatusCode);
 
         using var response = await client.PostAsync("/api/auth/logout", null, TestContext.Current.CancellationToken);
@@ -112,16 +110,6 @@ public class AuthTests(ApiFactory factory)
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
-    }
-
-    // The same path as `user create`, so the test logs in a user exactly like one the owner made.
-    private async Task<User> CreateUserAsync(string email)
-    {
-        using var scope = factory.Services.CreateScope();
-        var (result, user) = await scope.ServiceProvider.GetRequiredService<UserCreationService>()
-            .CreateAsync(email, Password);
-        Assert.True(result.Succeeded);
-        return user;
     }
 
     private static Task<HttpResponseMessage> LoginAsync(HttpClient client, string email, string password) =>

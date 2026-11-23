@@ -391,10 +391,16 @@ The project is also a learning path for building REST APIs with .NET and ASP.NET
   - Development and tests: a Mailpit container catches every email (dev-only Compose service; API tests can check
     it)
 - Operations:
-  - Structured JSON logs through `ILogger`, written on the server, kept 14 days. No personal data in logs: user
-    ID only, never emails, notes or workout values
-  - Error tracking for the API and the Angular app in an EU-hosted or self-hosted tracker (e.g. Sentry EU region
-    or GlitchTip); essential, no tracking, so still no cookie banner
+  - Logs and errors stay on the server: no external log service or error tracker (no Sentry, no GlitchTip: one
+    more service to run on a 1 GB server)
+  - Structured JSON logs through `ILogger`, one JSON object per line on the API's console, kept in the server's
+    journal (Docker's journald log driver) for 14 days and at most 1 GB. No personal data in logs: user ID only,
+    never emails, notes or workout values
+  - Error tracking is the error log: the API logs every unhandled exception at Error with the user's ID; the Angular
+    app sends the errors nothing in it caught (message, stack, page path; at most 10 per page load) to the API,
+    which logs them the same way, with email addresses replaced, and takes at most 30 a minute so nothing can flood
+    the log. Read with `journalctl` and `jq`; no grouping or alerts. Nothing is sent to a third party, so still no
+    cookie banner
   - `/api/health` endpoint (API + database) watched by a free external uptime check that sends email alerts
   - Backups (from milestone 3): nightly encrypted `pg_dump`, copied off the server to EU storage, kept 30 days,
     with a restore test into a scratch database (monthly or from the deploy script). Until then the data export is

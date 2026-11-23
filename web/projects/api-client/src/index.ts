@@ -63,6 +63,21 @@ export const ProblemDetails = zod.object({
 export type ProblemDetails = zod.input<typeof ProblemDetails>;
 export type ProblemDetailsOutput = zod.output<typeof ProblemDetails>;
 
+export const reportClientErrorRequestMessageMax = 1000;
+
+export const reportClientErrorRequestStackMax = 8000;
+
+export const reportClientErrorRequestPathMax = 500;
+
+export const ReportClientErrorRequest = zod.object({
+  message: zod.string().min(1).max(reportClientErrorRequestMessageMax),
+  stack: zod.string().max(reportClientErrorRequestStackMax).nullish(),
+  path: zod.string().max(reportClientErrorRequestPathMax).nullish(),
+});
+
+export type ReportClientErrorRequest = zod.input<typeof ReportClientErrorRequest>;
+export type ReportClientErrorRequestOutput = zod.output<typeof ReportClientErrorRequest>;
+
 export const Theme = zod.union([zod.literal('light'), zod.literal('dark'), zod.literal(null)]);
 
 export type Theme = zod.input<typeof Theme>;
@@ -95,6 +110,17 @@ export const GetHealthHeader = zod.object({
 });
 
 export const GetHealthResponse = HealthResponse;
+
+export const ReportClientErrorHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
+
+export const ReportClientErrorBody = ReportClientErrorRequest;
+
+export const ReportClientErrorResponse = zod.void();
 
 export const LoginHeader = zod.object({
   'X-Client-Version': zod

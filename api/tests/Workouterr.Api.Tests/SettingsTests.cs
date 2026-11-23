@@ -9,8 +9,6 @@ namespace Workouterr.Api.Tests;
 
 public class SettingsTests(ApiFactory factory)
 {
-    private const string Password = "Correct-horse-1";
-
     [Fact]
     public async Task Get_ReturnsTheDefaults_ForANewAccount()
     {
@@ -80,7 +78,7 @@ public class SettingsTests(ApiFactory factory)
         using var firstBrowser = await LoggedInClientAsync("settings-two-browsers@example.com");
         await UpdateAsync(firstBrowser, new UpdateSettingsRequest(Theme: Theme.Dark));
 
-        using var secondBrowser = await LogInAsync("settings-two-browsers@example.com");
+        using var secondBrowser = await factory.LogInAsync("settings-two-browsers@example.com");
 
         Assert.Equal(Theme.Dark, (await GetSettingsAsync(secondBrowser)).Theme);
     }
@@ -99,23 +97,8 @@ public class SettingsTests(ApiFactory factory)
 
     private async Task<HttpClient> LoggedInClientAsync(string email)
     {
-        using (var scope = factory.Services.CreateScope())
-        {
-            var (result, _) = await scope.ServiceProvider.GetRequiredService<UserCreationService>()
-                .CreateAsync(email, Password);
-            Assert.True(result.Succeeded);
-        }
-        return await LogInAsync(email);
-    }
-
-    // A new client is a new browser: its own cookie container, so its own login.
-    private async Task<HttpClient> LogInAsync(string email)
-    {
-        var client = factory.CreateClient();
-        using var login = await client.PostAsJsonAsync(
-            "/api/auth/login", new LoginRequest(email, Password), TestContext.Current.CancellationToken);
-        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
-        return client;
+        await factory.CreateUserAsync(email);
+        return await factory.LogInAsync(email);
     }
 
     private static async Task<SettingsResponse> GetSettingsAsync(HttpClient client) =>

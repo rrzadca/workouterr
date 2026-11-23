@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Workouterr.Api;
 using Workouterr.Api.Auth;
 using Workouterr.Api.Compatibility;
+using Workouterr.Api.Diagnostics;
 using Workouterr.Api.Health;
 using Workouterr.Api.Persistence;
 using Workouterr.Api.Settings;
@@ -27,6 +28,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOpenApi(options => options.AddDocumentTransformer<MiddlewareResponsesTransformer>());
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<UnhandledExceptionLogger>();
+builder.Services.AddClientErrorRateLimit();
 // Checks the data annotations on request types (LoginRequest, …) and answers 400 with a validation problem.
 builder.Services.AddValidation();
 builder.Services.AddHealthChecks()
@@ -48,6 +51,8 @@ application.UseStatusCodePages();
 application.UseClientVersionCheck();
 application.UseCsrfGuard();
 application.UseAuthentication();
+application.UseUserLogScope();
+application.UseRateLimiter();
 application.UseAuthorization();
 
 // Swagger UI on /api/doc, reading the same document the build writes to contracts/. Development only.
@@ -64,6 +69,7 @@ if (application.Environment.IsDevelopment())
 application.MapHealthEndpoints();
 application.MapAuthEndpoints();
 application.MapSettingsEndpoints();
+application.MapClientErrorEndpoints();
 
 application.Run();
 return 0;

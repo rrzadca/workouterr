@@ -18,16 +18,14 @@ namespace Workouterr.Api.Tests;
 /// </summary>
 public class LoginStorageTests(ApiFactory factory)
 {
-    private const string Password = "Correct-horse-1";
-
     [Fact]
     public async Task Login_SetsAStrictSecureHttpOnlyCookieFor30Days()
     {
-        await CreateUserAsync("cookie@example.com");
+        await factory.CreateUserAsync("cookie@example.com");
         using var client = CreateClient(factory);
 
         using var response = await client.PostAsJsonAsync(
-            "/api/auth/login", new LoginRequest("cookie@example.com", Password), TestContext.Current.CancellationToken);
+            "/api/auth/login", new LoginRequest("cookie@example.com", TestUsers.Password), TestContext.Current.CancellationToken);
 
         var cookie = SetCookieHeaderValue.Parse(response.Headers.GetValues(HeaderNames.SetCookie).Single());
         Assert.True(cookie.HttpOnly);
@@ -43,7 +41,7 @@ public class LoginStorageTests(ApiFactory factory)
     [Fact]
     public async Task Logout_EndsTheLogin_EvenForACopyOfTheCookie()
     {
-        await CreateUserAsync("logout-copy@example.com");
+        await factory.CreateUserAsync("logout-copy@example.com");
         var cookie = await LoginAsync(factory, "logout-copy@example.com");
         Assert.Equal(HttpStatusCode.OK, await GetMeStatusAsync(factory, cookie));
 
@@ -57,7 +55,7 @@ public class LoginStorageTests(ApiFactory factory)
     [Fact]
     public async Task SecurityStampChange_EndsTheLogin_OnTheNextRequest()
     {
-        var user = await CreateUserAsync("stamp@example.com");
+        var user = await factory.CreateUserAsync("stamp@example.com");
         var cookie = await LoginAsync(factory, "stamp@example.com");
         Assert.Equal(HttpStatusCode.OK, await GetMeStatusAsync(factory, cookie));
 
@@ -76,7 +74,7 @@ public class LoginStorageTests(ApiFactory factory)
     [Fact]
     public async Task Login_ReplacesTheSessionId_WhenAlreadyLoggedIn()
     {
-        var user = await CreateUserAsync("rotate@example.com");
+        var user = await factory.CreateUserAsync("rotate@example.com");
         var firstCookie = await LoginAsync(factory, "rotate@example.com");
 
         var secondCookie = await LoginAsync(factory, "rotate@example.com", firstCookie);
@@ -89,7 +87,7 @@ public class LoginStorageTests(ApiFactory factory)
     [Fact]
     public async Task FailedLogin_KeepsTheCurrentLogin()
     {
-        var user = await CreateUserAsync("failed-rotate@example.com");
+        var user = await factory.CreateUserAsync("failed-rotate@example.com");
         var cookie = await LoginAsync(factory, "failed-rotate@example.com");
 
         using var client = CreateClient(factory);
@@ -110,7 +108,7 @@ public class LoginStorageTests(ApiFactory factory)
     {
         var time = new FakeTimeProvider(DateTimeOffset.UtcNow);
         await using var application = WithTime(time);
-        await CreateUserAsync("renew@example.com");
+        await factory.CreateUserAsync("renew@example.com");
         var cookie = await LoginAsync(application, "renew@example.com");
 
         time.Advance(TimeSpan.FromHours(23));
@@ -131,7 +129,7 @@ public class LoginStorageTests(ApiFactory factory)
     {
         var time = new FakeTimeProvider(DateTimeOffset.UtcNow);
         await using var application = WithTime(time);
-        await CreateUserAsync("overlap@example.com");
+        await factory.CreateUserAsync("overlap@example.com");
         var cookie = await LoginAsync(application, "overlap@example.com");
 
         // A day later, a burst of requests (the app loading its screen) all carry the day-old ticket.
@@ -157,7 +155,7 @@ public class LoginStorageTests(ApiFactory factory)
     {
         var time = new FakeTimeProvider(DateTimeOffset.UtcNow);
         await using var application = WithTime(time);
-        await CreateUserAsync("sliding@example.com");
+        await factory.CreateUserAsync("sliding@example.com");
         var cookie = await LoginAsync(application, "sliding@example.com");
 
         // 58 days in, still logged in: each use moved the expiry 30 days on.
@@ -175,7 +173,7 @@ public class LoginStorageTests(ApiFactory factory)
     {
         var time = new FakeTimeProvider(DateTimeOffset.UtcNow);
         await using var application = WithTime(time);
-        await CreateUserAsync("maximum@example.com");
+        await factory.CreateUserAsync("maximum@example.com");
         var cookie = await LoginAsync(application, "maximum@example.com");
 
         for (var day = 20; day <= 80; day += 20)
@@ -197,7 +195,7 @@ public class LoginStorageTests(ApiFactory factory)
         var time = new FakeTimeProvider(DateTimeOffset.UtcNow);
         var loginStart = time.GetUtcNow();
         await using var application = WithTime(time);
-        await CreateUserAsync("cookie-maximum@example.com");
+        await factory.CreateUserAsync("cookie-maximum@example.com");
         var cookie = await LoginAsync(application, "cookie-maximum@example.com");
 
         for (var day = 20; day <= 80; day += 20)
@@ -221,15 +219,6 @@ public class LoginStorageTests(ApiFactory factory)
     private WebApplicationFactory<Program> WithTime(TimeProvider time) =>
         factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.AddSingleton(time)));
 
-    private async Task<User> CreateUserAsync(string email)
-    {
-        using var scope = factory.Services.CreateScope();
-        var (result, user) = await scope.ServiceProvider.GetRequiredService<UserCreationService>()
-            .CreateAsync(email, Password);
-        Assert.True(result.Succeeded);
-        return user;
-    }
-
     private async Task<int> CountLoginsAsync(User user)
     {
         using var scope = factory.Services.CreateScope();
@@ -244,7 +233,7 @@ public class LoginStorageTests(ApiFactory factory)
         using var client = CreateClient(application);
         using var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
         {
-            Content = JsonContent.Create(new LoginRequest(email, Password)),
+            Content = JsonContent.Create(new LoginRequest(email, TestUsers.Password)),
         };
         if (currentCookie is not null)
         {
