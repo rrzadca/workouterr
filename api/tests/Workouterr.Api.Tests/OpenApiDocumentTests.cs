@@ -19,8 +19,8 @@ public class OpenApiDocumentTests(ApiFactory factory)
 
         Assert.All(Operations(document), operation =>
         {
-            Assert.Contains(operation.Operation.GetProperty("parameters").EnumerateArray(), reference =>
-                reference.GetProperty("$ref").GetString()
+            Assert.Contains(operation.Operation.GetProperty("parameters").EnumerateArray(), parameter =>
+                parameter.TryGetProperty("$ref", out var reference) && reference.GetString()
                 == $"#/components/parameters/{MiddlewareResponsesTransformer.ClientVersionParameter}");
             Assert.True(operation.Operation.GetProperty("responses").TryGetProperty("426", out _));
         });
@@ -49,6 +49,43 @@ public class OpenApiDocumentTests(ApiFactory factory)
 
         var schema = document.RootElement.GetProperty("components").GetProperty("schemas").GetProperty(schemaName);
         Assert.Equal(expectedNames, schema.GetProperty("enum").EnumerateArray().Select(name => name.GetString()));
+    }
+
+    [Fact]
+    public async Task ExerciseList_FiltersByMuscleGroupNames()
+    {
+        using var document = await GetDocumentAsync();
+
+        var parameter = document.RootElement.GetProperty("paths").GetProperty("/api/exercises").GetProperty("get")
+            .GetProperty("parameters").EnumerateArray()
+            .Single(parameter => parameter.TryGetProperty("name", out var name) && name.GetString() == "muscleGroups");
+        Assert.Equal("query", parameter.GetProperty("in").GetString());
+        Assert.Equal("#/components/schemas/MuscleGroup",
+            parameter.GetProperty("schema").GetProperty("items").GetProperty("$ref").GetString());
+    }
+
+    // The browser's zod schema gets the 2-decimal rule from here.
+    [Fact]
+    public async Task ExerciseWeightStep_AllowsAtMostTwoDecimals()
+    {
+        using var document = await GetDocumentAsync();
+
+        var weightStep = document.RootElement.GetProperty("components").GetProperty("schemas")
+            .GetProperty("ExerciseRequest").GetProperty("properties").GetProperty("weightStep");
+        Assert.Equal(0.01m, weightStep.GetProperty("multipleOf").GetDecimal());
+        Assert.Equal(0.01m, weightStep.GetProperty("minimum").GetDecimal());
+    }
+
+    // The app's "used in routines" message reads this shape; the API answers it once routines exist (task 25).
+    [Fact]
+    public async Task ArchivingAnExercise_CanAnswerWithTheRoutinesItIsIn()
+    {
+        using var document = await GetDocumentAsync();
+
+        var conflict = document.RootElement.GetProperty("paths").GetProperty("/api/exercises/{id}/archive")
+            .GetProperty("post").GetProperty("responses").GetProperty("409");
+        Assert.Equal("#/components/schemas/ExerciseInRoutinesProblem", conflict.GetProperty("content")
+            .GetProperty("application/problem+json").GetProperty("schema").GetProperty("$ref").GetString());
     }
 
     private async Task<JsonDocument> GetDocumentAsync()
