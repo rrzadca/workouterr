@@ -17,18 +17,6 @@ public partial class UnhandledExceptionLogger(
     public async ValueTask<bool> TryHandleAsync(
         HttpContext context, Exception exception, CancellationToken cancellationToken)
     {
-        // A request the endpoint couldn't bind (malformed JSON, an unknown enum name). Production answers it 400 without
-        // throwing; Development throws instead, so the developer sees why. Either way it's the client's mistake, not a crash.
-        if (exception is BadHttpRequestException badRequest)
-        {
-            context.Response.StatusCode = badRequest.StatusCode;
-            return await problemDetails.TryWriteAsync(new ProblemDetailsContext
-            {
-                HttpContext = context,
-                ProblemDetails = { Status = badRequest.StatusCode },
-            });
-        }
-
         using (UserLogScope.Begin(logger, context.User))
         {
             LogUnhandledException(logger, exception, context.Request.Method, context.Request.Path);

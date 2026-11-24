@@ -13,8 +13,9 @@ ASP.NET Core Minimal API on .NET 10. Run every command from `api/`.
   JSON object per line (`appsettings.json`; Development keeps the readable `simple` format). `UserLogScope` adds the
   logged-in user's `UserId` to every line of a request; never log an email, a note or a workout value.
   `UnhandledExceptionLogger` logs each unhandled exception once, at Error, with the user's ID, and answers 500 Problem
-  Details. `POST /api/client-errors` logs the Angular app's uncaught errors the same way, at most 30 a minute for
-  all callers together (rate limiter, 429). `EmailRedaction` replaces anything shaped like an email with `[email]` in
+  Details; `BadRequestExceptionHandler`, registered before it, answers `BadHttpRequestException` 400 without
+  logging. `POST /api/client-errors` logs the Angular app's uncaught errors the same way, at most 30 a minute for all
+  callers together (rate limiter, 429). `EmailRedaction` replaces anything shaped like an email with `[email]` in
   text the API doesn't write itself (the browser's errors, Identity's messages in the CLI). API tests read the logs
   through `factory.Services.GetFakeLogCollector()`; `TestUsers` creates and logs in test users.
 - Endpoints are Minimal API handlers with typed results (`Results<Ok<T>, ProblemHttpResult>`), a name
@@ -24,11 +25,14 @@ ASP.NET Core Minimal API on .NET 10. Run every command from `api/`.
   body. Optional request fields get a default (`= null`).
 - Request validation: data annotations on the request record (published in the document, so the browser's zod schema
   has them); rules across fields in `IValidatableObject.Validate`. An annotation the generator doesn't publish gets a
-  schema transformer (`DecimalPlacesAttribute` → `multipleOf`). A body or parameter that can't be bound is a 400
-  Problem Details in every environment (`UnhandledExceptionLogger` answers Development's `BadHttpRequestException`).
+  schema transformer (`Validation/`: `DecimalPlacesAttribute` → `multipleOf`). Limits that only the request checks are
+  constants on the request type; the entity keeps only what its columns need. A body or parameter that can't be bound
+  is a 400 Problem Details in every environment (`BadRequestExceptionHandler` answers Development's
+  `BadHttpRequestException`).
 - Query binding parses enums by their C# names, so an enum in the query string is bound as a string and read with
   `WireNames.TryParse`; an operation transformer on the endpoint shows the enum in the document.
-- A user's own records are looked up by ID and user ID together; another user's record is 404, never 403.
+- A user's own records are looked up by ID and user ID together (`ClaimsPrincipal.UserId()`, from the login cookie,
+  without loading the user); another user's record is 404, never 403.
 - What middleware adds to every endpoint is described in the document by `MiddlewareResponsesTransformer`: the client
   version header parameter and 426 on every operation, the CSRF guard's 403 and 415 on state-changing ones.
 - Every route sits under `/api`, so the dev proxy and Caddy forward it to the API.

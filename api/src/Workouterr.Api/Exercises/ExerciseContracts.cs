@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Workouterr.Api.Validation;
 using Workouterr.Domain.Exercises;
 
 namespace Workouterr.Api.Exercises;
@@ -17,13 +18,20 @@ public record ExerciseRequest(
     [property: Required, MinLength(1)] List<MuscleGroup> MuscleGroups,
     [property: MaxLength(Exercise.DescriptionMaxLength)] string? Description = null,
     // In kg, at most 2 decimals. Required for WEIGHT_REPS and only for it.
-    [property: Range(Exercise.WeightStepMin, Exercise.WeightStepMax), DecimalPlaces(Exercise.WeightStepScale)]
+    [property: Range(ExerciseRequest.WeightStepMin, ExerciseRequest.WeightStepMax)]
+    [property: DecimalPlaces(Exercise.WeightStepScale)]
     decimal? WeightStep = null,
     // Whole seconds, 1 s – 10 min. Required for TIME and only for it.
-    [property: Range(1, Exercise.TimeStepMaxSeconds)] int? TimeStepSeconds = null,
+    [property: Range(1, ExerciseRequest.TimeStepMaxSeconds)] int? TimeStepSeconds = null,
     bool PerSide = false) : IValidatableObject
 {
     public const string NotBlank = @".*\S.*";
+
+    public const int TimeStepMaxSeconds = 600;
+    // Doubles, because attribute arguments can't be decimals; Range compares them with the decimal exactly enough.
+    // The column (numeric(5, 2), see Exercise) holds up to 999.99, so the range is the tighter limit.
+    public const double WeightStepMin = 0.01;
+    public const double WeightStepMax = 100;
 
     // Runs only when every annotation above passed, so the steps are in range here.
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -76,14 +84,3 @@ public class ExerciseInRoutinesProblem : ProblemDetails
 }
 
 public record RoutineReference(Guid Id, string Name);
-
-/// <summary>A decimal with at most this many digits after the point (1.25 passes, 1.255 doesn't).</summary>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public class DecimalPlacesAttribute(int places) : ValidationAttribute(
-    $"The field {{0}} must have at most {places} decimal places.")
-{
-    public int Places { get; } = places;
-
-    public override bool IsValid(object? value) =>
-        value is not decimal number || decimal.Round(number, Places) == number;
-}

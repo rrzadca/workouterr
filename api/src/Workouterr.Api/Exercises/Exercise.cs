@@ -8,17 +8,13 @@ public class Exercise
 {
     public const int NameMaxLength = 100;
     public const int DescriptionMaxLength = 2000;
-    public const int TimeStepMaxSeconds = 600;
 
     /// <summary>Per user, archived ones included.</summary>
     public const int MaxPerUser = 500;
 
-    // numeric(5, 2): a weight step is at most 100 kg with at most 2 decimals.
+    // numeric(5, 2): room for the request's 100 kg limit, with at most 2 decimals.
     public const int WeightStepPrecision = 5;
     public const int WeightStepScale = 2;
-    // A double, because attribute arguments can't be decimals; Range compares it with the decimal exactly enough.
-    public const double WeightStepMin = 0.01;
-    public const double WeightStepMax = 100;
 
     public Guid Id { get; set; }
 

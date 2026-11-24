@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
-namespace Workouterr.Api.Exercises;
+namespace Workouterr.Api.Validation;
 
 /// <summary>
 /// Publishes <see cref="DecimalPlacesAttribute"/> in the OpenAPI document as <c>multipleOf</c> (2 places = 0.01), which

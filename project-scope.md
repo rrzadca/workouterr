@@ -126,6 +126,8 @@ Public product, free to use. Anyone can register.
     moves by 15 s and typed values are accepted
   - Names (exercise, routine, plan): 1–100 characters, trimmed, not blank. Duplicate names are allowed
   - Descriptions up to 2,000 characters; notes (per exercise in a session) up to 1,000
+  - A text limit applies to the text as sent; the API trims it when saving. The app trims before sending, so only
+    another client can be refused for surrounding spaces
   - Sets per routine entry 1–20; sets per exercise in a session (including added ones) up to 30
   - Entries per routine up to 30; exercises in a session (including extras) up to 40; routines per plan up to 20
   - Per user (archived ones included): up to 500 exercises, 100 routines and 50 plans

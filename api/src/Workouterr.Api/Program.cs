@@ -9,6 +9,7 @@ using Workouterr.Api.Health;
 using Workouterr.Api.Persistence;
 using Workouterr.Api.Settings;
 using Workouterr.Api.Users;
+using Workouterr.Api.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,8 @@ builder.Services.AddOpenApi(options => options
     .AddDocumentTransformer<MiddlewareResponsesTransformer>()
     .AddSchemaTransformer<DecimalPlacesTransformer>());
 builder.Services.AddProblemDetails();
+// Exception handlers run in the order they're added, until one handles the exception.
+builder.Services.AddExceptionHandler<BadRequestExceptionHandler>();
 builder.Services.AddExceptionHandler<UnhandledExceptionLogger>();
 builder.Services.AddClientErrorRateLimit();
 // Checks the data annotations on request types (LoginRequest, …) and answers 400 with a validation problem.

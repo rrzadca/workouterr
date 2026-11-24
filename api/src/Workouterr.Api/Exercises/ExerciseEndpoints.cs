@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
@@ -65,7 +64,7 @@ public static class ExerciseEndpoints
     /// <remarks>Query binding parses an enum by its C# name (<c>Arms</c>), so the groups arrive as strings and are read
     /// by their wire names (<c>ARMS</c>), like in a JSON body.</remarks>
     private static async Task<Results<Ok<List<ExerciseResponse>>, ValidationProblem>> ListExercises(
-        ClaimsPrincipal principal, UserManager<User> userManager, AppDbContext database,
+        ClaimsPrincipal user, AppDbContext database,
         [FromQuery(Name = MuscleGroupsParameter)] string[]? muscleGroupNames = null, [FromQuery] bool archived = false)
     {
         var muscleGroups = new List<MuscleGroup>();
@@ -81,7 +80,7 @@ public static class ExerciseEndpoints
             muscleGroups.Add(group);
         }
 
-        var userId = UserId(principal, userManager);
+        var userId = user.UserId();
         var query = database.Exercises.AsNoTracking()
             .Where(exercise => exercise.UserId == userId && exercise.IsArchived == archived);
         if (muscleGroups.Count > 0)
@@ -90,18 +89,17 @@ public static class ExerciseEndpoints
             query = query.Where(exercise => exercise.MuscleGroups.Any(group => muscleGroups.Contains(group)));
         }
 
-        var found = await query
+        var exercises = await query
             .OrderBy(exercise => exercise.Name)
             .ThenBy(exercise => exercise.Id)
             .ToListAsync();
-        return TypedResults.Ok(found.Select(ExerciseResponse.From).ToList());
+        return TypedResults.Ok(exercises.Select(ExerciseResponse.From).ToList());
     }
 
     private static async Task<Results<Created<ExerciseResponse>, ProblemHttpResult>> CreateExercise(
-        ExerciseRequest request, ClaimsPrincipal principal, UserManager<User> userManager,
-        AppDbContext database)
+        ExerciseRequest request, ClaimsPrincipal user, AppDbContext database)
     {
-        var userId = UserId(principal, userManager);
+        var userId = user.UserId();
         // Archived ones count too: archiving is how an exercise is deleted, so it would otherwise not limit anything.
         // Two creates at the same moment could both pass the count and end one over; the limit guards against abuse,
         // not against that.
@@ -119,56 +117,35 @@ public static class ExerciseEndpoints
         return TypedResults.Created($"/api/exercises/{exercise.Id}", ExerciseResponse.From(exercise));
     }
 
-    private static async Task<Results<Ok<ExerciseResponse>, ProblemHttpResult>> UpdateExercise(
-        Guid id, ExerciseRequest request, ClaimsPrincipal principal, UserManager<User> userManager,
-        AppDbContext database)
+    // TODO(task 29): once sessions exist, refuse to change the tracked metrics of an exercise used in one.
+    private static Task<Results<Ok<ExerciseResponse>, ProblemHttpResult>> UpdateExercise(
+        Guid id, ExerciseRequest request, ClaimsPrincipal user, AppDbContext database) =>
+        ChangeAsync(database, id, user.UserId(), request.ApplyTo);
+
+    // TODO(task 25): answer 409 with an ExerciseInRoutinesProblem while the exercise is in a routine.
+    private static Task<Results<Ok<ExerciseResponse>, ProblemHttpResult>> ArchiveExercise(
+        Guid id, ClaimsPrincipal user, AppDbContext database) =>
+        ChangeAsync(database, id, user.UserId(), exercise => exercise.IsArchived = true);
+
+    private static Task<Results<Ok<ExerciseResponse>, ProblemHttpResult>> RestoreExercise(
+        Guid id, ClaimsPrincipal user, AppDbContext database) =>
+        ChangeAsync(database, id, user.UserId(), exercise => exercise.IsArchived = false);
+
+    /// <summary>Finds the user's exercise, applies the change, saves and answers with the exercise as it now is; 404
+    /// when the user has no exercise with that ID.</summary>
+    private static async Task<Results<Ok<ExerciseResponse>, ProblemHttpResult>> ChangeAsync(
+        AppDbContext database, Guid id, Guid userId, Action<Exercise> change)
     {
-        // TODO(task 29): once sessions exist, refuse to change the tracked metrics of an exercise used in one.
-        var exercise = await FindAsync(database, id, UserId(principal, userManager));
+        // Another user's exercise is "not found", never "forbidden": the answer doesn't reveal that the ID exists.
+        var exercise = await database.Exercises.SingleOrDefaultAsync(
+            exercise => exercise.Id == id && exercise.UserId == userId);
         if (exercise is null)
         {
-            return NotFound();
+            return TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, title: "Exercise not found");
         }
 
-        request.ApplyTo(exercise);
+        change(exercise);
         await database.SaveChangesAsync();
         return TypedResults.Ok(ExerciseResponse.From(exercise));
     }
-
-    private static async Task<Results<Ok<ExerciseResponse>, ProblemHttpResult>> ArchiveExercise(
-        Guid id, ClaimsPrincipal principal, UserManager<User> userManager, AppDbContext database)
-    {
-        // TODO(task 25): answer 409 with an ExerciseInRoutinesProblem while the exercise is in a routine.
-        return await SetArchivedAsync(database, id, UserId(principal, userManager), archived: true);
-    }
-
-    private static async Task<Results<Ok<ExerciseResponse>, ProblemHttpResult>> RestoreExercise(
-        Guid id, ClaimsPrincipal principal, UserManager<User> userManager, AppDbContext database) =>
-        await SetArchivedAsync(database, id, UserId(principal, userManager), archived: false);
-
-    private static async Task<Results<Ok<ExerciseResponse>, ProblemHttpResult>> SetArchivedAsync(
-        AppDbContext database, Guid id, Guid userId, bool archived)
-    {
-        var exercise = await FindAsync(database, id, userId);
-        if (exercise is null)
-        {
-            return NotFound();
-        }
-
-        exercise.IsArchived = archived;
-        await database.SaveChangesAsync();
-        return TypedResults.Ok(ExerciseResponse.From(exercise));
-    }
-
-    // Another user's exercise is "not found", never "forbidden": the answer doesn't reveal that the ID exists.
-    private static Task<Exercise?> FindAsync(AppDbContext database, Guid id, Guid userId) =>
-        database.Exercises.SingleOrDefaultAsync(exercise => exercise.Id == id && exercise.UserId == userId);
-
-    private static ProblemHttpResult NotFound() =>
-        TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, title: "Exercise not found");
-
-    // RequireAuthorization guarantees a logged-in user, so the ID claim is there. The user's row isn't loaded: if the
-    // account was deleted, its exercises went with it and every query simply finds nothing.
-    private static Guid UserId(ClaimsPrincipal principal, UserManager<User> userManager) =>
-        Guid.Parse(userManager.GetUserId(principal)!);
 }
