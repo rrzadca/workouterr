@@ -184,7 +184,7 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
   groups (enum), archived flag; column settings (lengths, decimal precision); migration.
   Scope: Exercises.
   Done when: the migration applies and the enums appear in the OpenAPI document.
-- [ ] **21. Exercise endpoints.** List (with muscle-group filter and archived toggle), create, update, archive,
+- [x] **21. Exercise endpoints.** List (with muscle-group filter and archived toggle), create, update, archive,
   restore; request types carry the limits as data annotations. The archive endpoint declares the 409 that lists the
   routines (`ExerciseInRoutinesProblem`), so task 23 can build its message; task 25 enforces it once routines exist.
   Scope: Exercises; Routines → Limits.
