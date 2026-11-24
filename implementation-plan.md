@@ -180,7 +180,7 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
 
 ### Exercises
 
-- [ ] **20. Exercise model.** Entity with metrics (WEIGHT + REPS, REPS, TIME), weight and time steps, per side, muscle
+- [x] **20. Exercise model.** Entity with metrics (WEIGHT + REPS, REPS, TIME), weight and time steps, per side, muscle
   groups (enum), archived flag; column settings (lengths, decimal precision); migration.
   Scope: Exercises.
   Done when: the migration applies and the enums appear in the OpenAPI document.
