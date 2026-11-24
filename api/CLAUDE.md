@@ -19,6 +19,16 @@ ASP.NET Core Minimal API on .NET 10. Run every command from `api/`.
   through `factory.Services.GetFakeLogCollector()`; `TestUsers` creates and logs in test users.
 - Endpoints are Minimal API handlers with typed results (`Results<Ok<T>, ProblemHttpResult>`), a name
   (`WithName`, the client's function name) and a tag, so the OpenAPI document describes them fully.
+- JSON (`Program.cs`): enums travel by their wire names, numbers only as JSON numbers (so the document types them
+  `number`, not `number | string`), and a request record's constructor parameter without a default must be in the
+  body. Optional request fields get a default (`= null`).
+- Request validation: data annotations on the request record (published in the document, so the browser's zod schema
+  has them); rules across fields in `IValidatableObject.Validate`. An annotation the generator doesn't publish gets a
+  schema transformer (`DecimalPlacesAttribute` → `multipleOf`). A body or parameter that can't be bound is a 400
+  Problem Details in every environment (`UnhandledExceptionLogger` answers Development's `BadHttpRequestException`).
+- Query binding parses enums by their C# names, so an enum in the query string is bound as a string and read with
+  `WireNames.TryParse`; an operation transformer on the endpoint shows the enum in the document.
+- A user's own records are looked up by ID and user ID together; another user's record is 404, never 403.
 - What middleware adds to every endpoint is described in the document by `MiddlewareResponsesTransformer`: the client
   version header parameter and 426 on every operation, the CSRF guard's 403 and 415 on state-changing ones.
 - Every route sits under `/api`, so the dev proxy and Caddy forward it to the API.

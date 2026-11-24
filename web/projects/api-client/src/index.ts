@@ -14,6 +14,83 @@ export const CurrentUserResponse = zod.object({
 export type CurrentUserResponse = zod.input<typeof CurrentUserResponse>;
 export type CurrentUserResponseOutput = zod.output<typeof CurrentUserResponse>;
 
+export const RoutineReference = zod.object({
+  id: zod.uuid(),
+  name: zod.string(),
+});
+
+export type RoutineReference = zod.input<typeof RoutineReference>;
+export type RoutineReferenceOutput = zod.output<typeof RoutineReference>;
+
+export const ExerciseInRoutinesProblem = zod.object({
+  type: zod.string().nullish(),
+  title: zod.string().nullish(),
+  status: zod.int().nullish(),
+  detail: zod.string().nullish(),
+  instance: zod.string().nullish(),
+  routines: zod.array(RoutineReference),
+});
+
+export type ExerciseInRoutinesProblem = zod.input<typeof ExerciseInRoutinesProblem>;
+export type ExerciseInRoutinesProblemOutput = zod.output<typeof ExerciseInRoutinesProblem>;
+
+export const TrackedMetrics = zod.enum(['WEIGHT_REPS', 'REPS', 'TIME']);
+
+export type TrackedMetrics = zod.input<typeof TrackedMetrics>;
+export type TrackedMetricsOutput = zod.output<typeof TrackedMetrics>;
+
+export const MuscleGroup = zod.enum(['CHEST', 'BACK', 'SHOULDERS', 'ARMS', 'CORE', 'LEGS']);
+
+export type MuscleGroup = zod.input<typeof MuscleGroup>;
+export type MuscleGroupOutput = zod.output<typeof MuscleGroup>;
+
+export const exerciseRequestNameMax = 100;
+
+export const exerciseRequestNameRegExp = new RegExp('.*\\S.*');
+
+export const exerciseRequestDescriptionMax = 2000;
+
+export const exerciseRequestWeightStepMin = 0.01;
+export const exerciseRequestWeightStepMax = 100;
+export const exerciseRequestWeightStepMultipleOf = 0.01;
+
+export const exerciseRequestTimeStepSecondsMax = 600;
+
+export const exerciseRequestPerSideDefault = false;
+
+export const ExerciseRequest = zod.object({
+  name: zod.string().min(1).max(exerciseRequestNameMax).regex(exerciseRequestNameRegExp),
+  metrics: TrackedMetrics,
+  muscleGroups: zod.array(MuscleGroup).min(1),
+  description: zod.string().max(exerciseRequestDescriptionMax).nullish(),
+  weightStep: zod
+    .number()
+    .min(exerciseRequestWeightStepMin)
+    .max(exerciseRequestWeightStepMax)
+    .multipleOf(exerciseRequestWeightStepMultipleOf)
+    .nullish(),
+  timeStepSeconds: zod.int().min(1).max(exerciseRequestTimeStepSecondsMax).nullish(),
+  perSide: zod.boolean().default(exerciseRequestPerSideDefault),
+});
+
+export type ExerciseRequest = zod.input<typeof ExerciseRequest>;
+export type ExerciseRequestOutput = zod.output<typeof ExerciseRequest>;
+
+export const ExerciseResponse = zod.object({
+  id: zod.uuid(),
+  name: zod.string(),
+  description: zod.string().nullable(),
+  metrics: TrackedMetrics,
+  weightStep: zod.number().nullable(),
+  timeStepSeconds: zod.int().nullable(),
+  perSide: zod.boolean(),
+  muscleGroups: zod.array(MuscleGroup),
+  isArchived: zod.boolean(),
+});
+
+export type ExerciseResponse = zod.input<typeof ExerciseResponse>;
+export type ExerciseResponseOutput = zod.output<typeof ExerciseResponse>;
+
 export const HealthStatus = zod.enum(['Unhealthy', 'Degraded', 'Healthy']);
 
 export type HealthStatus = zod.input<typeof HealthStatus>;
@@ -26,12 +103,10 @@ export const HealthResponse = zod.object({
 export type HealthResponse = zod.input<typeof HealthResponse>;
 export type HealthResponseOutput = zod.output<typeof HealthResponse>;
 
-export const httpValidationProblemDetailsStatusRegExpTwo = new RegExp('^-?(?:0|[1-9]\\d*)$');
-
 export const HttpValidationProblemDetails = zod.object({
   type: zod.string().nullish(),
   title: zod.string().nullish(),
-  status: zod.union([zod.int(), zod.stringFormat('int32', httpValidationProblemDetailsStatusRegExpTwo)]).nullish(),
+  status: zod.int().nullish(),
   detail: zod.string().nullish(),
   instance: zod.string().nullish(),
   errors: zod.record(zod.string(), zod.array(zod.string())).optional(),
@@ -50,17 +125,10 @@ export const LoginRequest = zod.object({
 export type LoginRequest = zod.input<typeof LoginRequest>;
 export type LoginRequestOutput = zod.output<typeof LoginRequest>;
 
-export const MuscleGroup = zod.enum(['CHEST', 'BACK', 'SHOULDERS', 'ARMS', 'CORE', 'LEGS']);
-
-export type MuscleGroup = zod.input<typeof MuscleGroup>;
-export type MuscleGroupOutput = zod.output<typeof MuscleGroup>;
-
-export const problemDetailsStatusRegExpTwo = new RegExp('^-?(?:0|[1-9]\\d*)$');
-
 export const ProblemDetails = zod.object({
   type: zod.string().nullish(),
   title: zod.string().nullish(),
-  status: zod.union([zod.int(), zod.stringFormat('int32', problemDetailsStatusRegExpTwo)]).nullish(),
+  status: zod.int().nullish(),
   detail: zod.string().nullish(),
   instance: zod.string().nullish(),
 });
@@ -96,11 +164,6 @@ export const SettingsResponse = zod.object({
 
 export type SettingsResponse = zod.input<typeof SettingsResponse>;
 export type SettingsResponseOutput = zod.output<typeof SettingsResponse>;
-
-export const TrackedMetrics = zod.enum(['WEIGHT_REPS', 'REPS', 'TIME']);
-
-export type TrackedMetrics = zod.input<typeof TrackedMetrics>;
-export type TrackedMetricsOutput = zod.output<typeof TrackedMetrics>;
 
 export const updateSettingsRequestDisplayNameMax = 50;
 
@@ -180,3 +243,72 @@ export const UpdateSettingsHeader = zod.object({
 export const UpdateSettingsBody = UpdateSettingsRequest;
 
 export const UpdateSettingsResponse = SettingsResponse;
+
+export const listExercisesQueryArchivedDefault = false;
+
+export const ListExercisesQueryParams = zod.object({
+  muscleGroups: zod.array(MuscleGroup).optional(),
+  archived: zod.boolean().default(listExercisesQueryArchivedDefault),
+});
+
+export const ListExercisesHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
+
+export const ListExercisesResponseItem = ExerciseResponse;
+export const ListExercisesResponse = zod.array(ListExercisesResponseItem);
+
+export const CreateExerciseHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
+
+export const CreateExerciseBody = ExerciseRequest;
+
+export const CreateExerciseResponse = ExerciseResponse;
+
+export const UpdateExerciseParams = zod.object({
+  id: zod.uuid(),
+});
+
+export const UpdateExerciseHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
+
+export const UpdateExerciseBody = ExerciseRequest;
+
+export const UpdateExerciseResponse = ExerciseResponse;
+
+export const ArchiveExerciseParams = zod.object({
+  id: zod.uuid(),
+});
+
+export const ArchiveExerciseHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
+
+export const ArchiveExerciseResponse = ExerciseResponse;
+
+export const RestoreExerciseParams = zod.object({
+  id: zod.uuid(),
+});
+
+export const RestoreExerciseHeader = zod.object({
+  'X-Client-Version': zod
+    .string()
+    .optional()
+    .describe("The app's build version. A build older than the API accepts gets 426 Upgrade Required."),
+});
+
+export const RestoreExerciseResponse = ExerciseResponse;

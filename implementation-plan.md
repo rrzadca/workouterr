@@ -185,10 +185,10 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
   Scope: Exercises.
   Done when: the migration applies and the enums appear in the OpenAPI document.
 - [ ] **21. Exercise endpoints.** List (with muscle-group filter and archived toggle), create, update, archive,
-  restore; request types carry the limits as data annotations. Archiving is blocked while the exercise is in a
-  routine (response lists the routines).
+  restore; request types carry the limits as data annotations. The archive endpoint declares the 409 that lists the
+  routines (`ExerciseInRoutinesProblem`), so task 23 can build its message; task 25 enforces it once routines exist.
   Scope: Exercises; Routines → Limits.
-  Done when: API tests cover every endpoint, the limits and the archive rule.
+  Done when: API tests cover every endpoint and the limits, and the document declares the archive 409.
 - [ ] **22. Starter exercises.** About 25 exercises in a JSON file (English and Polish), a test validating it against
   the exercise schema, copied in the user-creation transaction (CLI included). Users get a language (`en` by default,
   `user create <email> --language pl`); the language setting itself comes in task 43.
@@ -207,10 +207,11 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
   Scope: Routines.
   Done when: the migration applies and the schema covers every field the scope lists.
 - [ ] **25. Routine endpoints.** CRUD, reorder, archive / restore; request types with the limits, cross-field checks
-  (ascending ladder, 1–10 rungs) and count limits.
-  Scope: Routines (including Limits).
-  Done when: API tests cover reordering keeping entry IDs, removing an entry (soft delete), the limits and the
-  rejection of an unsorted ladder.
+  (ascending ladder, 1–10 rungs) and count limits. Archiving an exercise that is in an active routine now answers
+  the 409 declared in task 21, listing those routines.
+  Scope: Routines (including Limits); Exercises (archiving).
+  Done when: API tests cover reordering keeping entry IDs, removing an entry (soft delete), the limits, the
+  rejection of an unsorted ladder and the exercise archive rule.
 - [ ] **26. Routine editor.** Screen for name, description and entries: add an exercise (picker with muscle-group
   filter), reorder, sets, rest time, ladder editor that sorts rungs.
   Scope: Routines.

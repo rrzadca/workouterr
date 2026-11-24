@@ -24,12 +24,20 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
         ?? throw new InvalidOperationException("Connection string 'Workouterr' is missing."))
     .UseSnakeCaseNamingConvention());
 
-// Enums travel as their names, so the OpenAPI document lists them and the client gets a closed set of strings.
 builder.Services.ConfigureHttpJsonOptions(options =>
-    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+{
+    // Enums travel as their names, so the OpenAPI document lists them and the client gets a closed set of strings.
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    // Numbers are JSON numbers only. The web default also reads them from strings, which the document then types
+    // as `number | string` (and the generated client with it).
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+    // A request record's constructor parameter without a default must be in the body: a missing `metrics` is a 400,
+    // not a silent WEIGHT_REPS. Parameters with a default stay optional.
+    options.SerializerOptions.RespectRequiredConstructorParameters = true;
+});
 builder.Services.AddOpenApi(options => options
     .AddDocumentTransformer<MiddlewareResponsesTransformer>()
-    .AddDocumentTransformer<ExerciseEnumsTransformer>());
+    .AddSchemaTransformer<DecimalPlacesTransformer>());
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<UnhandledExceptionLogger>();
 builder.Services.AddClientErrorRateLimit();
@@ -72,6 +80,7 @@ if (application.Environment.IsDevelopment())
 application.MapHealthEndpoints();
 application.MapAuthEndpoints();
 application.MapSettingsEndpoints();
+application.MapExerciseEndpoints();
 application.MapClientErrorEndpoints();
 
 application.Run();
