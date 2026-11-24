@@ -3,7 +3,8 @@ using Workouterr.Api.Compatibility;
 
 namespace Workouterr.Api.Tests;
 
-/// <summary>What the middleware does to every request, as the document the app's client is generated from shows it.</summary>
+/// <summary>What the document the app's client is generated from shows: the middleware's effect on every request, and
+/// the enums the app needs.</summary>
 public class OpenApiDocumentTests(ApiFactory factory)
 {
     [Fact]
@@ -37,6 +38,17 @@ public class OpenApiDocumentTests(ApiFactory factory)
             Assert.Equal(isStateChanging, responses.TryGetProperty("403", out _));
             Assert.Equal(isStateChanging, responses.TryGetProperty("415", out _));
         });
+    }
+
+    [Theory]
+    [InlineData("MuscleGroup", new[] { "CHEST", "BACK", "SHOULDERS", "ARMS", "CORE", "LEGS" })]
+    [InlineData("TrackedMetrics", new[] { "WEIGHT_REPS", "REPS", "TIME" })]
+    public async Task ExerciseEnums_AreSchemasListingTheirWireNames(string schemaName, string[] expectedNames)
+    {
+        using var document = await GetDocumentAsync();
+
+        var schema = document.RootElement.GetProperty("components").GetProperty("schemas").GetProperty(schemaName);
+        Assert.Equal(expectedNames, schema.GetProperty("enum").EnumerateArray().Select(name => name.GetString()));
     }
 
     private async Task<JsonDocument> GetDocumentAsync()

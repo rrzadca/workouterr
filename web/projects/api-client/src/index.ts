@@ -50,6 +50,11 @@ export const LoginRequest = zod.object({
 export type LoginRequest = zod.input<typeof LoginRequest>;
 export type LoginRequestOutput = zod.output<typeof LoginRequest>;
 
+export const MuscleGroup = zod.enum(['CHEST', 'BACK', 'SHOULDERS', 'ARMS', 'CORE', 'LEGS']);
+
+export type MuscleGroup = zod.input<typeof MuscleGroup>;
+export type MuscleGroupOutput = zod.output<typeof MuscleGroup>;
+
 export const problemDetailsStatusRegExpTwo = new RegExp('^-?(?:0|[1-9]\\d*)$');
 
 export const ProblemDetails = zod.object({
@@ -91,6 +96,11 @@ export const SettingsResponse = zod.object({
 
 export type SettingsResponse = zod.input<typeof SettingsResponse>;
 export type SettingsResponseOutput = zod.output<typeof SettingsResponse>;
+
+export const TrackedMetrics = zod.enum(['WEIGHT_REPS', 'REPS', 'TIME']);
+
+export type TrackedMetrics = zod.input<typeof TrackedMetrics>;
+export type TrackedMetricsOutput = zod.output<typeof TrackedMetrics>;
 
 export const updateSettingsRequestDisplayNameMax = 50;
 
