@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Workouterr.Api.Auth;
+using Workouterr.Api.Exercises;
 using Workouterr.Api.Users;
 
 namespace Workouterr.Api.Persistence;
@@ -10,6 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options)
 {
     public DbSet<Login> Logins => Set<Login>();
+
+    public DbSet<Exercise> Exercises => Set<Exercise>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -39,5 +42,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             .WithMany()
             .HasForeignKey(login => login.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Exercise>(exercise =>
+        {
+            exercise.Property(e => e.Name).HasMaxLength(Exercise.NameMaxLength);
+            exercise.Property(e => e.Description).HasMaxLength(Exercise.DescriptionMaxLength);
+            // Enums stored by name, like the theme, so the columns read "WeightReps" and {Chest,Legs}.
+            exercise.Property(e => e.Metrics).HasConversion<string>().HasMaxLength(16);
+            exercise.Property(e => e.WeightStep)
+                .HasPrecision(Exercise.WeightStepPrecision, Exercise.WeightStepScale);
+            // A PostgreSQL array column: the picker's filter ("has this group") is `= ANY(muscle_groups)`, no join.
+            exercise.PrimitiveCollection(e => e.MuscleGroups)
+                .ElementType(group => group.HasConversion<string>().HasMaxLength(16));
+            // Deleting a user deletes their exercises (the foreign key also gets an index, for "this user's exercises").
+            exercise.HasOne<User>()
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }

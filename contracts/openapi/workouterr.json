@@ -536,6 +536,16 @@
           }
         }
       },
+      "MuscleGroup": {
+        "enum": [
+          "CHEST",
+          "BACK",
+          "SHOULDERS",
+          "ARMS",
+          "CORE",
+          "LEGS"
+        ]
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -635,6 +645,13 @@
           "light",
           "dark",
           null
+        ]
+      },
+      "TrackedMetrics": {
+        "enum": [
+          "WEIGHT_REPS",
+          "REPS",
+          "TIME"
         ]
       },
       "UpdateSettingsRequest": {

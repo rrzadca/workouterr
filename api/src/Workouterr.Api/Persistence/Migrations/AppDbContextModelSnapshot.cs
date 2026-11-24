@@ -221,6 +221,65 @@ namespace Workouterr.Api.Persistence.Migrations
                     b.ToTable("logins", (string)null);
                 });
 
+            modelBuilder.Entity("Workouterr.Api.Exercises.Exercise", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_archived");
+
+                    b.Property<string>("Metrics")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("metrics");
+
+                    b.PrimitiveCollection<string[]>("MuscleGroups")
+                        .IsRequired()
+                        .HasColumnType("character varying(16)[]")
+                        .HasColumnName("muscle_groups");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<bool>("PerSide")
+                        .HasColumnType("boolean")
+                        .HasColumnName("per_side");
+
+                    b.Property<int?>("TimeStepSeconds")
+                        .HasColumnType("integer")
+                        .HasColumnName("time_step_seconds");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<decimal?>("WeightStep")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("weight_step");
+
+                    b.HasKey("Id")
+                        .HasName("pk_exercises");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_exercises_user_id");
+
+                    b.ToTable("exercises", (string)null);
+                });
+
             modelBuilder.Entity("Workouterr.Api.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -383,6 +442,16 @@ namespace Workouterr.Api.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_logins_users_user_id");
+                });
+
+            modelBuilder.Entity("Workouterr.Api.Exercises.Exercise", b =>
+                {
+                    b.HasOne("Workouterr.Api.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_exercises_users_user_id");
                 });
 #pragma warning restore 612, 618
         }

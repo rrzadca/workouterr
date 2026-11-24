@@ -4,6 +4,7 @@ using Workouterr.Api;
 using Workouterr.Api.Auth;
 using Workouterr.Api.Compatibility;
 using Workouterr.Api.Diagnostics;
+using Workouterr.Api.Exercises;
 using Workouterr.Api.Health;
 using Workouterr.Api.Persistence;
 using Workouterr.Api.Settings;
@@ -26,7 +27,9 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
 // Enums travel as their names, so the OpenAPI document lists them and the client gets a closed set of strings.
 builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-builder.Services.AddOpenApi(options => options.AddDocumentTransformer<MiddlewareResponsesTransformer>());
+builder.Services.AddOpenApi(options => options
+    .AddDocumentTransformer<MiddlewareResponsesTransformer>()
+    .AddDocumentTransformer<ExerciseEnumsTransformer>());
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<UnhandledExceptionLogger>();
 builder.Services.AddClientErrorRateLimit();
