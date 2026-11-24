@@ -14,6 +14,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
     public DbSet<Exercise> Exercises => Set<Exercise>();
 
+    // Enums are stored by name; the longest name today is "WeightReps" (10).
+    private const int EnumNameMaxLength = 16;
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -24,7 +27,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             user.ToTable("users");
             user.Property(u => u.DisplayName).HasMaxLength(User.DisplayNameMaxLength);
             // Stored by name, so the column reads "Light" / "Dark" rather than a number.
-            user.Property(u => u.Theme).HasConversion<string>().HasMaxLength(16);
+            user.Property(u => u.Theme).HasConversion<string>().HasMaxLength(EnumNameMaxLength);
             // Existing accounts get the sound on. The sentinel tells EF that `true` is "not set" and leaves it to the
             // database default, while `false` is always written.
             user.Property(u => u.RestTimerSound).HasDefaultValue(true).HasSentinel(true);
@@ -43,21 +46,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             .HasForeignKey(login => login.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Entity<Exercise>(exercise =>
+        builder.Entity<Exercise>(exerciseEntity =>
         {
-            exercise.Property(e => e.Name).HasMaxLength(Exercise.NameMaxLength);
-            exercise.Property(e => e.Description).HasMaxLength(Exercise.DescriptionMaxLength);
+            exerciseEntity.Property(exercise => exercise.Name).HasMaxLength(Exercise.NameMaxLength);
+            exerciseEntity.Property(exercise => exercise.Description).HasMaxLength(Exercise.DescriptionMaxLength);
             // Enums stored by name, like the theme, so the columns read "WeightReps" and {Chest,Legs}.
-            exercise.Property(e => e.Metrics).HasConversion<string>().HasMaxLength(16);
-            exercise.Property(e => e.WeightStep)
+            exerciseEntity.Property(exercise => exercise.Metrics).HasConversion<string>().HasMaxLength(EnumNameMaxLength);
+            exerciseEntity.Property(exercise => exercise.WeightStep)
                 .HasPrecision(Exercise.WeightStepPrecision, Exercise.WeightStepScale);
             // A PostgreSQL array column: the picker's filter ("has this group") is `= ANY(muscle_groups)`, no join.
-            exercise.PrimitiveCollection(e => e.MuscleGroups)
-                .ElementType(group => group.HasConversion<string>().HasMaxLength(16));
+            exerciseEntity.PrimitiveCollection(exercise => exercise.MuscleGroups)
+                .ElementType(group => group.HasConversion<string>().HasMaxLength(EnumNameMaxLength));
             // Deleting a user deletes their exercises (the foreign key also gets an index, for "this user's exercises").
-            exercise.HasOne<User>()
+            exerciseEntity.HasOne<User>()
                 .WithMany()
-                .HasForeignKey(e => e.UserId)
+                .HasForeignKey(exercise => exercise.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }
