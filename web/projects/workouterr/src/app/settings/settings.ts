@@ -1,4 +1,3 @@
-import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
 import { form, FormField, FormRoot, validateStandardSchema } from '@angular/forms/signals';
 import { TranslocoDirective } from '@jsverse/transloco';
@@ -10,6 +9,7 @@ import { RadFormInputText } from '@rrzadca/radinf-ui/form-inputs/form-input-text
 import { RadIcon } from '@rrzadca/radinf-ui/icon';
 import { RadSpinner } from '@rrzadca/radinf-ui/spinner';
 import { UpdateSettingsBody, updateSettingsRequestDisplayNameMax } from '@workouterr/api-client';
+import { requestErrorKind } from '../api/request-error';
 import { AccountSettingsService } from './account-settings';
 
 // The account's settings. So far the profile (display name) and the preferences (rest-timer sound); email, password,
@@ -76,7 +76,7 @@ export class Settings {
       await this.accountSettings.update({ restTimerSound });
     } catch (error) {
       this.restTimerSound.set(!restTimerSound);
-      const kind = saveErrorKind(error);
+      const kind = requestErrorKind(error);
       this.restTimerSoundErrorKey.set(kind ? `settings.${kind}` : null);
     }
   }
@@ -86,30 +86,9 @@ export class Settings {
     try {
       await this.accountSettings.update({ displayName: this.profile().displayName });
     } catch (error) {
-      const kind = saveErrorKind(error);
+      const kind = requestErrorKind(error);
       return kind ? { kind } : undefined;
     }
     return undefined;
-  }
-}
-
-// A save's own errors, each a key under `settings.` in the translations.
-type SaveErrorKind = 'unreachable' | 'serverError';
-
-// What a failed save shows. A 401 shows nothing: the login has ended and the login page replaces this one. Nor does a
-// 426: the "new version" dialog already covers the page. Anything else (a 400 the form should have caught, a 5xx, a
-// response the contract doesn't allow) can only be tried again later.
-function saveErrorKind(error: unknown): SaveErrorKind | null {
-  if (!(error instanceof HttpErrorResponse)) {
-    return 'serverError';
-  }
-  switch (error.status) {
-    case 0:
-      return 'unreachable';
-    case HttpStatusCode.Unauthorized:
-    case HttpStatusCode.UpgradeRequired:
-      return null;
-    default:
-      return 'serverError';
   }
 }

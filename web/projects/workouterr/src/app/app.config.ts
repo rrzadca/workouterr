@@ -15,7 +15,7 @@ import { clientVersionInterceptor } from './api/client-version';
 import { routes } from './app.routes';
 import { loginEndedInterceptor } from './auth/login-ended-interceptor';
 import { ClientErrorHandler } from './diagnostics/client-error-handler';
-import { appIcons } from './icons';
+import { appIcons } from './shared/icons';
 import { ThemeService } from './theme';
 import { TranslocoHttpLoader } from './transloco-loader';
 

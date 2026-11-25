@@ -8,7 +8,7 @@ import { provideRadIcons } from '@rrzadca/radinf-ui/icon';
 import english from '../../public/i18n/en.json';
 import { ClientVersionService } from './api/client-version';
 import { App } from './app';
-import { appIcons } from './icons';
+import { appIcons } from './shared/icons';
 import { reloadPage } from './new-version-dialog/new-version-dialog';
 
 describe('App', () => {

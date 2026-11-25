@@ -26,6 +26,16 @@
 
     <div class="flex flex-col gap-px">
       <span class="px-2.5 py-1 text-caption font-semibold tracking-caps text-text-faint uppercase">
+        {{ t('nav.library') }}
+      </span>
+      <a routerLink="/exercises" routerLinkActive ariaCurrentWhenActive="page" [class]="navLinkClasses">
+        <rad-icon name="dumbbell" class="[--rad-icon-size:20px]" />
+        <span class="min-w-0 flex-1 truncate">{{ t('nav.exercises') }}</span>
+      </a>
+    </div>
+
+    <div class="flex flex-col gap-px">
+      <span class="px-2.5 py-1 text-caption font-semibold tracking-caps text-text-faint uppercase">
         {{ t('nav.account') }}
       </span>
       <a routerLink="/settings" routerLinkActive ariaCurrentWhenActive="page" [class]="navLinkClasses">

@@ -6,7 +6,7 @@ import { RadButtonHarness } from '@rrzadca/radinf-ui/button/testing';
 import { provideRadIcons } from '@rrzadca/radinf-ui/icon';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import english from '../../../public/i18n/en.json';
-import { appIcons } from '../icons';
+import { appIcons } from '../shared/icons';
 import { Unreachable } from './unreachable';
 
 @Component({ template: '' })
