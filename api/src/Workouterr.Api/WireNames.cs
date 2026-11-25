@@ -11,6 +11,17 @@ public static class WireNames
     public static bool TryParse<TEnum>(string name, out TEnum value) where TEnum : struct, Enum =>
         Lookup<TEnum>.ByName.TryGetValue(name, out value);
 
+    // For a name already limited to the wire names (a CLI option's accepted values): one that isn't is a bug.
+    public static TEnum Parse<TEnum>(string name) where TEnum : struct, Enum =>
+        TryParse<TEnum>(name, out var value)
+            ? value
+            : throw new ArgumentException($"'{name}' is not a wire name of {typeof(TEnum).Name}.", nameof(name));
+
+    public static string Of<TEnum>(TEnum value) where TEnum : struct, Enum =>
+        Lookup<TEnum>.ByName.First(pair => EqualityComparer<TEnum>.Default.Equals(pair.Value, value)).Key;
+
+    public static string[] All<TEnum>() where TEnum : struct, Enum => Lookup<TEnum>.ByName.Keys.ToArray();
+
     // Built once per enum type.
     private static class Lookup<TEnum> where TEnum : struct, Enum
     {

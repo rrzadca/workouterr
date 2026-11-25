@@ -15,9 +15,9 @@ public static class UserCommands
         var languageOption = new Option<string>("--language")
         {
             Description = "The user's language; the starter exercises are copied in it.",
-            DefaultValueFactory = _ => "en",
+            DefaultValueFactory = _ => WireNames.Of(Language.English),
         };
-        languageOption.AcceptOnlyFromAmong("en", "pl");
+        languageOption.AcceptOnlyFromAmong(WireNames.All<Language>());
         var createCommand = new Command("create", "Create a user; the password is read from the terminal.")
         {
             emailArgument,
@@ -26,7 +26,7 @@ public static class UserCommands
         createCommand.SetAction(async parseResult =>
         {
             var email = parseResult.GetRequiredValue(emailArgument);
-            WireNames.TryParse<Language>(parseResult.GetRequiredValue(languageOption), out var language);
+            var language = WireNames.Parse<Language>(parseResult.GetRequiredValue(languageOption));
             var password = ReadPassword();
             if (password is null)
             {

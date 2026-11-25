@@ -29,12 +29,8 @@ public class UserCreationService(
             return (result, user);
         }
 
-        foreach (var starterExercise in starterExercises.All)
-        {
-            var exercise = new Exercise { UserId = user.Id, Name = "" };
-            starterExercise.ToRequest(language).ApplyTo(exercise);
-            database.Exercises.Add(exercise);
-        }
+        database.Exercises.AddRange(
+            starterExercises.All.Select(starterExercise => starterExercise.ToRequest(language).ToExercise(user.Id)));
         await database.SaveChangesAsync();
         await transaction.CommitAsync();
         return (result, user);

@@ -21,6 +21,7 @@ public class StarterExercisesTests
         var exercises = StarterExercises.Parse(StarterExercises.ReadResource());
 
         Assert.InRange(exercises.Count, 20, 30);
+        Assert.True(exercises.Count < Exercise.MaxPerUser);
         foreach (var language in Enum.GetValues<Language>())
         {
             var names = exercises.Select(exercise => exercise.Name.In(language)).ToList();
@@ -37,9 +38,12 @@ public class StarterExercisesTests
         Entry(description: """{"en":"Deep.","pl":"Głęboki.","de":"Tief."}"""),
         Entry(muscleGroups: """["FULL_BODY"]"""),
         Entry(muscleGroups: "[]"),
-        Entry(metrics: "\"REPS\""),
         Entry(weightStep: "\"2.5\""),
         Entry(weightStep: "1.255"),
+        Entry(name: $$"""{"en":"{{new string('a', Exercise.NameMaxLength + 1)}}","pl":"Przysiad"}"""),
+        Entry(metrics: "\"REPS\""),
+        Entry(metrics: "\"TIME\"", weightStep: "null"),
+        Entry(extra: ",\"timeStepSeconds\":30"),
         Entry(extra: ",\"perside\":true"),
     };
 
@@ -79,7 +83,7 @@ public class StarterExercisesTests
                 // Annotations first, then IValidatableObject (the cross-field steps), as the API checks a request.
                 if (!Validator.TryValidateObject(request, new ValidationContext(request), results, true))
                 {
-                    problems.AddRange(results.Select(result => $"{exercise.Name.En} ({language}): {result.ErrorMessage}"));
+                    problems.AddRange(results.Select(result => $"{exercise.Name.In(Language.English)} ({language}): {result.ErrorMessage}"));
                 }
             }
         }

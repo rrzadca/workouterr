@@ -189,7 +189,7 @@ focus ring width: rrzadca/radinf-ui#38, icon sizes: rrzadca/radinf-ui#39).
   routines (`ExerciseInRoutinesProblem`), so task 23 can build its message; task 25 enforces it once routines exist.
   Scope: Exercises; Routines → Limits.
   Done when: API tests cover every endpoint and the limits, and the document declares the archive 409.
-- [ ] **22. Starter exercises.** About 25 exercises in a JSON file (English and Polish), a test validating it against
+- [x] **22. Starter exercises.** About 25 exercises in a JSON file (English and Polish), a test validating it against
   the exercise schema, copied in the user-creation transaction (CLI included). Users get a language (`en` by default,
   `user create <email> --language pl`); the language setting itself comes in task 43.
   Scope: Exercises (starter set); Accounts → Language setting.
