@@ -6,17 +6,27 @@ namespace Workouterr.Api.Users;
 
 public static class UserCommands
 {
-    // `user create <email>`; the password is asked for, never passed as an argument, so it stays out of shell history.
+    // `user create <email> [--language pl]`; the password is asked for, never passed as an argument, so it stays out
+    // of shell history.
     public static Command Create(IServiceProvider services)
     {
         var emailArgument = new Argument<string>("email") { Description = "The new user's email address." };
+        // A string limited to the wire names: an Option<Language> would parse the C# names (English, Polish).
+        var languageOption = new Option<string>("--language")
+        {
+            Description = "The user's language; the starter exercises are copied in it.",
+            DefaultValueFactory = _ => WireNames.Of(Language.English),
+        };
+        languageOption.AcceptOnlyFromAmong(WireNames.All<Language>());
         var createCommand = new Command("create", "Create a user; the password is read from the terminal.")
         {
             emailArgument,
+            languageOption,
         };
         createCommand.SetAction(async parseResult =>
         {
             var email = parseResult.GetRequiredValue(emailArgument);
+            var language = WireNames.Parse<Language>(parseResult.GetRequiredValue(languageOption));
             var password = ReadPassword();
             if (password is null)
             {
@@ -26,7 +36,7 @@ public static class UserCommands
 
             using var scope = services.CreateScope();
             var userCreation = scope.ServiceProvider.GetRequiredService<UserCreationService>();
-            var (result, user) = await userCreation.CreateAsync(email, password);
+            var (result, user) = await userCreation.CreateAsync(email, password, language);
             if (!result.Succeeded)
             {
                 // The output lands in the server's journal, which never holds an email ("Email '…' is already taken").

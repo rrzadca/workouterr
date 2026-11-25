@@ -1,0 +1,451 @@
+[
+  {
+    "name": {
+      "en": "Bench press",
+      "pl": "Wyciskanie sztangi na ławce płaskiej"
+    },
+    "description": {
+      "en": "Barbell, flat bench. Lower the bar to the middle of the chest and press it back up.",
+      "pl": "Sztanga, ławka płaska. Opuść sztangę do środka klatki piersiowej i wypchnij ją z powrotem."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "CHEST",
+      "SHOULDERS",
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Incline dumbbell press",
+      "pl": "Wyciskanie hantli na ławce skośnej"
+    },
+    "description": {
+      "en": "Dumbbells, bench at 30–45°. The weight is one dumbbell.",
+      "pl": "Hantle, ławka ustawiona pod kątem 30–45°. Ciężar to jeden hantel."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2,
+    "perSide": false,
+    "muscleGroups": [
+      "CHEST",
+      "SHOULDERS",
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Push-up",
+      "pl": "Pompki"
+    },
+    "description": {
+      "en": "Body in a straight line, chest down to just above the floor.",
+      "pl": "Ciało w jednej linii, klatka piersiowa tuż nad podłogą."
+    },
+    "metrics": "REPS",
+    "perSide": false,
+    "muscleGroups": [
+      "CHEST",
+      "SHOULDERS",
+      "ARMS",
+      "CORE"
+    ]
+  },
+  {
+    "name": {
+      "en": "Dip",
+      "pl": "Pompki na poręczach"
+    },
+    "description": {
+      "en": "Parallel bars. Lower until the upper arms are parallel to the floor.",
+      "pl": "Poręcze. Opuszczaj się, aż ramiona będą równoległe do podłogi."
+    },
+    "metrics": "REPS",
+    "perSide": false,
+    "muscleGroups": [
+      "CHEST",
+      "SHOULDERS",
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Back squat",
+      "pl": "Przysiad ze sztangą"
+    },
+    "description": {
+      "en": "Barbell on the upper back. Squat until the hips are at least at knee height.",
+      "pl": "Sztanga na górnej części pleców. Schodź, aż biodra znajdą się co najmniej na wysokości kolan."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "LEGS",
+      "CORE"
+    ]
+  },
+  {
+    "name": {
+      "en": "Deadlift",
+      "pl": "Martwy ciąg"
+    },
+    "description": {
+      "en": "Barbell from the floor, back straight, until standing upright.",
+      "pl": "Sztanga podnoszona z podłogi przy prostych plecach, do pełnego wyprostu."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "LEGS",
+      "BACK",
+      "CORE"
+    ]
+  },
+  {
+    "name": {
+      "en": "Romanian deadlift",
+      "pl": "Rumuński martwy ciąg"
+    },
+    "description": {
+      "en": "Barbell, knees slightly bent. Hinge at the hips until you feel the stretch in the hamstrings.",
+      "pl": "Sztanga, kolana lekko ugięte. Pochyl się w biodrach, aż poczujesz rozciąganie z tyłu ud."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "LEGS",
+      "BACK"
+    ]
+  },
+  {
+    "name": {
+      "en": "Leg press",
+      "pl": "Wypychanie nóg na suwnicy"
+    },
+    "description": {
+      "en": "Leg press machine. Lower the sled until the knees are at about 90°.",
+      "pl": "Suwnica. Opuszczaj platformę, aż kolana zegną się do około 90°."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 5,
+    "perSide": false,
+    "muscleGroups": [
+      "LEGS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Walking lunge",
+      "pl": "Wykroki z hantlami"
+    },
+    "description": {
+      "en": "A dumbbell in each hand. The reps are per leg; the weight is one dumbbell.",
+      "pl": "Hantel w każdej ręce. Powtórzenia liczone na nogę, ciężar to jeden hantel."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2,
+    "perSide": true,
+    "muscleGroups": [
+      "LEGS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Leg curl",
+      "pl": "Uginanie nóg na maszynie"
+    },
+    "description": {
+      "en": "Lying or seated leg curl machine.",
+      "pl": "Maszyna do uginania nóg, leżąc lub siedząc."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "LEGS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Leg extension",
+      "pl": "Prostowanie nóg na maszynie"
+    },
+    "description": {
+      "en": "Seated leg extension machine. Straighten the knees fully.",
+      "pl": "Maszyna do prostowania nóg, siedząc. Wyprostuj kolana do końca."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "LEGS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Standing calf raise",
+      "pl": "Wspięcia na palce stojąc"
+    },
+    "description": {
+      "en": "Calf raise machine or a barbell. Full range, pause at the top.",
+      "pl": "Maszyna lub sztanga. Pełny zakres ruchu, zatrzymanie na górze."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 5,
+    "perSide": false,
+    "muscleGroups": [
+      "LEGS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Hip thrust",
+      "pl": "Hip thrust ze sztangą"
+    },
+    "description": {
+      "en": "Upper back on a bench, barbell over the hips. Drive the hips up until the body is straight.",
+      "pl": "Górna część pleców na ławce, sztanga na biodrach. Wypchnij biodra w górę do wyprostu."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "LEGS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Pull-up",
+      "pl": "Podciąganie na drążku"
+    },
+    "description": {
+      "en": "Overhand grip, from a dead hang until the chin is over the bar.",
+      "pl": "Nachwyt, od pełnego zwisu, aż broda znajdzie się nad drążkiem."
+    },
+    "metrics": "REPS",
+    "perSide": false,
+    "muscleGroups": [
+      "BACK",
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Lat pulldown",
+      "pl": "Ściąganie drążka wyciągu górnego"
+    },
+    "description": {
+      "en": "Cable machine, wide grip. Pull the bar to the upper chest.",
+      "pl": "Wyciąg górny, szeroki chwyt. Ściągnij drążek do górnej części klatki piersiowej."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "BACK",
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Barbell row",
+      "pl": "Wiosłowanie sztangą"
+    },
+    "description": {
+      "en": "Torso bent forward, back straight. Pull the bar to the lower chest.",
+      "pl": "Tułów pochylony, plecy proste. Przyciągnij sztangę do dolnej części klatki piersiowej."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "BACK",
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "One-arm dumbbell row",
+      "pl": "Wiosłowanie hantlem jednorącz"
+    },
+    "description": {
+      "en": "One knee and hand on a bench. The reps are per arm.",
+      "pl": "Kolano i dłoń oparte na ławce. Powtórzenia liczone na rękę."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2,
+    "perSide": true,
+    "muscleGroups": [
+      "BACK",
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Seated cable row",
+      "pl": "Wiosłowanie na wyciągu dolnym"
+    },
+    "description": {
+      "en": "Seated, back straight. Pull the handle to the stomach.",
+      "pl": "Siedząc, plecy proste. Przyciągnij uchwyt do brzucha."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "BACK",
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Overhead press",
+      "pl": "Wyciskanie sztangi nad głowę"
+    },
+    "description": {
+      "en": "Standing, barbell from the shoulders to straight arms overhead.",
+      "pl": "Stojąc, sztanga wyciskana z barków do wyprostu rąk nad głową."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "SHOULDERS",
+      "ARMS",
+      "CORE"
+    ]
+  },
+  {
+    "name": {
+      "en": "Lateral raise",
+      "pl": "Unoszenie hantli bokiem"
+    },
+    "description": {
+      "en": "Dumbbells, raised out to the sides up to shoulder height. The weight is one dumbbell.",
+      "pl": "Hantle unoszone bokiem do wysokości barków. Ciężar to jeden hantel."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2,
+    "perSide": false,
+    "muscleGroups": [
+      "SHOULDERS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Face pull",
+      "pl": "Przyciąganie liny do twarzy"
+    },
+    "description": {
+      "en": "Cable with a rope at face height. Pull the rope towards the face, elbows high.",
+      "pl": "Wyciąg z liną na wysokości twarzy. Przyciągnij linę do twarzy, łokcie wysoko."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "SHOULDERS",
+      "BACK"
+    ]
+  },
+  {
+    "name": {
+      "en": "Barbell curl",
+      "pl": "Uginanie ramion ze sztangą"
+    },
+    "description": {
+      "en": "Standing, elbows at the sides.",
+      "pl": "Stojąc, łokcie przy tułowiu."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Dumbbell curl",
+      "pl": "Uginanie ramion z hantlami"
+    },
+    "description": {
+      "en": "Standing, both arms together. The weight is one dumbbell.",
+      "pl": "Stojąc, obie ręce jednocześnie. Ciężar to jeden hantel."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2,
+    "perSide": false,
+    "muscleGroups": [
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Triceps pushdown",
+      "pl": "Prostowanie ramion na wyciągu górnym"
+    },
+    "description": {
+      "en": "Cable with a bar or rope. Elbows at the sides, straighten the arms fully.",
+      "pl": "Wyciąg górny z drążkiem lub liną. Łokcie przy tułowiu, wyprostuj ręce do końca."
+    },
+    "metrics": "WEIGHT_REPS",
+    "weightStep": 2.5,
+    "perSide": false,
+    "muscleGroups": [
+      "ARMS"
+    ]
+  },
+  {
+    "name": {
+      "en": "Plank",
+      "pl": "Deska"
+    },
+    "description": {
+      "en": "On the forearms, body in a straight line.",
+      "pl": "Podpór na przedramionach, ciało w jednej linii."
+    },
+    "metrics": "TIME",
+    "timeStepSeconds": 5,
+    "perSide": false,
+    "muscleGroups": [
+      "CORE"
+    ]
+  },
+  {
+    "name": {
+      "en": "Side plank",
+      "pl": "Deska bokiem"
+    },
+    "description": {
+      "en": "On one forearm, hips up. The time is per side.",
+      "pl": "Podpór bokiem na jednym przedramieniu, biodra w górze. Czas liczony na stronę."
+    },
+    "metrics": "TIME",
+    "timeStepSeconds": 5,
+    "perSide": true,
+    "muscleGroups": [
+      "CORE"
+    ]
+  },
+  {
+    "name": {
+      "en": "Hanging leg raise",
+      "pl": "Unoszenie nóg w zwisie"
+    },
+    "description": {
+      "en": "Hanging from a bar, raise the legs to at least hip height.",
+      "pl": "W zwisie na drążku unieś nogi co najmniej do wysokości bioder."
+    },
+    "metrics": "REPS",
+    "perSide": false,
+    "muscleGroups": [
+      "CORE"
+    ]
+  }
+]

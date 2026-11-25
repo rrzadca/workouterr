@@ -40,7 +40,7 @@ public class ExerciseStorageTests(ApiFactory factory)
     [Fact]
     public async Task FilteringByMuscleGroup_MatchesExercisesThatHaveIt()
     {
-        var user = await factory.CreateUserAsync("exercise-filter@example.com");
+        var user = await factory.CreateUserWithoutExercisesAsync("exercise-filter@example.com");
         await StoreAsync(new Exercise
         {
             UserId = user.Id,

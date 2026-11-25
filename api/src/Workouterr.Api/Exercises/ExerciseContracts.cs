@@ -48,6 +48,13 @@ public record ExerciseRequest(
         }
     }
 
+    public Exercise ToExercise(Guid userId)
+    {
+        var exercise = new Exercise { UserId = userId, Name = "" };
+        ApplyTo(exercise);
+        return exercise;
+    }
+
     public void ApplyTo(Exercise exercise)
     {
         exercise.Name = Name.Trim();

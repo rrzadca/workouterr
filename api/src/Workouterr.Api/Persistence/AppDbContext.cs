@@ -31,6 +31,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             // Existing accounts get the sound on. The sentinel tells EF that `true` is "not set" and leaves it to the
             // database default, while `false` is always written.
             user.Property(u => u.RestTimerSound).HasDefaultValue(true).HasSentinel(true);
+            // Stored by name, like the theme. Existing accounts become English, the default for a new one too.
+            user.Property(u => u.Language).HasConversion<string>().HasMaxLength(EnumNameMaxLength)
+                .HasDefaultValue(Language.English);
         });
         builder.Entity<IdentityUserClaim<Guid>>().ToTable("user_claims");
         builder.Entity<IdentityUserLogin<Guid>>().ToTable("user_logins");

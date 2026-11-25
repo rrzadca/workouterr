@@ -136,7 +136,7 @@ public class ExerciseEndpointTests(ApiFactory factory)
     [Fact]
     public async Task Create_StopsAt500Exercises_CountingArchivedOnes()
     {
-        var user = await factory.CreateUserAsync("exercise-limit@example.com");
+        var user = await factory.CreateUserWithoutExercisesAsync("exercise-limit@example.com");
         using var client = await factory.LogInAsync("exercise-limit@example.com");
         using (var scope = factory.Services.CreateScope())
         {
@@ -315,7 +315,7 @@ public class ExerciseEndpointTests(ApiFactory factory)
 
     private async Task<HttpClient> LoggedInClientAsync(string email)
     {
-        await factory.CreateUserAsync(email);
+        await factory.CreateUserWithoutExercisesAsync(email);
         return await factory.LogInAsync(email);
     }
 

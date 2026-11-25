@@ -51,6 +51,7 @@ builder.Services.AddHealthChecks()
 
 builder.Services.AddAuth();
 builder.Services.AddScoped<UserCreationService>();
+builder.Services.AddSingleton<StarterExercises>();
 
 var application = builder.Build();
 

@@ -110,8 +110,7 @@ public static class ExerciseEndpoints
                 title: $"An account can have at most {Exercise.MaxPerUser} exercises, archived ones included.");
         }
 
-        var exercise = new Exercise { UserId = userId, Name = "" };
-        request.ApplyTo(exercise);
+        var exercise = request.ToExercise(userId);
         database.Exercises.Add(exercise);
         await database.SaveChangesAsync();
         return TypedResults.Created($"/api/exercises/{exercise.Id}", ExerciseResponse.From(exercise));
