@@ -24,6 +24,8 @@ Transloco keys, the app's own state). `project-scope.md` wins wherever the two d
 - **Body text colour.** `tokens.css` defines `--text-body` as both a colour and a font size (the font size wins);
   the app names the colour `--text-default`.
 - **No window chrome.** The macOS title bar goes; the sidebar stays for iPad landscape.
+- **Edit forms in a dialog.** The mockups put a record's form beside its list (exercises, routines); the app opens
+  every edit form in a dialog over the list.
 - **Theme toggle** moves from the title bar to the sidebar footer (sun / moon).
 - **Dropped:** "Continue with Apple", "Remember me", pause on the rest timer.
 - **Changed:** the rest timer gets +15 s / −15 s next to skip; registration's name field is an optional display

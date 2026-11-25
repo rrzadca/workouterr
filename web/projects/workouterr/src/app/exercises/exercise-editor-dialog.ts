@@ -1,10 +1,9 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component, computed, effect, inject, input, linkedSignal, output, signal, untracked } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { applyWhen, form, FormField, FormRoot, validateStandardSchema } from '@angular/forms/signals';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { RadButton } from '@rrzadca/radinf-ui/button';
-import { RadCard, RadCardHeader } from '@rrzadca/radinf-ui/card';
-import { RadDialog } from '@rrzadca/radinf-ui/dialog';
+import { RAD_DIALOG_DATA, RadDialog, RadDialogFooter, RadDialogRef, RadDialogTitle } from '@rrzadca/radinf-ui/dialog';
 import { RadFormField } from '@rrzadca/radinf-ui/form-field';
 import { RadFormInputCheckbox } from '@rrzadca/radinf-ui/form-inputs/form-input-checkbox';
 import { RadFormInputRadio, RadFormInputRadioGroup } from '@rrzadca/radinf-ui/form-inputs/form-input-radio';
@@ -76,15 +75,21 @@ const newExerciseDraft: ExerciseDraft = {
   muscleGroups: [],
 };
 
-// The form card beside the list: a new exercise when `exercise` is null, else the given one, with archive or restore.
-// Every change the API accepts comes out of `changed`, as the API answered it.
+export interface ExerciseEditorDialogData {
+  // The exercise to edit, or null for a new one.
+  readonly exercise: ExerciseResponse | null;
+}
+
+// The exercise form, in a dialog over the list: a new exercise, or the given one with archive or restore. The dialog
+// closes with the exercise as the API answered a save, archive or restore; Cancel, Escape or the backdrop close it
+// with nothing.
 @Component({
   imports: [
     FormField,
     FormRoot,
     RadButton,
-    RadCard,
-    RadCardHeader,
+    RadDialogFooter,
+    RadDialogTitle,
     RadFormField,
     RadFormInputCheckbox,
     RadFormInputRadio,
@@ -95,18 +100,17 @@ const newExerciseDraft: ExerciseDraft = {
     RadIcon,
     TranslocoDirective,
   ],
-  selector: 'app-exercise-editor',
-  templateUrl: './exercise-editor.html',
+  selector: 'app-exercise-editor-dialog',
+  templateUrl: './exercise-editor-dialog.html',
 })
-export class ExerciseEditor {
+export class ExerciseEditorDialog {
   private readonly dialog = inject(RadDialog);
+  private readonly dialogRef = inject<RadDialogRef<ExerciseResponse>>(RadDialogRef);
   private readonly exerciseApi = inject(ExerciseApi);
   private readonly toast = inject(RadToast);
   private readonly transloco = inject(TranslocoService);
 
-  readonly exercise = input.required<ExerciseResponse | null>();
-  readonly changed = output<ExerciseResponse>();
-
+  protected readonly exercise = inject<ExerciseEditorDialogData>(RAD_DIALOG_DATA).exercise;
   protected readonly metricOptions = TrackedMetrics.options;
   protected readonly muscleGroupOptions = MuscleGroup.options;
   // For the messages: the contract's limits, so the text never repeats a number.
@@ -116,8 +120,7 @@ export class ExerciseEditor {
     timeStepMax: exerciseRequestTimeStepSecondsMax,
   };
 
-  // Starts again from the exercise whenever another one (or the API's answer to a save) comes in.
-  protected readonly draft = linkedSignal<ExerciseDraft>(() => draftFrom(this.exercise()));
+  protected readonly draft = signal<ExerciseDraft>(draftFrom(this.exercise));
   protected readonly exerciseForm = form(
     this.draft,
     (draft) => {
@@ -175,17 +178,6 @@ export class ExerciseEditor {
   protected readonly requestErrorKey = signal<string | null>(null);
   protected readonly archiving = signal(false);
 
-  constructor() {
-    // Another exercise in the form: its fields start untouched, with no message from the previous one.
-    effect(() => {
-      this.exercise();
-      untracked(() => {
-        this.exerciseForm().reset();
-        this.requestErrorKey.set(null);
-      });
-    });
-  }
-
   // The chips' stand-in (checkboxes) isn't bound with [formField], so it touches the field itself.
   protected toggleMuscleGroup(group: MuscleGroup, checked: boolean) {
     this.exerciseForm.muscleGroups().markAsTouched();
@@ -197,14 +189,18 @@ export class ExerciseEditor {
     }));
   }
 
+  protected cancel() {
+    this.dialogRef.close();
+  }
+
   protected async archive() {
-    const exercise = this.exercise();
+    const exercise = this.exercise;
     if (!exercise) {
       return;
     }
     await this.runAction(async () => {
       try {
-        this.changed.emit(await this.exerciseApi.archive(exercise.id));
+        this.dialogRef.close(await this.exerciseApi.archive(exercise.id));
         this.toast.show(this.transloco.translate('exercises.archived'), { variant: 'neutral' });
       } catch (error) {
         const routines = routinesBlockingArchive(error);
@@ -221,26 +217,26 @@ export class ExerciseEditor {
   }
 
   protected async restore() {
-    const exercise = this.exercise();
+    const exercise = this.exercise;
     if (!exercise) {
       return;
     }
     await this.runAction(async () => {
-      this.changed.emit(await this.exerciseApi.restore(exercise.id));
+      this.dialogRef.close(await this.exerciseApi.restore(exercise.id));
       this.toast.show(this.transloco.translate('exercises.restored'), { variant: 'success' });
     });
   }
 
   // Runs only when the form is valid.
   private async save() {
-    const exercise = this.exercise();
+    const exercise = this.exercise;
     const request = requestFrom(this.draft());
     this.requestErrorKey.set(null);
     try {
       const saved = exercise
         ? await this.exerciseApi.update(exercise.id, request)
         : await this.exerciseApi.create(request);
-      this.changed.emit(saved);
+      this.dialogRef.close(saved);
       this.toast.show(this.transloco.translate('exercises.saved'), { variant: 'success' });
     } catch (error) {
       // Only a create answers 409 for the account's exercise limit.

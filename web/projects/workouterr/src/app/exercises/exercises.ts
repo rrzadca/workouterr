@@ -1,26 +1,23 @@
 import { httpResource } from '@angular/common/http';
-import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { RadBadge } from '@rrzadca/radinf-ui/badge';
 import { RadButton } from '@rrzadca/radinf-ui/button';
+import { RadDialog } from '@rrzadca/radinf-ui/dialog';
 import { RadFormInputCheckbox } from '@rrzadca/radinf-ui/form-inputs/form-input-checkbox';
 import { RadFormInputRadio, RadFormInputRadioGroup } from '@rrzadca/radinf-ui/form-inputs/form-input-radio';
 import { RadFormInputText } from '@rrzadca/radinf-ui/form-inputs/form-input-text';
 import { RadSpinner } from '@rrzadca/radinf-ui/spinner';
 import { type ExerciseResponse, ListExercisesResponse, MuscleGroup } from '@workouterr/api-client';
 import { formatDecimal, formatSeconds } from '../shared/utils/format';
-import { ExerciseEditor } from './exercise-editor';
+import { ExerciseEditorDialog, type ExerciseEditorDialogData } from './exercise-editor-dialog';
 
 type ExerciseView = 'active' | 'archived';
 
-// What the form beside the list shows: nothing, a new exercise, or the exercise with this ID.
-type Selection = { kind: 'none' } | { kind: 'new' } | { kind: 'exercise'; id: string };
-
 // The exercise library (project scope, Exercises): the active or the archived exercises, filtered by name and muscle
-// group, with the selected one (or a new one) in the form beside them.
+// group. A row, or "New exercise", opens the form in a dialog.
 @Component({
   imports: [
-    ExerciseEditor,
     RadBadge,
     RadButton,
     RadFormInputCheckbox,
@@ -34,6 +31,7 @@ type Selection = { kind: 'none' } | { kind: 'new' } | { kind: 'exercise'; id: st
   templateUrl: './exercises.html',
 })
 export class Exercises {
+  private readonly dialog = inject(RadDialog);
   private readonly transloco = inject(TranslocoService);
 
   protected readonly views: readonly ExerciseView[] = ['active', 'archived'];
@@ -42,11 +40,6 @@ export class Exercises {
   protected readonly view = signal<ExerciseView>('active');
   protected readonly search = signal('');
   protected readonly muscleGroupFilter = signal<readonly MuscleGroup[]>([]);
-  // Switching between active and archived closes the form.
-  protected readonly selection = linkedSignal<ExerciseView, Selection>({
-    source: this.view,
-    computation: () => ({ kind: 'none' }),
-  });
 
   // Every exercise of the view, once: the name and muscle-group filters run here, so tapping a chip needs no request
   // (and works on the gym's weak Wi-Fi). At most 500 per account, so the list is never long.
@@ -69,18 +62,6 @@ export class Exercises {
           (groups.length === 0 || exercise.muscleGroups.some((group) => groups.includes(group))),
       );
   });
-  protected readonly selectedExercise = computed(() => {
-    const selection = this.selection();
-    if (selection.kind !== 'exercise' || !this.exercises.hasValue()) {
-      return null;
-    }
-    return this.exercises.value().find((exercise) => exercise.id === selection.id) ?? null;
-  });
-  // The form is open for a new exercise, or for a selected one still in the list.
-  protected readonly editing = computed(() => {
-    const selection = this.selection();
-    return selection.kind === 'new' || (selection.kind === 'exercise' && this.selectedExercise() !== null);
-  });
 
   // The radio group's value is untyped; only the two views are offered.
   protected showView(view: unknown) {
@@ -101,23 +82,25 @@ export class Exercises {
     );
   }
 
-  protected select(exercise: ExerciseResponse) {
-    this.selection.set({ kind: 'exercise', id: exercise.id });
-  }
-
-  protected startNew() {
-    this.selection.set({ kind: 'new' });
+  // The form for the given exercise, or for a new one when it is null.
+  protected openEditor(exercise: ExerciseResponse | null) {
+    this.dialog
+      .open<ExerciseResponse, ExerciseEditorDialogData>(ExerciseEditorDialog, { data: { exercise } })
+      .closed.subscribe((changed) => {
+        if (changed) {
+          this.onChanged(changed);
+        }
+      });
   }
 
   // The API's answer to a save, archive or restore. It stays in the list (by name, like the API's order) while it
-  // belongs to this view; archived from the active list, or restored from the archive, it leaves, and the form closes.
-  protected onChanged(changed: ExerciseResponse) {
+  // belongs to this view; archived from the active list, or restored from the archive, it leaves.
+  private onChanged(changed: ExerciseResponse) {
     const belongsHere = changed.isArchived === (this.view() === 'archived');
     this.exercises.update((exercises) => {
       const others = (exercises ?? []).filter((exercise) => exercise.id !== changed.id);
       return belongsHere ? [...others, changed].sort(byName) : others;
     });
-    this.selection.set(belongsHere ? { kind: 'exercise', id: changed.id } : { kind: 'none' });
   }
 
   // The step the +/- buttons use, as the list shows it: `2.5 kg`, `1 rep`, `45 s`.

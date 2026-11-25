@@ -94,6 +94,7 @@
     "muscleGroups": "Muscle groups",
     "muscleGroupsRequired": "Pick at least one muscle group.",
     "save": "Save",
+    "cancel": "Cancel",
     "archive": "Archive",
     "restore": "Restore",
     "saved": "Exercise saved",

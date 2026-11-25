@@ -109,8 +109,13 @@ describe('Exercises', () => {
       await fixture.whenStable();
     }
 
+    // The form's dialog renders in the overlay at the end of <body>, outside the page.
     function editor(): Promise<HarnessLoader> {
-      return loader.getChildLoader('app-exercise-editor');
+      return documentLoader.getChildLoader('app-exercise-editor-dialog');
+    }
+
+    function editorElement() {
+      return document.querySelector('app-exercise-editor-dialog');
     }
 
     async function field(label: string) {
@@ -118,11 +123,24 @@ describe('Exercises', () => {
       return { formField, input: await formField.getHarness(RadFormInputTextHarness) };
     }
 
+    // A button on the page or in an open dialog.
     async function clickButton(text: string) {
-      await (await loader.getHarness(RadButtonHarness.with({ text }))).click();
+      await (await documentLoader.getHarness(RadButtonHarness.with({ text }))).click();
     }
 
-    return { fixture, element, loader, documentLoader, settle, rowNames, openRow, editor, field, clickButton };
+    return {
+      fixture,
+      element,
+      loader,
+      documentLoader,
+      settle,
+      rowNames,
+      openRow,
+      editor,
+      editorElement,
+      field,
+      clickButton,
+    };
   }
 
   it('lists the exercises with their groups, metrics and step', async () => {
@@ -202,7 +220,7 @@ describe('Exercises', () => {
   });
 
   it('refuses what the API would refuse, without sending it', async () => {
-    const { element, field, clickButton } = await render();
+    const { editorElement, field, clickButton } = await render();
 
     await clickButton('New exercise');
     await (await field('Name')).input.setValue('   ');
@@ -213,7 +231,9 @@ describe('Exercises', () => {
     expect(await (await field('Weight step (kg)')).formField.getErrors()).toEqual([
       'Enter a step from 0.01 to 100 kg, with at most 2 decimals.',
     ]);
-    expect(element.querySelector('#muscle-groups-error')?.textContent?.trim()).toBe('Pick at least one muscle group.');
+    expect(editorElement()?.querySelector('#muscle-groups-error')?.textContent?.trim()).toBe(
+      'Pick at least one muscle group.',
+    );
   });
 
   it('accepts a weight step that floating point would get wrong', async () => {
@@ -228,8 +248,8 @@ describe('Exercises', () => {
     expect(httpTesting.expectOne({ method: 'POST', url: '/api/exercises' }).request.body.weightStep).toBe(1.15);
   });
 
-  it('edits the selected exercise', async () => {
-    const { openRow, field, clickButton, settle, element } = await render();
+  it('edits an exercise in a dialog, which closes once it is saved', async () => {
+    const { openRow, field, clickButton, settle, rowNames, editorElement } = await render();
 
     await openRow('Bench press');
     expect(await (await field('Name')).input.getValue()).toBe('Bench press');
@@ -242,11 +262,24 @@ describe('Exercises', () => {
     update.flush({ ...benchPress, name: 'Flat bench press' });
     await settle();
 
-    expect(element.querySelector('app-exercise-editor h2')?.textContent?.trim()).toBe('Flat bench press');
+    expect(editorElement()).toBeNull();
+    expect(rowNames()).toEqual(['Flat bench press', 'Plank', 'Walking lunge']);
+  });
+
+  it('closes the dialog on Cancel without sending anything', async () => {
+    const { openRow, field, clickButton, settle, rowNames, editorElement } = await render();
+
+    await openRow('Bench press');
+    await (await field('Name')).input.setValue('Flat bench press');
+    await clickButton('Cancel');
+    await settle();
+
+    expect(editorElement()).toBeNull();
+    expect(rowNames()).toEqual(['Bench press', 'Plank', 'Walking lunge']);
   });
 
   it('archives an exercise, which leaves the active list', async () => {
-    const { openRow, clickButton, settle, rowNames, element } = await render();
+    const { openRow, clickButton, settle, rowNames, editorElement } = await render();
 
     await openRow('Plank');
     await clickButton('Archive');
@@ -256,7 +289,7 @@ describe('Exercises', () => {
     await settle();
 
     expect(rowNames()).toEqual(['Bench press', 'Walking lunge']);
-    expect(element.querySelector('app-exercise-editor')).toBeNull();
+    expect(editorElement()).toBeNull();
   });
 
   it('lists the routines that stop an exercise being archived', async () => {
@@ -267,7 +300,7 @@ describe('Exercises', () => {
     respondInRoutines(httpTesting.expectOne({ method: 'POST', url: `/api/exercises/${benchPress.id}/archive` }));
     await settle();
 
-    const dialog = await documentLoader.getHarness(RadDialogHarness);
+    const dialog = await documentLoader.getHarness(RadDialogHarness.with({ titleText: "Can't archive this exercise" }));
     expect(await dialog.getTitleText()).toBe("Can't archive this exercise");
     expect(await dialog.getText()).toContain('“Bench press” is in these routines. Remove it from them first:');
     expect(await dialog.getText()).toContain('Push day');
@@ -276,7 +309,7 @@ describe('Exercises', () => {
   });
 
   it('says a create went over the exercise limit', async () => {
-    const { field, clickButton, settle, editor, element } = await render();
+    const { field, clickButton, settle, editor, editorElement } = await render();
 
     await clickButton('New exercise');
     await (await field('Name')).input.setValue('Incline press');
@@ -287,13 +320,13 @@ describe('Exercises', () => {
       .flush({ title: 'Too many exercises.', status: 409 }, { status: 409, statusText: 'Conflict' });
     await settle();
 
-    expect(element.querySelector('app-exercise-editor [role="alert"]')?.textContent).toContain(
+    expect(editorElement()?.querySelector('[role="alert"]')?.textContent).toContain(
       "You've reached the most exercises",
     );
   });
 
   it('treats an archive 409 without routines as a server error, not the exercise limit', async () => {
-    const { openRow, clickButton, settle, element } = await render();
+    const { openRow, clickButton, settle, editorElement } = await render();
 
     await openRow('Bench press');
     await clickButton('Archive');
@@ -302,7 +335,7 @@ describe('Exercises', () => {
       .flush({ title: 'Conflict.', status: 409 }, { status: 409, statusText: 'Conflict' });
     await settle();
 
-    const alert = element.querySelector('app-exercise-editor [role="alert"]')?.textContent;
+    const alert = editorElement()?.querySelector('[role="alert"]')?.textContent;
     expect(alert).toContain('Something went wrong on our side');
     expect(alert).not.toContain("You've reached the most exercises");
   });
@@ -330,7 +363,7 @@ describe('Exercises', () => {
   });
 
   it('says so when a save could not reach the API', async () => {
-    const { openRow, clickButton, settle, element } = await render();
+    const { openRow, clickButton, settle, editorElement } = await render();
 
     await openRow('Plank');
     await clickButton('Save');
@@ -339,9 +372,7 @@ describe('Exercises', () => {
       .flush(null, { status: 0, statusText: 'Unknown Error' });
     await settle();
 
-    expect(element.querySelector('app-exercise-editor [role="alert"]')?.textContent).toContain(
-      "Couldn't reach Workouterr",
-    );
+    expect(editorElement()?.querySelector('[role="alert"]')?.textContent).toContain("Couldn't reach Workouterr");
   });
 });
 

@@ -13,17 +13,10 @@
         <rad-form-input-radio [value]="option">{{ t('exercises.views.' + option) }}</rad-form-input-radio>
       }
     </rad-form-input-radio-group>
-    <rad-button variant="primary" size="lg" icon="plus" (click)="startNew()">{{ t('exercises.new') }}</rad-button>
+    <rad-button variant="primary" size="lg" icon="plus" (click)="openEditor(null)">{{ t('exercises.new') }}</rad-button>
   </div>
 
-  <!-- The list and, while one is open, the form beside it; stacked when the screen is narrow (iPad portrait). -->
-  <div
-    [class]="
-      editing()
-        ? 'grid grid-cols-1 items-start gap-4 p-gutter-screen lg:grid-cols-[minmax(0,1fr)_340px]'
-        : 'grid grid-cols-1 items-start gap-4 p-gutter-screen'
-    "
-  >
+  <div class="p-gutter-screen">
     <div class="flex min-w-0 flex-col gap-3">
       <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
         <rad-form-input-text
@@ -66,9 +59,8 @@
               <li>
                 <button
                   type="button"
-                  class="grid min-h-control-sm w-full cursor-pointer grid-cols-[minmax(0,1fr)_minmax(0,11rem)_7.5rem_4.5rem] items-center gap-2.5 border-b border-border-hairline px-3.5 py-2 text-left [transition:var(--transition-control)] hover:bg-surface-hover focus-visible:ring-3 focus-visible:ring-accent-ring focus-visible:outline-none focus-visible:ring-inset aria-[current=true]:bg-surface-selected"
-                  [attr.aria-current]="exercise.id === selectedExercise()?.id ? 'true' : null"
-                  (click)="select(exercise)"
+                  class="grid min-h-control-sm w-full cursor-pointer grid-cols-[minmax(0,1fr)_minmax(0,11rem)_7.5rem_4.5rem] items-center gap-2.5 border-b border-border-hairline px-3.5 py-2 text-left [transition:var(--transition-control)] hover:bg-surface-hover focus-visible:ring-3 focus-visible:ring-accent-ring focus-visible:outline-none focus-visible:ring-inset"
+                  (click)="openEditor(exercise)"
                 >
                   <span class="min-w-0">
                     <span class="block truncate font-medium text-text-strong">{{ exercise.name }}</span>
@@ -107,9 +99,5 @@
         </div>
       }
     </div>
-
-    @if (editing()) {
-      <app-exercise-editor class="lg:sticky lg:top-4" [exercise]="selectedExercise()" (changed)="onChanged($event)" />
-    }
   </div>
 </div>

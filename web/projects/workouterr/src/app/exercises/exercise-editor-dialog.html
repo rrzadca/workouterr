@@ -1,21 +1,16 @@
-<rad-card class="shadow-card" *transloco="let t">
-  @let currentExercise = exercise();
-  <rad-card-header>
-    <div class="flex min-w-0 flex-col gap-0.5">
-      <h2 class="truncate text-title-3 font-semibold tracking-title text-text-strong">
-        {{ currentExercise ? currentExercise.name : t('exercises.newTitle') }}
-      </h2>
-      <span class="text-label text-text-muted">
-        @if (!currentExercise) {
-          {{ t('exercises.newSubtitle') }}
-        } @else if (currentExercise.isArchived) {
-          {{ t('exercises.archivedSubtitle') }}
-        }
-      </span>
-    </div>
-  </rad-card-header>
+<ng-container *transloco="let t">
+  @let currentExercise = exercise;
+  <h2 radDialogTitle class="truncate">
+    {{ currentExercise ? currentExercise.name : t('exercises.newTitle') }}
+  </h2>
 
   <form [formRoot]="exerciseForm" class="flex flex-col gap-4">
+    @if (!currentExercise) {
+      <p class="-mt-2 text-label text-text-muted">{{ t('exercises.newSubtitle') }}</p>
+    } @else if (currentExercise.isArchived) {
+      <p class="-mt-2 text-label text-text-muted">{{ t('exercises.archivedSubtitle') }}</p>
+    }
+
     @let nameError = nameErrorKey();
     <rad-form-field
       [label]="t('exercises.name')"
@@ -103,21 +98,25 @@
       </p>
     }
 
-    <div class="flex flex-wrap gap-2">
+    <!-- Inside the form, so Save submits it. Archive or restore sits at the start, away from Save. -->
+    <rad-dialog-footer>
+      @if (currentExercise) {
+        <span class="me-auto">
+          @if (currentExercise.isArchived) {
+            <rad-button size="lg" icon="archive-restore" [loading]="archiving()" (click)="restore()">
+              {{ t('exercises.restore') }}
+            </rad-button>
+          } @else {
+            <rad-button variant="ghost" size="lg" icon="archive" [loading]="archiving()" (click)="archive()">
+              {{ t('exercises.archive') }}
+            </rad-button>
+          }
+        </span>
+      }
+      <rad-button size="lg" (click)="cancel()">{{ t('exercises.cancel') }}</rad-button>
       <rad-button type="submit" variant="primary" size="lg" [loading]="exerciseForm().submitting()">
         {{ t('exercises.save') }}
       </rad-button>
-      @if (currentExercise) {
-        @if (currentExercise.isArchived) {
-          <rad-button size="lg" icon="archive-restore" [loading]="archiving()" (click)="restore()">
-            {{ t('exercises.restore') }}
-          </rad-button>
-        } @else {
-          <rad-button variant="ghost" size="lg" icon="archive" [loading]="archiving()" (click)="archive()">
-            {{ t('exercises.archive') }}
-          </rad-button>
-        }
-      }
-    </div>
+    </rad-dialog-footer>
   </form>
-</rad-card>
+</ng-container>
