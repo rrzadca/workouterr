@@ -31,6 +31,9 @@ ASP.NET Core Minimal API on .NET 10. Run every command from `api/`.
   `BadHttpRequestException`).
 - Query binding parses enums by their C# names, so an enum in the query string is bound as a string and read with
   `WireNames.TryParse`; an operation transformer on the endpoint shows the enum in the document.
+- Every account is created by `UserCreationService` (CLI now, registration later): the user and a copy of the
+  starter exercises (`Exercises/starter-exercises.json`, embedded; English and Polish texts) in one transaction.
+  `StarterExercisesTests` checks the file against `ExerciseRequest`'s limits in every language.
 - A user's own records are looked up by ID and user ID together (`ClaimsPrincipal.UserId()`, from the login cookie,
   without loading the user); another user's record is 404, never 403.
 - What middleware adds to every endpoint is described in the document by `MiddlewareResponsesTransformer`: the client
@@ -46,9 +49,10 @@ ASP.NET Core Minimal API on .NET 10. Run every command from `api/`.
   stays in the `postgres-data` volume).
 - `dotnet build`: build the solution (warnings fail it).
 - `dotnet run --project src/Workouterr.Api`: run the API on `http://localhost:5080`.
-- `dotnet run --project src/Workouterr.Api -- user create <email>`: create a user (verified) in the database the
-  API's configuration points at; asks for the password twice with hidden input, or reads one line from a pipe. Exit
-  code 1 with Identity's messages when the email is taken or the password breaks the rules.
+- `dotnet run --project src/Workouterr.Api -- user create <email> [--language pl]`: create a user (verified, `en` by
+  default) with the starter exercises in their language, in the database the API's configuration points at; asks for
+  the password twice with hidden input, or reads one line from a pipe. Exit code 1 with Identity's messages when the
+  email is taken or the password breaks the rules.
 - `curl http://localhost:5080/api/health`: `{"status":"Healthy"}` (200), or Problem Details (503) when the database is
   down.
 - `http://localhost:5080/api/doc`: Swagger UI over the live OpenAPI document (`/api/openapi/v1.json`), Development

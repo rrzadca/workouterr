@@ -16,6 +16,10 @@ public class User : IdentityUser<Guid>
 
     /// <summary>Whether the rest timer plays a sound at zero (the full-screen cue shows either way).</summary>
     public bool RestTimerSound { get; set; } = true;
+
+    /// <summary>Chosen when the account is created (English unless told otherwise); the starter exercises are copied
+    /// in it.</summary>
+    public Language Language { get; set; }
 }
 
 // Lower-case names on the wire, the values the app's `data-theme` attribute takes. The converter sits on the type, so

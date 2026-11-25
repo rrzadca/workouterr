@@ -315,7 +315,7 @@ public class ExerciseEndpointTests(ApiFactory factory)
 
     private async Task<HttpClient> LoggedInClientAsync(string email)
     {
-        await factory.CreateUserAsync(email);
+        await factory.CreateUserWithoutExercisesAsync(email);
         return await factory.LogInAsync(email);
     }
 

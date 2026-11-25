@@ -1,8 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Workouterr.Api.Auth;
+using Workouterr.Api.Persistence;
 using Workouterr.Api.Users;
 
 namespace Workouterr.Api.Tests;
@@ -19,6 +21,19 @@ public static class TestUsers
         var (result, user) = await scope.ServiceProvider.GetRequiredService<UserCreationService>()
             .CreateAsync(email, Password);
         Assert.True(result.Succeeded);
+        return user;
+    }
+
+    // For tests that count or name exactly the exercises they store: the user without the starter set (copying it is
+    // UserCreationTests' subject).
+    public static async Task<User> CreateUserWithoutExercisesAsync(
+        this WebApplicationFactory<Program> application, string email)
+    {
+        var user = await application.CreateUserAsync(email);
+        using var scope = application.Services.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<AppDbContext>().Exercises
+            .Where(exercise => exercise.UserId == user.Id)
+            .ExecuteDeleteAsync(TestContext.Current.CancellationToken);
         return user;
     }
 

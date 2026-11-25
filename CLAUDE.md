@@ -59,7 +59,7 @@ volumes are `workouterr_*`.
   `postgres` if needed). Run it before starting a new API.
 - `docker compose up -d --wait`: start the stack and wait until it is running; `down` stops it and keeps the
   volumes.
-- `docker compose run --rm api user create <email>`: the API's CLI commands, inside the stack.
+- `docker compose run --rm api user create <email> [--language pl]`: the API's CLI commands, inside the stack.
 - `./deploy.sh [--skip-e2e]`: deploy the current commit to the server (clean working tree, `GITHUB_PACKAGES_TOKEN`
   set, Docker running). Runs every check and test first and stops on the first failure, before anything is built or
   sent; then builds the images for `linux/amd64`, loads them on the server over SSH, runs the migrations, starts the

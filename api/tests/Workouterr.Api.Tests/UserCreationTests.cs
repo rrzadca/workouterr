@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Workouterr.Api.Exercises;
 using Workouterr.Api.Persistence;
 using Workouterr.Api.Users;
 
@@ -27,6 +28,49 @@ public class UserCreationTests(ApiFactory factory)
         Assert.Equal(
             PasswordVerificationResult.Success,
             passwordHasher.VerifyHashedPassword(storedUser, storedUser.PasswordHash!, TestUsers.Password));
+    }
+
+    [Theory]
+    [InlineData(Language.English)]
+    [InlineData(Language.Polish)]
+    public async Task Create_CopiesTheStarterExercises_InTheUsersLanguage(Language language)
+    {
+        using var scope = factory.Services.CreateScope();
+        var userCreation = scope.ServiceProvider.GetRequiredService<UserCreationService>();
+        var starterExercises = scope.ServiceProvider.GetRequiredService<StarterExercises>().All;
+
+        var (_, user) = await userCreation.CreateAsync($"starter-{language}@example.com", TestUsers.Password, language);
+
+        var database = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Assert.Equal(language, (await database.Users.AsNoTracking()
+            .SingleAsync(candidate => candidate.Id == user.Id, TestContext.Current.CancellationToken)).Language);
+        var exercises = await database.Exercises.AsNoTracking()
+            .Where(exercise => exercise.UserId == user.Id)
+            .ToListAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(
+            starterExercises.Select(starter => starter.Name.In(language)).Order(),
+            exercises.Select(exercise => exercise.Name).Order());
+        var benchPress = Assert.Single(exercises, exercise => exercise.Name == starterExercises[0].Name.In(language));
+        Assert.Equal(starterExercises[0].Description.In(language), benchPress.Description);
+        Assert.Equal(starterExercises[0].WeightStep, benchPress.WeightStep);
+        Assert.Equal(starterExercises[0].MuscleGroups, benchPress.MuscleGroups);
+        Assert.All(exercises, exercise => Assert.False(exercise.IsArchived));
+    }
+
+    [Fact]
+    public async Task Create_IsEnglish_UnlessTold()
+    {
+        using var scope = factory.Services.CreateScope();
+        var userCreation = scope.ServiceProvider.GetRequiredService<UserCreationService>();
+
+        var (_, user) = await userCreation.CreateAsync("starter-default@example.com", TestUsers.Password);
+
+        Assert.Equal(Language.English, user.Language);
+        var names = await scope.ServiceProvider.GetRequiredService<AppDbContext>().Exercises.AsNoTracking()
+            .Where(exercise => exercise.UserId == user.Id)
+            .Select(exercise => exercise.Name)
+            .ToListAsync(TestContext.Current.CancellationToken);
+        Assert.Contains("Bench press", names);
     }
 
     [Fact]

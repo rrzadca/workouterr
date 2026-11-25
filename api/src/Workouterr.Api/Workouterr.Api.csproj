@@ -6,6 +6,11 @@
     <OpenApiGenerateDocumentsOptions>--file-name workouterr</OpenApiGenerateDocumentsOptions>
   </PropertyGroup>
 
+  <!-- Inside the assembly, so the file travels with the API wherever it runs (container included). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Exercises/starter-exercises.json" LogicalName="starter-exercises.json" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Workouterr.Domain\Workouterr.Domain.csproj" />
   </ItemGroup>
