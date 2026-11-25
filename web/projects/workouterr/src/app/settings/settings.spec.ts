@@ -12,7 +12,7 @@ import { TranslocoTestingModule } from '@jsverse/transloco';
 import type { SettingsResponse } from '@workouterr/api-client';
 import english from '../../../public/i18n/en.json';
 import { AuthService } from '../auth/auth';
-import { appIcons } from '../icons';
+import { appIcons } from '../shared/icons';
 import { Settings } from './settings';
 
 describe('Settings', () => {

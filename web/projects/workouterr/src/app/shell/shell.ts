@@ -4,7 +4,7 @@ import { TranslocoDirective } from '@jsverse/transloco';
 import { RadButton } from '@rrzadca/radinf-ui/button';
 import { RadIcon } from '@rrzadca/radinf-ui/icon';
 import { AuthService } from '../auth/auth';
-import type { AppIconName } from '../icons';
+import type { AppIconName } from '../shared/icons';
 import { AccountSettingsService } from '../settings/account-settings';
 import { type Theme, ThemeService } from '../theme';
 

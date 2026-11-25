@@ -21,6 +21,10 @@ export const routes: Routes = [
     canActivate: [requireLogin],
     children: [
       { path: '', loadComponent: () => import('./home/home').then((module) => module.Home) },
+      {
+        path: 'exercises',
+        loadComponent: () => import('./exercises/exercises').then((module) => module.Exercises),
+      },
       { path: 'settings', loadComponent: () => import('./settings/settings').then((module) => module.Settings) },
     ],
   },

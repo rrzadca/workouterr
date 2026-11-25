@@ -46,7 +46,7 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
   from their file in `docs/design/components/` with Tailwind and the design tokens. Dialogs open from code:
   `inject(RadDialog).open(SomeDialog, { … })`, with an `<h2 radDialogTitle>` and a `<rad-dialog-footer>` in the
   content (see `new-version-dialog/`).
-- Icons: Lucide drawings as path data in `src/app/icons.ts`, registered with `provideRadIcons` and shown with
+- Icons: Lucide drawings as path data in `src/app/shared/icons.ts`, registered with `provideRadIcons` and shown with
   `<rad-icon name="…">` or a component's `icon` input; add one there when a screen needs it (the file says how).
 - Global styles live in the app: `projects/workouterr/src/styles/global.css` (Tailwind, fonts, radinf-ui's
   stylesheet, tokens, theme), loaded by the app's `styles.css`. PostCSS (Tailwind) is configured once, in
@@ -61,6 +61,13 @@ Angular workspace (standalone, zoneless, Tailwind CSS v4). Run every command fro
 - Account settings (`src/app/settings/account-settings.ts`): `AccountSettingsService` loads `/api/settings` (an
   `httpResource`) whenever someone is logged in, and `update()` PATCHes only the fields it is given, keeping the
   settings the API answers with. The sidebar's name and the settings page read it.
+- Exercises (`src/app/exercises/`): the page loads every exercise of the view (active or archived) once and filters by
+  name and muscle group in the browser; `ExerciseEditor` is the form beside it and `ExerciseApi` the calls that change
+  something. A form field typed as text but sent as a number (a step) is checked with the request field's zod schema
+  through a string schema (`sentAs` in `exercise-editor.ts`), because Signal Forms needs a schema of the field's own
+  type. `shared/utils/format.ts` writes and reads decimals and durations; `api/request-error.ts` turns a failed request into the
+  `unreachable` / `serverError` message every page shows. Stand-ins wait on radinf-ui: segmented control (#40),
+  toggle chips (#41), selectable table rows (#42).
 - Theme: `data-theme="light" | "dark"` on `<html>`, set by `ThemeService` (`src/app/theme.ts`) when the app starts,
   from `localStorage['workouterr.theme']`, else the system theme. Once the account's settings arrive, their theme
   replaces that copy (`null`, never chosen, clears it); the sun / moon button switches at once and saves the choice

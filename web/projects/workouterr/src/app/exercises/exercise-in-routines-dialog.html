@@ -1,0 +1,16 @@
+<ng-container *transloco="let t">
+  <h2 radDialogTitle>{{ t('exercises.inRoutinesTitle') }}</h2>
+  <div [id]="descriptionId" class="flex flex-col gap-3">
+    <p class="text-pretty text-text-muted">{{ t('exercises.inRoutinesMessage', { name: data.exerciseName }) }}</p>
+    <ul class="flex flex-wrap gap-1.5">
+      @for (routine of data.routines; track routine.id) {
+        <li>
+          <rad-badge>{{ routine.name }}</rad-badge>
+        </li>
+      }
+    </ul>
+  </div>
+  <rad-dialog-footer>
+    <rad-button variant="primary" size="lg" (click)="close()">{{ t('exercises.inRoutinesClose') }}</rad-button>
+  </rad-dialog-footer>
+</ng-container>

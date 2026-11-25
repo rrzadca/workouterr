@@ -1,0 +1,123 @@
+<rad-card class="shadow-card" *transloco="let t">
+  @let currentExercise = exercise();
+  <rad-card-header>
+    <div class="flex min-w-0 flex-col gap-0.5">
+      <h2 class="truncate text-title-3 font-semibold tracking-title text-text-strong">
+        {{ currentExercise ? currentExercise.name : t('exercises.newTitle') }}
+      </h2>
+      <span class="text-label text-text-muted">
+        @if (!currentExercise) {
+          {{ t('exercises.newSubtitle') }}
+        } @else if (currentExercise.isArchived) {
+          {{ t('exercises.archivedSubtitle') }}
+        }
+      </span>
+    </div>
+  </rad-card-header>
+
+  <form [formRoot]="exerciseForm" class="flex flex-col gap-4">
+    @let nameError = nameErrorKey();
+    <rad-form-field
+      [label]="t('exercises.name')"
+      [error]="nameError ? t(nameError, { max: limits.nameMax }) : undefined"
+    >
+      <rad-form-input-text size="lg" autocomplete="off" [formField]="exerciseForm.name" />
+    </rad-form-field>
+
+    @let descriptionError = descriptionErrorKey();
+    <rad-form-field
+      [label]="t('exercises.description')"
+      [error]="descriptionError ? t(descriptionError, { max: limits.descriptionMax }) : undefined"
+    >
+      <rad-form-input-textarea size="lg" [rows]="3" [formField]="exerciseForm.description" />
+    </rad-form-field>
+
+    <!-- Stand-in for a segmented control (rrzadca/radinf-ui#40). -->
+    <rad-form-field [label]="t('exercises.metrics')">
+      <rad-form-input-radio-group size="lg" orientation="horizontal" [formField]="exerciseForm.metrics">
+        @for (metrics of metricOptions; track metrics) {
+          <rad-form-input-radio [value]="metrics">{{ t('exercises.metricsLabels.' + metrics) }}</rad-form-input-radio>
+        }
+      </rad-form-input-radio-group>
+    </rad-form-field>
+
+    @switch (draft().metrics) {
+      @case ('WEIGHT_REPS') {
+        @let weightStepError = weightStepErrorKey();
+        <rad-form-field
+          [label]="t('exercises.weightStep')"
+          [hint]="t('exercises.stepHint')"
+          [error]="weightStepError ? t(weightStepError, weightStepLimits()) : undefined"
+        >
+          <rad-form-input-text size="lg" inputmode="decimal" [formField]="exerciseForm.weightStep" />
+        </rad-form-field>
+      }
+      @case ('TIME') {
+        @let timeStepError = timeStepErrorKey();
+        <rad-form-field
+          [label]="t('exercises.timeStep')"
+          [hint]="t('exercises.stepHint')"
+          [error]="timeStepError ? t(timeStepError, { max: limits.timeStepMax }) : undefined"
+        >
+          <rad-form-input-text size="lg" inputmode="numeric" [formField]="exerciseForm.timeStepSeconds" />
+        </rad-form-field>
+      }
+      @default {
+        <p class="text-label text-text-muted">{{ t('exercises.repsStep') }}</p>
+      }
+    }
+
+    <div class="flex flex-col gap-0.5">
+      <rad-form-input-switch size="lg" ariaDescribedby="per-side-description" [formField]="exerciseForm.perSide">
+        {{ t('exercises.perSide') }}
+      </rad-form-input-switch>
+      <span id="per-side-description" class="text-caption text-text-muted">
+        {{ t('exercises.perSideDescription') }}
+      </span>
+    </div>
+
+    <!-- Stand-in for toggle chips (rrzadca/radinf-ui#41): one checkbox per group, so not one <rad-form-field>. -->
+    @let muscleGroupsError = muscleGroupsErrorKey();
+    <fieldset class="flex flex-col gap-2" [attr.aria-describedby]="muscleGroupsError ? 'muscle-groups-error' : null">
+      <legend class="mb-2 text-label font-medium text-text-strong">{{ t('exercises.muscleGroups') }}</legend>
+      <div class="flex flex-wrap gap-x-4 gap-y-2">
+        @for (group of muscleGroupOptions; track group) {
+          <rad-form-input-checkbox
+            size="lg"
+            [checked]="draft().muscleGroups.includes(group)"
+            (checkedChange)="toggleMuscleGroup(group, $event)"
+          >
+            {{ t('exercises.muscleGroupLabels.' + group) }}
+          </rad-form-input-checkbox>
+        }
+      </div>
+      @if (muscleGroupsError) {
+        <p id="muscle-groups-error" class="text-caption text-status-danger">{{ t(muscleGroupsError) }}</p>
+      }
+    </fieldset>
+
+    @if (requestErrorKey(); as requestError) {
+      <p role="alert" class="flex items-center gap-2 rounded-md bg-status-danger-soft px-3 py-2.5 text-status-danger">
+        <rad-icon name="circle-alert" class="[--rad-icon-size:18px]" />
+        {{ t(requestError) }}
+      </p>
+    }
+
+    <div class="flex flex-wrap gap-2">
+      <rad-button type="submit" variant="primary" size="lg" [loading]="exerciseForm().submitting()">
+        {{ t('exercises.save') }}
+      </rad-button>
+      @if (currentExercise) {
+        @if (currentExercise.isArchived) {
+          <rad-button size="lg" icon="archive-restore" [loading]="archiving()" (click)="restore()">
+            {{ t('exercises.restore') }}
+          </rad-button>
+        } @else {
+          <rad-button variant="ghost" size="lg" icon="archive" [loading]="archiving()" (click)="archive()">
+            {{ t('exercises.archive') }}
+          </rad-button>
+        }
+      }
+    </div>
+  </form>
+</rad-card>
