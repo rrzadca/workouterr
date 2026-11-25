@@ -243,7 +243,9 @@ export class ExerciseEditor {
       this.changed.emit(saved);
       this.toast.show(this.transloco.translate('exercises.saved'), { variant: 'success' });
     } catch (error) {
-      this.requestErrorKey.set(errorKey(error));
+      // Only a create answers 409 for the account's exercise limit.
+      const limitReached = !exercise && isStatus(error, HttpStatusCode.Conflict);
+      this.requestErrorKey.set(limitReached ? 'exercises.limitReached' : errorKey(error));
     }
     return undefined;
   }
@@ -299,22 +301,22 @@ function shownError(field: { touched(): boolean; invalid(): boolean }, key: stri
 
 // The routines from the archive's 409, or null for any other failure.
 function routinesBlockingArchive(error: unknown) {
-  if (!(error instanceof HttpErrorResponse) || error.status !== HttpStatusCode.Conflict) {
+  if (!isStatus(error, HttpStatusCode.Conflict)) {
     return null;
   }
   const problem = ExerciseInRoutinesProblem.safeParse(error.error);
   return problem.success ? problem.data.routines : null;
 }
 
-// A request's failure as a key under `exercises.`: the API's own refusals first, then the ones every request has.
+function isStatus(error: unknown, status: HttpStatusCode): error is HttpErrorResponse {
+  return error instanceof HttpErrorResponse && error.status === status;
+}
+
+// A request's failure as a key under `exercises.`: the 404 every call on an exercise can answer, then the ones every
+// request has. A 409 means something different per call, so the caller checks it first.
 function errorKey(error: unknown) {
-  if (error instanceof HttpErrorResponse) {
-    if (error.status === HttpStatusCode.NotFound) {
-      return 'exercises.notFound';
-    }
-    if (error.status === HttpStatusCode.Conflict) {
-      return 'exercises.limitReached';
-    }
+  if (isStatus(error, HttpStatusCode.NotFound)) {
+    return 'exercises.notFound';
   }
   const kind = requestErrorKind(error);
   return kind ? `exercises.${kind}` : null;

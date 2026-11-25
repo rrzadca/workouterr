@@ -275,6 +275,38 @@ describe('Exercises', () => {
     expect(rowNames()).toContain('Bench press');
   });
 
+  it('says a create went over the exercise limit', async () => {
+    const { field, clickButton, settle, editor, element } = await render();
+
+    await clickButton('New exercise');
+    await (await field('Name')).input.setValue('Incline press');
+    await (await (await editor()).getHarness(RadFormInputCheckboxHarness.with({ label: 'Chest' }))).check();
+    await clickButton('Save');
+    httpTesting
+      .expectOne({ method: 'POST', url: '/api/exercises' })
+      .flush({ title: 'Too many exercises.', status: 409 }, { status: 409, statusText: 'Conflict' });
+    await settle();
+
+    expect(element.querySelector('app-exercise-editor [role="alert"]')?.textContent).toContain(
+      "You've reached the most exercises",
+    );
+  });
+
+  it('treats an archive 409 without routines as a server error, not the exercise limit', async () => {
+    const { openRow, clickButton, settle, element } = await render();
+
+    await openRow('Bench press');
+    await clickButton('Archive');
+    httpTesting
+      .expectOne({ method: 'POST', url: `/api/exercises/${benchPress.id}/archive` })
+      .flush({ title: 'Conflict.', status: 409 }, { status: 409, statusText: 'Conflict' });
+    await settle();
+
+    const alert = element.querySelector('app-exercise-editor [role="alert"]')?.textContent;
+    expect(alert).toContain('Something went wrong on our side');
+    expect(alert).not.toContain("You've reached the most exercises");
+  });
+
   it('shows the archive and restores from it', async () => {
     const { fixture, element, openRow, clickButton, settle, rowNames } = await render();
 
